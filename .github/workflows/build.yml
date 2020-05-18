@@ -1,0 +1,13 @@
+name: Build commit
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v1
+      - name: Build
+        run: ./gradlew build
