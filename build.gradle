@@ -1,0 +1,123 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.6.3'
+    }
+}
+
+plugins {
+    id 'org.jetbrains.kotlin.multiplatform' version '1.3.72'
+}
+repositories {
+    mavenCentral()
+    google()
+    jcenter()
+}
+
+apply plugin: 'com.android.library'
+
+group 'io.rebble'
+version '0.0.1'
+
+apply plugin: 'maven-publish'
+
+android { // android specific configuration
+    compileSdkVersion 29 // SDK version to compile against
+    defaultConfig {
+        minSdkVersion 15 // min SDK version supported by this lib
+        targetSdkVersion 29 // max SDK version supported by this lib
+        versionCode 1
+        versionName '0.0.1'
+        testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner' // See notes #1
+    }
+
+    buildTypes { // the build variants for the lib
+        release {
+            minifyEnabled false
+        }
+    }
+
+    sourceSets {
+        main {
+            manifest.srcFile 'src/androidMain/AndroidManifest.xml'// See notes #4
+            java.srcDirs = ['src/androidMain/kotlin']
+            res.srcDirs = ['src/androidMain/res']
+        }
+    }
+}
+
+dependencies {
+    //androidTestImplementation 'com.android.support.test:runner:1.0.2'
+}
+
+kotlin {
+    jvm {
+        compilations.main.output // get the main compilation output
+        compilations.test.runtimeDependencyFiles // get the test runtime classpath
+    }
+
+    /*iosArm64("ios") {
+        binaries {
+            framework()
+        }
+    }*/
+    // use the android preset
+    android("android") {
+        // you can also publish both "release" and "debug"
+        publishLibraryVariants("release")
+    }
+
+    sourceSets {
+        jvmMain {
+            dependencies {
+                implementation kotlin('stdlib')
+            }
+        }
+        jvmTest {
+            dependencies {
+                implementation kotlin('test')
+                implementation kotlin('test-junit')
+                implementation kotlin('reflect')
+            }
+        }
+
+        commonMain {
+            dependencies {
+                implementation kotlin('stdlib-common')
+            }
+        }
+        commonTest {
+            dependencies {
+                implementation kotlin('test-common')
+                implementation kotlin('test-annotations-common')
+                implementation kotlin('reflect')
+            }
+        }
+        androidMain {
+            dependencies {
+                implementation kotlin('stdlib')
+            }
+        }
+
+        /*iosMain {
+        }*/
+    }
+}
+
+/*task iosTest {
+    def device = project.findProperty("iosDevice")?.toString() ?: "iPhone 8"
+    dependsOn kotlin.targets.ios.binaries.getTest('DEBUG').linkTaskName
+    group = JavaBasePlugin.VERIFICATION_GROUP
+    description = "Runs tests for target 'ios' on an iOS simulator"
+
+    doLast {
+        def binary = kotlin.targets.ios.binaries.getTest('DEBUG').outputFile
+        exec {
+            commandLine 'xcrun', 'simctl', 'spawn', device, binary.absolutePath
+        }
+    }
+}*/
