@@ -61,11 +61,11 @@ kotlin {
         compilations.test.runtimeDependencyFiles // get the test runtime classpath
     }
 
-    /*iosArm64("ios") {
+    iosArm64("ios") {
         binaries {
             framework()
         }
-    }*/
+    }
     // use the android preset
     android("android") {
         // you can also publish both "release" and "debug"
@@ -111,8 +111,11 @@ kotlin {
             }
         }
 
-        /*iosMain {
-        }*/
+        iosMain {
+            dependencies {
+                implementation kotlin('stdlib')
+            }
+        }
     }
 }
 
