@@ -48,6 +48,9 @@ android { // android specific configuration
 
     buildTypes { // the build variants for the lib
         release {
+            minifyEnabled true
+        }
+        debug {
             minifyEnabled false
         }
     }
@@ -80,6 +83,7 @@ kotlin {
     android("android") {
         // you can also publish both "release" and "debug"
         publishLibraryVariants("release")
+        publishLibraryVariants("debug")
     }
 
     sourceSets {
