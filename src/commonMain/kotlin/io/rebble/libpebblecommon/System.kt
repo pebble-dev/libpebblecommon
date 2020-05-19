@@ -30,6 +30,47 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
         type = command.get()
     }
 
+    enum class OSType(val value: UInt) {
+        Unknown(0u),
+        IOS(1u),
+        Android(2u),
+        MacOS(3u),
+        Linux(4u),
+        Windows(5u)
+    }
+
+    enum class SessionCapsFlag(val value: UByte) {
+        Geolocation(1u),
+        GammaRay(Int.MIN_VALUE.toUByte())
+    }
+
+    enum class ProtocolCapsFlag(val value: UByte) {
+        SupportsAppRunStateProtocol(0u),
+        SupportsInfiniteLogDump(1u),
+        SupportsExtendedMusicProtocol(2u),
+        SupportsTwoWayDismissal(3u),
+        SupportsLocalization(4u),
+        Supports8kAppMessage(5u),
+        SupportsHealthInsights(6u),
+        SupportsSendTextApp(8u),
+        SupportsUnreadCoreDump(10u),
+        SupportsWeatherApp(11u),
+        SupportsRemindersApp(12u),
+        SupportsWorkoutApp(13u),
+        SupportsFwUpdateAcrossDisconnection(21u),
+        SupportsSmoothFwInstallProgress(14u);
+
+        companion object {
+            fun makeFlags(vararg flags: ProtocolCapsFlag): UInt {
+                var ret: UInt = 0u
+                flags.forEach {flag ->
+                    ret or flag.value.toUInt()
+                }
+                return ret
+            }
+        }
+    }
+
     class AppVersionRequest : PhoneAppVersion(Message.AppVersionRequest)
     class AppVersionResponse : PhoneAppVersion(Message.AppVersionResponse) {
         val protocolVersion = SUInt(m) // Unused as of v3.0

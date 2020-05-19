@@ -4,9 +4,11 @@ import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.protocol.PacketRegistry
 import io.rebble.libpebblecommon.protocol.PebblePacket
 import io.rebble.libpebblecommon.protocol.ProtocolEndpoint
-
+import io.rebble.libpebblecommon.PhoneAppVersion.ProtocolCapsFlag
 @ExperimentalUnsignedTypes
 class ProtocolHandler(private val send: (ByteArray) -> Unit) {
+    var protocolCaps: UInt = ProtocolCapsFlag.makeFlags(ProtocolCapsFlag.SupportsSendTextApp)
+
     init {
         PacketRegistry.setup()
     }
@@ -29,11 +31,13 @@ class ProtocolHandler(private val send: (ByteArray) -> Unit) {
 
                 ProtocolEndpoint.PHONE_VERSION -> {
                     val res = PhoneAppVersion.AppVersionResponse()
-                    res.protocolVersion.set(1u)
+                    res.protocolVersion.set(0xffffffffu)
+                    res.sessionCaps.    set(0u)
+                    res.platformFlags.  set(0u)
                     res.majorVersion.   set(2u)
                     res.minorVersion.   set(2u)
                     res.bugfixVersion.  set(0u)
-                    //TODO: Platform flags + CAPS
+                    res.platformFlags.  set(protocolCaps)
                     _send(res.serialize().toByteArray(), res)
                 }
 
