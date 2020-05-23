@@ -1,6 +1,6 @@
 package io.rebble.libpebblecommon.structmapper
 
-import io.rebble.libpebblecommon.DataBuffer
+import io.rebble.libpebblecommon.util.DataBuffer
 
 /**
  * Maps class properties to a struct equivalent
@@ -17,10 +17,10 @@ class StructMapper: Mappable {
         return struct.toList()
     }
 
-    override fun toBytes(endianness: Char): UByteArray {
+    override fun toBytes(): UByteArray {
         var bytes = ubyteArrayOf()
         getStruct().forEach {
-            bytes += it.toBytes(endianness)
+            bytes += it.toBytes()
         }
         return bytes
     }
