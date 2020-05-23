@@ -1,21 +1,38 @@
 package io.rebble.libpebblecommon
 
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
-import io.rebble.libpebblecommon.protocol.PacketRegistry
-import io.rebble.libpebblecommon.protocol.PebblePacket
-import io.rebble.libpebblecommon.protocol.ProtocolEndpoint
-import io.rebble.libpebblecommon.structmapper.SByte
-import io.rebble.libpebblecommon.structmapper.SUInt
-import io.rebble.libpebblecommon.structmapper.SULong
-import io.rebble.libpebblecommon.structmapper.StructMapper
+import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
+import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
+import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
+import io.rebble.libpebblecommon.structmapper.*
 
 @ExperimentalUnsignedTypes
-class TimeMessage(private val message: Message) : PebblePacket(ProtocolEndpoint.TIME) {
+open class TimeMessage(private val message: Message) : PebblePacket(
+    ProtocolEndpoint.TIME) {
     enum class Message(val value: UByte) {
         GetTimeRequest(0x00u),
         GetTimeResponse(0x01u),
         SetLocalTime(0x02u),
         SetUTC(0x03u)
+    }
+    val command = SByte(m, message.value)
+    init {
+        type = command.get()
+    }
+
+    class GetTimeRequest : TimeMessage(Message.GetTimeRequest)
+    class GetTimeResponse(time: UInt = 0u) : TimeMessage(Message.GetTimeResponse) {
+        val time = SUInt(m, time)
+    }
+
+    class SetLocalTime(time: UInt = 0u) : TimeMessage(Message.SetLocalTime) {
+        val time = SUInt(m, time)
+    }
+    class SetUTC(unixTime: UInt = 0u, utcOffset: Short = 0, timeZoneName: String) : TimeMessage(Message.SetUTC) {
+        val unixTime = SUInt(m, unixTime)
+        val utcOffset = SShort(m, utcOffset)
+        @ExperimentalStdlibApi
+        val timeZoneName = SString(m, timeZoneName)
     }
 }
 
@@ -44,7 +61,7 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
         GammaRay(Int.MIN_VALUE.toUByte())
     }
 
-    enum class ProtocolCapsFlag(val value: UByte) {
+    enum class ProtocolCapsFlag(val value: UInt) {
         SupportsAppRunStateProtocol(0u),
         SupportsInfiniteLogDump(1u),
         SupportsExtendedMusicProtocol(2u),
@@ -64,11 +81,23 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
             fun makeFlags(vararg flags: ProtocolCapsFlag): UInt {
                 var ret: UInt = 0u
                 flags.forEach {flag ->
-                    ret or flag.value.toUInt()
+                    ret or flag.value
                 }
                 return ret
             }
         }
+    }
+
+    enum class PlatformFlag(val value: UInt) {
+        Telephony(16u),
+        SMS(32u),
+        GPS(64u),
+        BTLE(128u),
+        CameraFront(240u),
+        CameraRear(256u),
+        Accelerometer(512u),
+        Gyroscope(1024u),
+        Compass(2048u);
     }
 
     class AppVersionRequest : PhoneAppVersion(Message.AppVersionRequest)
@@ -85,6 +114,46 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
 
     companion object {
         val endpoint = ProtocolEndpoint.PHONE_VERSION
+    }
+}
+
+@ExperimentalUnsignedTypes
+open class SystemMessage(message: Message) : PebblePacket(endpoint) {
+    enum class Message(val value: UByte) {
+        NewFirmwareAvailable(0x00u),
+        FirmwareUpdateStart(0x01u),
+        FirmwareUpdateComplete(0x02u),
+        FirmwareUpdateFailed(0x03u),
+        FirmwareUpToDate(0x04u),
+        StopReconnecting(0x06u),
+        StartReconnecting(0x07u),
+        MAPDisabled(0x08u),
+        MAPEnabled(0x09u),
+        FirmwareUpdateStartResponse(0x0au)
+    }
+    val command = SByte(m, message.value)
+    val messageType = SByte(m)
+    init {
+        type = command.get()
+        TODO("Incomplete packet declaration")
+    }
+
+    companion object {
+        val endpoint = ProtocolEndpoint.SYSTEM_MESSAGE
+    }
+}
+
+@ExperimentalUnsignedTypes
+class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : PebblePacket(endpoint) {
+    val command = SByte(m, opcode)
+    //val discoverable = SBool(m, discoverable)
+    val duration = SUShort(m, duration)
+    init {
+        type = command.get()
+        TODO("Incomplete packet declaration")
+    }
+    companion object {
+        val endpoint = ProtocolEndpoint.BLE_CONTROL
     }
 }
 
