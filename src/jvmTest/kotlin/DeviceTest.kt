@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import java.lang.Exception
 import kotlin.test.Test
 import java.util.*
+import kotlin.system.exitProcess
 import kotlin.test.assertTrue
 
 @ExperimentalUnsignedTypes
@@ -40,7 +41,10 @@ class DeviceTests {
     }
 
     init {
-        if (phoneHost == "change-me") throw Exception("Need to set phone dev connection host, note that while this is a test it's intended for manually testing packets on a real device")
+        if (phoneHost == "change-me") {
+            println("NOTE: Need to set phone dev connection host, note that while this is a test it's intended for manually testing packets on a real device")
+            exitProcess(0)
+        }
         PacketRegistry.setup()
     }
 
