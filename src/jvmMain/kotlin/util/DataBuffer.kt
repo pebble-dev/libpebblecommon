@@ -1,4 +1,4 @@
-package io.rebble.libpebblecommon
+package io.rebble.libpebblecommon.util
 
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
@@ -18,6 +18,11 @@ actual class DataBuffer {
         actualBuf.putShort(short.toShort())
     }
     actual fun getUShort(): UShort = actualBuf.short.toUShort()
+
+    actual fun putShort(short: Short) {
+        actualBuf.putShort(short)
+    }
+    actual fun getShort(): Short = actualBuf.short
 
     actual fun putByte(byte: UByte) {
         actualBuf.put(byte.toByte())

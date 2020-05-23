@@ -1,4 +1,4 @@
-package io.rebble.libpebblecommon.protocol
+package io.rebble.libpebblecommon.protocolhelpers
 
 @ExperimentalUnsignedTypes
 enum class ProtocolEndpoint(val value: UShort) {
@@ -10,6 +10,7 @@ enum class ProtocolEndpoint(val value: UShort) {
     PHONE_CONTROL(33u),
     APP_MESSAGE(48u),
     APP_CUSTOMIZE(50u),
+    BLE_CONTROL(51u),
     APP_RUN_STATE(52u),
     LOGS(2000u),
     PING(2001u),

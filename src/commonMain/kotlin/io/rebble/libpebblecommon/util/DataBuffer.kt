@@ -1,4 +1,4 @@
-package io.rebble.libpebblecommon
+package io.rebble.libpebblecommon.util
 
 @ExperimentalUnsignedTypes
 expect class DataBuffer {
@@ -7,6 +7,9 @@ expect class DataBuffer {
 
     fun putUShort(short: UShort)
     fun getUShort(): UShort
+
+    fun putShort(short: Short)
+    fun getShort(): Short
 
     fun putByte(byte: UByte)
     fun getByte(): UByte

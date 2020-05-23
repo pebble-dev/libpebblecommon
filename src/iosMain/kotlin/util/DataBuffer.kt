@@ -1,4 +1,4 @@
-package io.rebble.libpebblecommon
+package io.rebble.libpebblecommon.util
 
 import kotlinx.cinterop.*
 import platform.Foundation.*
@@ -31,6 +31,21 @@ actual class DataBuffer {
         memScoped {
             val pShort = alloc<UShortVar>()
             actualBuf.getBytes(pShort.ptr, UShort.SIZE_BYTES.toULong())
+            return pShort.value
+        }
+    }
+
+    actual fun putShort(short: Short) {
+        memScoped {
+            val pShort = alloc<ShortVar>()
+            pShort.value = short
+            actualBuf.appendBytes(pShort.ptr, Short.SIZE_BYTES.toULong())
+        }
+    }
+    actual fun getShort(): Short {
+        memScoped {
+            val pShort = alloc<ShortVar>()
+            actualBuf.getBytes(pShort.ptr, Short.SIZE_BYTES.toULong())
             return pShort.value
         }
     }
