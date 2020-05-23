@@ -1,8 +1,8 @@
 import io.rebble.libpebblecommon.PhoneAppVersion
 import io.rebble.libpebblecommon.PingPong
-import io.rebble.libpebblecommon.protocol.PacketRegistry
-import io.rebble.libpebblecommon.protocol.PebblePacket
-import io.rebble.libpebblecommon.protocol.ProtocolEndpoint
+import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
+import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
+import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.SByte
 import io.rebble.libpebblecommon.structmapper.SUShort
 import kotlin.experimental.and
@@ -26,24 +26,12 @@ class Tests {
         return String(hexChars)
     }
 
-    class DummyLittlePacket: PebblePacket(ProtocolEndpoint.PING, '<') {
-        val stuff = SUShort(m, 51966u)
-    }
-
     @Test
     fun serializeSimplePacket() {
         val packet: PebblePacket = PingPong.Ping(51966u)
 
         assertEquals(bytesToHex(ubyteArrayOf(0x00u,0x05u,0x07u,0xD1u,0x00u,0x00u,0x00u,0xCAu,0xFEu)), bytesToHex(packet.serialize()),
             "Serialized big-endian packet invalid") // [short1,short2],[short1,short2],[byte],[uint1,uint2,uint3,uint4]
-    }
-
-    @Test
-    fun serializeSimpleLittlePacket() {
-        val packet: PebblePacket = DummyLittlePacket()
-
-        assertEquals(bytesToHex(ubyteArrayOf(0x00u,0x02u,0x07u,0xD1u,0xFEu, 0xCAu)), bytesToHex(packet.serialize()),
-            "Serialized little-endian packet invalid") // [short1,short2],[short1,short2],[short2,short1]
     }
 
     @Test
