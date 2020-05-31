@@ -1,6 +1,9 @@
 package io.rebble.libpebblecommon.util
 
 @ExperimentalUnsignedTypes
+/**
+ * Common DataBuffer with bindings for each platform
+ */
 expect class DataBuffer {
     constructor(size: Int)
     constructor(bytes: UByteArray)
