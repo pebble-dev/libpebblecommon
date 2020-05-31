@@ -5,6 +5,8 @@ import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.PhoneAppVersion.ProtocolCapsFlag
+import io.rebble.libpebblecommon.blobdb.BlobResponse
+import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 
 /**
  * Default pebble protocol handler
@@ -16,11 +18,12 @@ open class ProtocolHandler(private val send: (ByteArray) -> Unit) {
 
     init {
         PacketRegistry.setup()
+        BlobDBService.init {packet -> _send(packet)}
     }
 
-    private fun _send(bytes: ByteArray, packet: PebblePacket) {
+    private fun _send(packet: PebblePacket) {
         println("Sending on EP ${packet.endpoint}: ${packet.type}")
-        send(bytes)
+        send(packet.serialize().toByteArray())
     }
 
     /**
@@ -43,8 +46,10 @@ open class ProtocolHandler(private val send: (ByteArray) -> Unit) {
                     res.minorVersion.   set(2u)
                     res.bugfixVersion.  set(0u)
                     res.platformFlags.  set(protocolCaps)
-                    _send(res.serialize().toByteArray(), res)
+                    _send(res)
                 }
+
+                is BlobResponse -> return BlobDBService.receive(packet)
 
                 else -> {
                     println("TODO: ${packet.endpoint}")

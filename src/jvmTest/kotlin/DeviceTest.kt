@@ -6,16 +6,16 @@ import io.ktor.http.HttpMethod
 import io.ktor.util.KtorExperimentalAPI
 import io.rebble.libpebblecommon.PingPong
 import io.rebble.libpebblecommon.blobdb.BlobResponse
-import io.rebble.libpebblecommon.services.NotificationSource
-import io.rebble.libpebblecommon.services.PushNotification
+import io.rebble.libpebblecommon.blobdb.NotificationSource
+import io.rebble.libpebblecommon.blobdb.PushNotification
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import java.lang.Exception
+import io.rebble.libpebblecommon.services.blobdb.BlobDBService
+import io.rebble.libpebblecommon.services.notification.NotificationService
+import io.rebble.libpebblecommon.util.LazyLock
+import kotlinx.coroutines.runBlocking
 import kotlin.test.Test
-import java.util.*
 import kotlin.system.exitProcess
 import kotlin.test.assertTrue
 
@@ -49,42 +49,22 @@ class DeviceTests {
     }
 
     @KtorExperimentalAPI
-    @ExperimentalUnsignedTypes
-    @ExperimentalStdlibApi
-    @Test
-    fun sendNotification() {
-        var block = true
-        GlobalScope.launch {
+    private fun sendWS(packet: PebblePacket, blockResponse: Boolean): PebblePacket? {
+        var ret: PebblePacket? = null
+        runBlocking {
             client.ws(
-                method = HttpMethod.Get,
-                host = phoneHost,
-                port = phonePort, path = "/"
+                    method = HttpMethod.Get,
+                    host = phoneHost,
+                    port = phonePort, path = "/"
             ) {
-                Timer("Unblock", false).schedule(object : TimerTask() {
-                    override fun run() {
-                        block = false
-                    }
-                }, 5000)
-                val sendpacket = PushNotification(
-                    sender = "A Notification",
-                    subject = "Hello world!",
-                    source = NotificationSource.SMS,
-                    backgroundColor = 0b11100111u
-                )
-                val spacket = sendpacket.serialize().toByteArray()
-                println(bytesToHex(spacket.toUByteArray()))
-                send(Frame.Binary(true, byteArrayOf(0x01) + spacket))
+                send(Frame.Binary(true, byteArrayOf(0x01) + packet.serialize().toByteArray()))
                 flush()
-                while(true) {
+                while(blockResponse) {
                     val frame = incoming.receive()
                     if (frame is Frame.Binary) {
                         try{
-                            val packet = PebblePacket.deserialize(frame.data.slice(1 until frame.data.size).toByteArray().toUByteArray())
-                            print(packet::class.simpleName)
-                            if (packet is BlobResponse && packet.token.get() == sendpacket.token.get()) {
-                                print(" | TOKEN MATCH")
-                            }
-                            println()
+                            ret = PebblePacket.deserialize(frame.data.slice(1 until frame.data.size).toByteArray().toUByteArray())
+                            break
                         }catch (e: PacketDecodeException) {
                             println(e.toString())
                         }
@@ -92,39 +72,37 @@ class DeviceTests {
                 }
             }
         }
-        while (block) {Thread.sleep(50)}
+        return ret
     }
 
+    @KtorExperimentalAPI
+    @ExperimentalUnsignedTypes
+    @ExperimentalStdlibApi
+    @Test
+    fun sendNotification() {
+        val notif = PushNotification(
+                sender = "Test Notif",
+                subject = "This is a test notification!",
+                message = "This is the notification body",
+                backgroundColor = 0b11110011u,
+                source = NotificationSource.Email
+        )
+        val lock = LazyLock()
+        lock.lock()
+        BlobDBService.init { snotif -> sendWS(snotif, false) }
+        NotificationService.send(notif) {
+            assertTrue(it is BlobResponse.Success, "Reply wasn't success from BlobDB when sending notif")
+            lock.unlock()
+        }
+        lock.syncLock(5000)
+    }
+
+    @KtorExperimentalAPI
     @ExperimentalUnsignedTypes
     @Test
     fun sendPing() {
-        var block = true
-        var gotPong = false
-        GlobalScope.launch {
-            client.ws(
-                method = HttpMethod.Get,
-                host = phoneHost,
-                port = phonePort, path = "/"
-            ) {
-                Timer("Unblock", false).schedule(object : TimerTask() {
-                    override fun run() {
-                        block = false
-                    }
-                }, 5000)
-                send(Frame.Binary(true, byteArrayOf(0x01) + PingPong.Ping(1337u).serialize().toByteArray()))
-                flush()
-                // Receive frame.
-                while(true) {
-                    val frame = incoming.receive()
-                    println(frame.data)
-                    if (frame is Frame.Binary) {
-                        val packet = PebblePacket.deserialize(frame.data.slice(1 until frame.data.size).toByteArray().toUByteArray())
-                        if (packet is PingPong.Ping && packet.cookie.get() == 1337u) gotPong = true; break
-                    }
-                }
-            }
-        }
-        while (block) {Thread.sleep(50)}
+        val res = sendWS(PingPong.Ping(1337u), true)
+        val gotPong = res?.endpoint == PingPong.endpoint && (res as? PingPong)?.cookie?.get() == 1337u
         assertTrue(gotPong, "Pong not received within sane amount of time")
     }
 }

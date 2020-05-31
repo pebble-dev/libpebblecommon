@@ -1,11 +1,9 @@
-package io.rebble.libpebblecommon.services
+package io.rebble.libpebblecommon.blobdb
 
 import com.benasher44.uuid.uuid4
 import com.benasher44.uuid.uuidFrom
 import com.benasher44.uuid.uuidOf
 import com.soywiz.klock.DateTime
-import io.rebble.libpebblecommon.blobdb.BlobCommand
-import io.rebble.libpebblecommon.blobdb.TimelineItem
 import io.rebble.libpebblecommon.structmapper.SUInt
 import io.rebble.libpebblecommon.structmapper.StructMapper
 import kotlin.random.Random
@@ -24,6 +22,9 @@ enum class NotificationSource(val id: UInt) { //TODO: There's likely more... (pr
 
 @ExperimentalStdlibApi
 @ExperimentalUnsignedTypes
+/**
+ * Helper class to generate a BlobDB command that inserts a notification
+ */
 open class PushNotification(subject: String, sender: String? = null, message: String? = null, source: NotificationSource = NotificationSource.Generic, backgroundColor: UByte? = null): BlobCommand.InsertCommand(Random.nextInt(0, UShort.MAX_VALUE.toInt()).toUShort(),
     BlobDatabase.Notification, ubyteArrayOf(), ubyteArrayOf()) {
     init {
