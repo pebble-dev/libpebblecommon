@@ -96,6 +96,7 @@ kotlin {
             dependencies {
                 implementation kotlin('stdlib')
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
+                implementation "com.soywiz.korlibs.klock:klock-jvm:$klockVersion"
             }
         }
         jvmTest {
@@ -130,6 +131,7 @@ kotlin {
             dependencies {
                 implementation kotlin('stdlib')
                 implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
+                implementation "com.soywiz.korlibs.klock:klock-android:$klockVersion"
             }
         }
         androidTest {
