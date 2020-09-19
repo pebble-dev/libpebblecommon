@@ -1,4 +1,4 @@
 package io.rebble.libpebblecommon
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 expect fun getPlatform(): PhoneAppVersion.OSType

@@ -150,6 +150,13 @@ kotlin {
             }
         }
     }
+    sourceSets {
+        all {
+            languageSettings {
+                useExperimentalAnnotation('kotlin.RequiresOptIn')
+            }
+        }
+    }
 }
 
 /*task iosTest {
