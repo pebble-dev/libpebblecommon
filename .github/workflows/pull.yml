@@ -1,0 +1,13 @@
+name: Build PR
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v1
+      - name: Build
+        run: ./gradlew build
