@@ -11,6 +11,7 @@ import kotlinx.coroutines.CompletableDeferred
  * Singleton to handle sending BlobDB commands cleanly, by allowing registered callbacks to be triggered when the sending packet receives a BlobResponse
  * @see BlobResponse
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 class BlobDBService(private val protocolHandler: ProtocolHandler) {
     private var send: ((PebblePacket) -> Unit)? = null
     private val pending: MutableMap<UShort, CompletableDeferred<BlobResponse>> = mutableMapOf()
