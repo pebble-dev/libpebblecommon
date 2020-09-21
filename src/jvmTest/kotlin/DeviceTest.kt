@@ -13,13 +13,14 @@ import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 import io.rebble.libpebblecommon.services.notification.NotificationService
-import io.rebble.libpebblecommon.util.LazyLock
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import kotlin.test.Test
-import kotlin.system.exitProcess
+import kotlin.test.Ignore
 import kotlin.test.assertTrue
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
+@Ignore("This tests requires manual run.")
 class DeviceTests {
     private fun bytesToHex(bytes: UByteArray): String {
         val hexArray = "0123456789ABCDEF".toCharArray()
@@ -41,31 +42,30 @@ class DeviceTests {
     }
 
     init {
-        if (phoneHost == "change-me") {
-            println("NOTE: Need to set phone dev connection host, note that while this is a test it's intended for manually testing packets on a real device")
-            exitProcess(0)
-        }
         PacketRegistry.setup()
     }
 
     @KtorExperimentalAPI
-    private fun sendWS(packet: PebblePacket, blockResponse: Boolean): PebblePacket? {
+    private suspend fun sendWS(packet: PebblePacket, blockResponse: Boolean): PebblePacket? {
         var ret: PebblePacket? = null
-        runBlocking {
+        withTimeout(5_000) {
             client.ws(
-                    method = HttpMethod.Get,
-                    host = phoneHost,
-                    port = phonePort, path = "/"
+                method = HttpMethod.Get,
+                host = phoneHost,
+                port = phonePort, path = "/"
             ) {
                 send(Frame.Binary(true, byteArrayOf(0x01) + packet.serialize().toByteArray()))
                 flush()
-                while(blockResponse) {
+                while (blockResponse) {
                     val frame = incoming.receive()
                     if (frame is Frame.Binary) {
-                        try{
-                            ret = PebblePacket.deserialize(frame.data.slice(1 until frame.data.size).toByteArray().toUByteArray())
+                        try {
+                            ret = PebblePacket.deserialize(
+                                frame.data.slice(1 until frame.data.size).toByteArray()
+                                    .toUByteArray()
+                            )
                             break
-                        }catch (e: PacketDecodeException) {
+                        } catch (e: PacketDecodeException) {
                             println(e.toString())
                         }
                     }
@@ -76,33 +76,34 @@ class DeviceTests {
     }
 
     @KtorExperimentalAPI
-    @ExperimentalUnsignedTypes
     @ExperimentalStdlibApi
     @Test
-    fun sendNotification() {
+    fun sendNotification() = runBlocking {
         val notif = PushNotification(
-                sender = "Test Notif",
-                subject = "This is a test notification!",
-                message = "This is the notification body",
-                backgroundColor = 0b11110011u,
-                source = NotificationSource.Email
+            sender = "Test Notif",
+            subject = "This is a test notification!",
+            message = "This is the notification body",
+            backgroundColor = 0b11110011u,
+            source = NotificationSource.Email
         )
-        val lock = LazyLock()
-        lock.lock()
-        BlobDBService.init { snotif -> sendWS(snotif, false) }
-        NotificationService.send(notif) {
-            assertTrue(it is BlobResponse.Success, "Reply wasn't success from BlobDB when sending notif")
-            lock.unlock()
-        }
-        lock.syncLock(5000)
+
+        val protocolHandler = TestProtocolHandler { receivePacket(sendWS(it, true)!!) }
+
+        val notificationService = NotificationService(BlobDBService(protocolHandler))
+        val notificationResult = notificationService.send(notif)
+
+        assertTrue(
+            notificationResult is BlobResponse.Success,
+            "Reply wasn't success from BlobDB when sending notif"
+        )
     }
 
     @KtorExperimentalAPI
-    @ExperimentalUnsignedTypes
     @Test
-    fun sendPing() {
+    fun sendPing() = runBlocking {
         val res = sendWS(PingPong.Ping(1337u), true)
-        val gotPong = res?.endpoint == PingPong.endpoint && (res as? PingPong)?.cookie?.get() == 1337u
+        val gotPong =
+            res?.endpoint == PingPong.endpoint && (res as? PingPong)?.cookie?.get() == 1337u
         assertTrue(gotPong, "Pong not received within sane amount of time")
     }
 }

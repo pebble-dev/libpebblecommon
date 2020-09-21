@@ -55,7 +55,7 @@ open class BlobCommand constructor(message: Message, token: UShort, database: Bl
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : PebblePacket(endpoint) {
     enum class BlobStatus(val value: UByte) {
         Success(0x01u),
@@ -91,7 +91,7 @@ open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : Pebb
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 fun blobDBPacketsRegister() {
     PacketRegistry.registerCustomTypeOffset(BlobResponse.endpoint, 4 + UShort.SIZE_BYTES)
     PacketRegistry.register(BlobResponse.endpoint, BlobResponse.BlobStatus.Success.value) { BlobResponse.Success() }

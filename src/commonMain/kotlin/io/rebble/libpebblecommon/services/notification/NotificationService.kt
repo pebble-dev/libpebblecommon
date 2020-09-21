@@ -9,12 +9,12 @@ import kotlin.random.Random
 /**
  * Singleton to handle sending notifications cleanly, as well as TODO: receiving/acting on action events
  */
+@OptIn(ExperimentalUnsignedTypes::class)
 class NotificationService(private val blobDbService: BlobDBService) {
 
     /**
      * Send a PushNotification command
      * @param notif the notification to send
-     * @param resultCallback optional callback to handle the BlobResponse
      * @see PushNotification
      */
     suspend fun send(notif: PushNotification): BlobResponse {
