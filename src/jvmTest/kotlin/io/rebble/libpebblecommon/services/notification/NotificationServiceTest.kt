@@ -1,4 +1,4 @@
-package notification
+package io.rebble.libpebblecommon.services.notification
 
 import TestProtocolHandler
 import assertIs
@@ -7,7 +7,6 @@ import io.rebble.libpebblecommon.blobdb.BlobResponse
 import io.rebble.libpebblecommon.blobdb.NotificationSource
 import io.rebble.libpebblecommon.blobdb.PushNotification
 import io.rebble.libpebblecommon.services.blobdb.BlobDBService
-import io.rebble.libpebblecommon.services.notification.NotificationService
 import runBlockingWithTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
