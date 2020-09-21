@@ -15,12 +15,12 @@ import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 import io.rebble.libpebblecommon.services.notification.NotificationService
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import okhttp3.internal.ws.WebSocketExtensions
 import kotlin.test.Test
-import kotlin.system.exitProcess
+import kotlin.test.Ignore
 import kotlin.test.assertTrue
 
 @OptIn(ExperimentalUnsignedTypes::class)
+@Ignore("This tests requires manual run.")
 class DeviceTests {
     private fun bytesToHex(bytes: UByteArray): String {
         val hexArray = "0123456789ABCDEF".toCharArray()
@@ -42,10 +42,6 @@ class DeviceTests {
     }
 
     init {
-        if (phoneHost == "change-me") {
-            println("NOTE: Need to set phone dev connection host, note that while this is a test it's intended for manually testing packets on a real device")
-            exitProcess(0)
-        }
         PacketRegistry.setup()
     }
 
