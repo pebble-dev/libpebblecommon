@@ -15,8 +15,8 @@ plugins {
 }
 
 def klockVersion = "1.12.0"
-def ktorVersion = "1.3.2"
-def kotlinxVersion = "1.3.9"
+def ktorVersion = "1.4.0"
+def coroutinesVersion = "1.3.9"
 
 repositories {
     mavenCentral()
@@ -95,7 +95,7 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation kotlin('stdlib')
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
                 implementation "com.soywiz.korlibs.klock:klock-jvm:$klockVersion"
                 implementation "com.benasher44:uuid-jvm:0.2.2"
             }
@@ -108,7 +108,6 @@ kotlin {
 
                 implementation "io.ktor:ktor-client-websockets:$ktorVersion"
                 implementation "io.ktor:ktor-client-cio:$ktorVersion"
-                implementation "io.ktor:ktor-client-js:$ktorVersion"
                 implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
             }
         }
@@ -118,7 +117,7 @@ kotlin {
                 implementation kotlin('stdlib-common')
                 implementation "com.benasher44:uuid:0.2.2"
                 implementation "com.soywiz.korlibs.klock:klock:$klockVersion"
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
             }
         }
         commonTest {
@@ -131,7 +130,7 @@ kotlin {
         androidMain {
             dependencies {
                 implementation kotlin('stdlib')
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
                 implementation "com.soywiz.korlibs.klock:klock-android:$klockVersion"
                 implementation "com.benasher44:uuid-jvm:0.2.2"
             }
@@ -147,7 +146,14 @@ kotlin {
         iosMain {
             dependencies {
                 implementation kotlin('stdlib')
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$kotlinxVersion"
+                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+            }
+        }
+    }
+    sourceSets {
+        all {
+            languageSettings {
+                useExperimentalAnnotation('kotlin.RequiresOptIn')
             }
         }
     }

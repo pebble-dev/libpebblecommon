@@ -1,24 +1,23 @@
 package io.rebble.libpebblecommon.services.blobdb
 
+import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.blobdb.BlobCommand
 import io.rebble.libpebblecommon.blobdb.BlobResponse
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
+import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
+import kotlinx.coroutines.CompletableDeferred
 
-@ExperimentalUnsignedTypes
 /**
  * Singleton to handle sending BlobDB commands cleanly, by allowing registered callbacks to be triggered when the sending packet receives a BlobResponse
  * @see BlobResponse
  */
-object BlobDBService {
+@OptIn(ExperimentalUnsignedTypes::class)
+class BlobDBService(private val protocolHandler: ProtocolHandler) {
     private var send: ((PebblePacket) -> Unit)? = null
-    private val pending: MutableMap<UShort, (BlobResponse) -> Unit> = mutableMapOf()
+    private val pending: MutableMap<UShort, CompletableDeferred<BlobResponse>> = mutableMapOf()
 
-    /**
-     * Setup the singleton so it is able to send packets
-     * @param send the call used to send packets
-     */
-    fun init(send: (packet: PebblePacket) -> Unit) {
-        this.send = send
+    init {
+        protocolHandler.registerReceiveCallback(ProtocolEndpoint.BLOBDB_V1, this::receive)
     }
 
     /**
@@ -28,9 +27,15 @@ object BlobDBService {
      * @param packet the packet to send
      * @param callback the callback to trigger on BlobResponse, NOTE: not guaranteed to trigger
      */
-    fun send(packet: BlobCommand, callback: (BlobResponse) -> Unit) {
-        pending[packet.token.get()] = callback
-        (send!!)(packet)
+    suspend fun send(packet: BlobCommand): BlobResponse {
+        val result = CompletableDeferred<BlobResponse>()
+        pending[packet.token.get()] = result
+
+        protocolHandler.withWatchContext {
+            protocolHandler.send(packet)
+        }
+
+        return result.await()
     }
 
     /**
@@ -39,10 +44,11 @@ object BlobDBService {
      * @see send
      * @see BlobResponse
      */
-    fun receive(packet: BlobResponse): Boolean {
-        val cb = pending[packet.token.get()] ?: return false
-        cb(packet)
-        pending.remove(packet.token.get())
-        return true
+    suspend fun receive(packet: PebblePacket): Unit {
+        if (packet !is BlobResponse) {
+            throw IllegalStateException("Received invalid packet type: $packet")
+        }
+
+        pending.remove(packet.token.get())?.complete(packet)
     }
 }
