@@ -6,7 +6,7 @@ import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class TimeMessage(private val message: Message) : PebblePacket(
     ProtocolEndpoint.TIME) {
     enum class Message(val value: UByte) {
@@ -36,7 +36,7 @@ open class TimeMessage(private val message: Message) : PebblePacket(
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
     enum class Message(val value: UByte, val instance: () -> PebblePacket) {
         AppVersionRequest(0x00u, {AppVersionRequest()}),
@@ -117,7 +117,7 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class SystemMessage(message: Message) : PebblePacket(endpoint) {
     enum class Message(val value: UByte) {
         NewFirmwareAvailable(0x00u),
@@ -143,7 +143,7 @@ open class SystemMessage(message: Message) : PebblePacket(endpoint) {
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : PebblePacket(endpoint) {
     val command = SByte(m, opcode)
     //val discoverable = SBool(m, discoverable)
@@ -157,7 +157,7 @@ class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) 
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class PingPong(message: Message, cookie: UInt): PebblePacket(endpoint) {
     enum class Message(val value: UByte) {
         Ping(0u),
@@ -185,7 +185,7 @@ open class PingPong(message: Message, cookie: UInt): PebblePacket(endpoint) {
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 fun systemPacketsRegister() {
     PacketRegistry.register(PhoneAppVersion.endpoint, PhoneAppVersion.Message.AppVersionRequest.value) { PhoneAppVersion.AppVersionRequest() }
     PacketRegistry.register(PhoneAppVersion.endpoint, PhoneAppVersion.Message.AppVersionResponse.value) { PhoneAppVersion.AppVersionResponse() }

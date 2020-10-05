@@ -11,7 +11,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 @ExperimentalStdlibApi
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 class Tests {
     @ExperimentalStdlibApi
     private fun bytesToHex(bytes: UByteArray): String {

@@ -5,7 +5,7 @@ import platform.Foundation.*
 import platform.darwin.NSUInteger
 import kotlin.collections.get
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 actual class DataBuffer {
     private val actualBuf: NSMutableData
     private var littleEndian = false

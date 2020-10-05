@@ -5,7 +5,7 @@ import io.rebble.libpebblecommon.blobdb.timelinePacketsRegister
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.systemPacketsRegister
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 /**
  * Singleton to track endpoint / type discriminators for deserialization
  */
