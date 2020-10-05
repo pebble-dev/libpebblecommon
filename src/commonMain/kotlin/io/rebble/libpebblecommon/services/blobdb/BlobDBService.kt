@@ -13,7 +13,6 @@ import kotlinx.coroutines.CompletableDeferred
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 class BlobDBService(private val protocolHandler: ProtocolHandler) {
-    private var send: ((PebblePacket) -> Unit)? = null
     private val pending: MutableMap<UShort, CompletableDeferred<BlobResponse>> = mutableMapOf()
 
     init {
@@ -25,7 +24,6 @@ class BlobDBService(private val protocolHandler: ProtocolHandler) {
      * @see BlobCommand
      * @see BlobResponse
      * @param packet the packet to send
-     * @param callback the callback to trigger on BlobResponse, NOTE: not guaranteed to trigger
      */
     suspend fun send(packet: BlobCommand): BlobResponse {
         val result = CompletableDeferred<BlobResponse>()
@@ -44,7 +42,7 @@ class BlobDBService(private val protocolHandler: ProtocolHandler) {
      * @see send
      * @see BlobResponse
      */
-    suspend fun receive(packet: PebblePacket): Unit {
+    fun receive(packet: PebblePacket) {
         if (packet !is BlobResponse) {
             throw IllegalStateException("Received invalid packet type: $packet")
         }
