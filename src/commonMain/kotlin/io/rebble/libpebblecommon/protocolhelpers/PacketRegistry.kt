@@ -1,9 +1,9 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
-import io.rebble.libpebblecommon.blobdb.blobDBPacketsRegister
-import io.rebble.libpebblecommon.blobdb.timelinePacketsRegister
+import io.rebble.libpebblecommon.packets.blobdb.blobDBPacketsRegister
+import io.rebble.libpebblecommon.packets.blobdb.timelinePacketsRegister
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
-import io.rebble.libpebblecommon.systemPacketsRegister
+import io.rebble.libpebblecommon.packets.systemPacketsRegister
 
 @OptIn(ExperimentalUnsignedTypes::class)
 /**

@@ -1,4 +1,4 @@
-package io.rebble.libpebblecommon.blobdb
+package io.rebble.libpebblecommon.packets.blobdb
 
 import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.bytes
@@ -103,14 +103,18 @@ open class TimelineAction(message: Message) : PebblePacket(endpoint) {
         ActionResponse(0x11u)
     }
 
-    class InvokeAction(itemID: Uuid = Uuid(0,0), actionID: UByte = 0u, attributes: List<TimelineItem.Attribute> = listOf()): TimelineAction(Message.InvokeAction) {
+    class InvokeAction(itemID: Uuid = Uuid(0,0), actionID: UByte = 0u, attributes: List<TimelineItem.Attribute> = listOf()): TimelineAction(
+        Message.InvokeAction
+    ) {
         val itemID = SUUID(m, itemID)
         val actionID = SByte(m, actionID)
         val numAttributes = SByte(m, attributes.size.toUByte())
         val attributes = SFixedList(m, attributes.size, attributes)
     }
 
-    class ActionResponse(itemID: Uuid = Uuid(0,0), response: UByte = 0u, attributes: List<TimelineItem.Attribute> = listOf()): TimelineAction(Message.ActionResponse) {
+    class ActionResponse(itemID: Uuid = Uuid(0,0), response: UByte = 0u, attributes: List<TimelineItem.Attribute> = listOf()): TimelineAction(
+        Message.ActionResponse
+    ) {
         val itemID = SUUID(m, itemID)
         val response = SByte(m, response)
         val numAttributes = SByte(m, attributes.size.toUByte())
@@ -124,6 +128,6 @@ open class TimelineAction(message: Message) : PebblePacket(endpoint) {
 
 @OptIn(ExperimentalUnsignedTypes::class)
 fun timelinePacketsRegister() {
-    PacketRegistry.register(TimelineAction.endpoint, TimelineAction.Message.InvokeAction.value) {TimelineAction.InvokeAction()}
-    PacketRegistry.register(TimelineAction.endpoint, TimelineAction.Message.ActionResponse.value) {TimelineAction.ActionResponse()}
+    PacketRegistry.register(TimelineAction.endpoint, TimelineAction.Message.InvokeAction.value) { TimelineAction.InvokeAction() }
+    PacketRegistry.register(TimelineAction.endpoint, TimelineAction.Message.ActionResponse.value) { TimelineAction.ActionResponse() }
 }

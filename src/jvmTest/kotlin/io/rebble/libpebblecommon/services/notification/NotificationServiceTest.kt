@@ -2,10 +2,10 @@ package io.rebble.libpebblecommon.services.notification
 
 import TestProtocolHandler
 import assertIs
-import io.rebble.libpebblecommon.blobdb.BlobCommand
-import io.rebble.libpebblecommon.blobdb.BlobResponse
-import io.rebble.libpebblecommon.blobdb.NotificationSource
-import io.rebble.libpebblecommon.blobdb.PushNotification
+import io.rebble.libpebblecommon.packets.blobdb.BlobCommand
+import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
+import io.rebble.libpebblecommon.packets.blobdb.NotificationSource
+import io.rebble.libpebblecommon.packets.blobdb.PushNotification
 import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 import runBlockingWithTimeout
 import kotlin.test.Test

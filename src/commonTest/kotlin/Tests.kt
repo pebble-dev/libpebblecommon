@@ -1,14 +1,8 @@
-import io.rebble.libpebblecommon.PhoneAppVersion
-import io.rebble.libpebblecommon.PingPong
+import io.rebble.libpebblecommon.packets.PingPong
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
-import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.structmapper.SByte
-import io.rebble.libpebblecommon.structmapper.SUShort
-import kotlin.experimental.and
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @ExperimentalStdlibApi
 @OptIn(ExperimentalUnsignedTypes::class)

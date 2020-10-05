@@ -1,7 +1,7 @@
 package io.rebble.libpebblecommon.services.notification
 
-import io.rebble.libpebblecommon.blobdb.BlobResponse
-import io.rebble.libpebblecommon.blobdb.PushNotification
+import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
+import io.rebble.libpebblecommon.packets.blobdb.PushNotification
 import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 import kotlinx.coroutines.delay
 import kotlin.random.Random

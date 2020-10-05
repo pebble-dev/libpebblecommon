@@ -1,4 +1,4 @@
-package io.rebble.libpebblecommon.blobdb
+package io.rebble.libpebblecommon.packets.blobdb
 
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket

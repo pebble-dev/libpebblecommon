@@ -4,10 +4,10 @@ import io.ktor.client.features.websocket.ws
 import io.ktor.http.cio.websocket.Frame
 import io.ktor.http.HttpMethod
 import io.ktor.util.KtorExperimentalAPI
-import io.rebble.libpebblecommon.PingPong
-import io.rebble.libpebblecommon.blobdb.BlobResponse
-import io.rebble.libpebblecommon.blobdb.NotificationSource
-import io.rebble.libpebblecommon.blobdb.PushNotification
+import io.rebble.libpebblecommon.packets.PingPong
+import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
+import io.rebble.libpebblecommon.packets.blobdb.NotificationSource
+import io.rebble.libpebblecommon.packets.blobdb.PushNotification
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket

@@ -1,8 +1,8 @@
 package io.rebble.libpebblecommon.services.blobdb
 
 import io.rebble.libpebblecommon.ProtocolHandler
-import io.rebble.libpebblecommon.blobdb.BlobCommand
-import io.rebble.libpebblecommon.blobdb.BlobResponse
+import io.rebble.libpebblecommon.packets.blobdb.BlobCommand
+import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import kotlinx.coroutines.CompletableDeferred

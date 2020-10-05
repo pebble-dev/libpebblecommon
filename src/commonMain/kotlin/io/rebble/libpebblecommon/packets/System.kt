@@ -1,6 +1,5 @@
-package io.rebble.libpebblecommon
+package io.rebble.libpebblecommon.packets
 
-import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
@@ -28,7 +27,9 @@ open class TimeMessage(private val message: Message) : PebblePacket(
     class SetLocalTime(time: UInt = 0u) : TimeMessage(Message.SetLocalTime) {
         val time = SUInt(m, time)
     }
-    class SetUTC(unixTime: UInt = 0u, utcOffset: Short = 0, timeZoneName: String) : TimeMessage(Message.SetUTC) {
+    class SetUTC(unixTime: UInt = 0u, utcOffset: Short = 0, timeZoneName: String) : TimeMessage(
+        Message.SetUTC
+    ) {
         val unixTime = SUInt(m, unixTime)
         val utcOffset = SShort(m, utcOffset)
         @ExperimentalStdlibApi
@@ -39,8 +40,8 @@ open class TimeMessage(private val message: Message) : PebblePacket(
 @OptIn(ExperimentalUnsignedTypes::class)
 open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
     enum class Message(val value: UByte, val instance: () -> PebblePacket) {
-        AppVersionRequest(0x00u, {AppVersionRequest()}),
-        AppVersionResponse(0x01u, {AppVersionResponse()})
+        AppVersionRequest(0x00u, { AppVersionRequest() }),
+        AppVersionResponse(0x01u, { AppVersionResponse() })
     }
     val command = SByte(m, message.value)
     init {
@@ -144,7 +145,9 @@ open class SystemMessage(message: Message) : PebblePacket(endpoint) {
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : PebblePacket(endpoint) {
+class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : PebblePacket(
+    endpoint
+) {
     val command = SByte(m, opcode)
     //val discoverable = SBool(m, discoverable)
     val duration = SUShort(m, duration)
@@ -171,12 +174,12 @@ open class PingPong(message: Message, cookie: UInt): PebblePacket(endpoint) {
 
     class Ping(cookie: UInt = 0u) : PingPong(Message.Ping, cookie) {
         init {
-            PacketRegistry.register(endpoint, command.get(), {Ping()})
+            PacketRegistry.register(endpoint, command.get(), { Ping() })
         }
     }
     class Pong(cookie: UInt = 0u) : PingPong(Message.Pong, cookie) {
         init {
-            PacketRegistry.register(endpoint, command.get(), {Pong()})
+            PacketRegistry.register(endpoint, command.get(), { Pong() })
         }
     }
 

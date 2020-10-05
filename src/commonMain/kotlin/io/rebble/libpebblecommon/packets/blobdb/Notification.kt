@@ -1,4 +1,4 @@
-package io.rebble.libpebblecommon.blobdb
+package io.rebble.libpebblecommon.packets.blobdb
 
 import com.benasher44.uuid.uuid4
 import com.benasher44.uuid.uuidFrom
