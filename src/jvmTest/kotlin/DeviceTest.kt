@@ -42,7 +42,6 @@ class DeviceTests {
     }
 
     init {
-        PacketRegistry.setup()
     }
 
     @KtorExperimentalAPI

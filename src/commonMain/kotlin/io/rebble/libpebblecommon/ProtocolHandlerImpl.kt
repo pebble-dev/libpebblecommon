@@ -21,8 +21,6 @@ class ProtocolHandlerImpl(private val bluetoothConnection: BluetoothConnection) 
     private val protocolMutex = Mutex()
 
     init {
-        PacketRegistry.setup()
-
         bluetoothConnection.setReceiveCallback(this::handle)
     }
 

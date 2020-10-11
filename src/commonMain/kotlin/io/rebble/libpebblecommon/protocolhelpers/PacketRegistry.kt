@@ -14,7 +14,7 @@ object PacketRegistry {
     private var typeOffsets: MutableMap<ProtocolEndpoint, Int> = mutableMapOf()
     private var decoders: MutableMap<ProtocolEndpoint, MutableMap<UByte, (UByteArray) -> PebblePacket>> = mutableMapOf()
 
-    fun setup() {
+    init {
         systemPacketsRegister()
         timelinePacketsRegister()
         blobDBPacketsRegister()
