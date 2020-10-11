@@ -3,6 +3,7 @@ package io.rebble.libpebblecommon.protocolhelpers
 import io.rebble.libpebblecommon.packets.blobdb.blobDBPacketsRegister
 import io.rebble.libpebblecommon.packets.blobdb.timelinePacketsRegister
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
+import io.rebble.libpebblecommon.packets.appmessagePacketsRegister
 import io.rebble.libpebblecommon.packets.systemPacketsRegister
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -17,6 +18,7 @@ object PacketRegistry {
         systemPacketsRegister()
         timelinePacketsRegister()
         blobDBPacketsRegister()
+        appmessagePacketsRegister()
     }
 
     /**

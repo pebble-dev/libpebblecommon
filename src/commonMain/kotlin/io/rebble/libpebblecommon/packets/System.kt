@@ -6,7 +6,7 @@ import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
 
 @OptIn(ExperimentalUnsignedTypes::class)
-open class TimeMessage(private val message: Message) : PebblePacket(
+open class TimeMessage(message: Message) : PebblePacket(
     ProtocolEndpoint.TIME) {
     enum class Message(val value: UByte) {
         GetTimeRequest(0x00u),
@@ -14,7 +14,7 @@ open class TimeMessage(private val message: Message) : PebblePacket(
         SetLocalTime(0x02u),
         SetUTC(0x03u)
     }
-    val command = SByte(m, message.value)
+    val command = SUByte(m, message.value)
     init {
         type = command.get()
     }
@@ -43,7 +43,7 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
         AppVersionRequest(0x00u, { AppVersionRequest() }),
         AppVersionResponse(0x01u, { AppVersionResponse() })
     }
-    val command = SByte(m, message.value)
+    val command = SUByte(m, message.value)
     init {
         type = command.get()
     }
@@ -80,7 +80,7 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
 
         companion object {
             fun makeFlags(vararg flags: ProtocolCapsFlag): UInt {
-                var ret: UInt = 0u
+                val ret: UInt = 0u
                 flags.forEach {flag ->
                     ret or flag.value
                 }
@@ -106,10 +106,10 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
         val protocolVersion = SUInt(m) // Unused as of v3.0
         val sessionCaps = SUInt(m) // Unused as of v3.0
         val platformFlags = SUInt(m)
-        val responseVersion = SByte(m, 2u)
-        val majorVersion = SByte(m)
-        val minorVersion = SByte(m)
-        val bugfixVersion = SByte(m)
+        val responseVersion = SUByte(m, 2u)
+        val majorVersion = SUByte(m)
+        val minorVersion = SUByte(m)
+        val bugfixVersion = SUByte(m)
         val protocolCaps = SULong(m)
     }
 
@@ -132,8 +132,8 @@ open class SystemMessage(message: Message) : PebblePacket(endpoint) {
         MAPEnabled(0x09u),
         FirmwareUpdateStartResponse(0x0au)
     }
-    val command = SByte(m, message.value)
-    val messageType = SByte(m)
+    val command = SUByte(m, message.value)
+    val messageType = SUByte(m)
     init {
         type = command.get()
         TODO("Incomplete packet declaration")
@@ -148,7 +148,7 @@ open class SystemMessage(message: Message) : PebblePacket(endpoint) {
 class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : PebblePacket(
     endpoint
 ) {
-    val command = SByte(m, opcode)
+    val command = SUByte(m, opcode)
     //val discoverable = SBool(m, discoverable)
     val duration = SUShort(m, duration)
     init {
@@ -166,7 +166,7 @@ open class PingPong(message: Message, cookie: UInt): PebblePacket(endpoint) {
         Ping(0u),
         Pong(1u)
     }
-    val command = SByte(m, message.value)
+    val command = SUByte(m, message.value)
     val cookie = SUInt(m, cookie)
     init {
         type = command.get()

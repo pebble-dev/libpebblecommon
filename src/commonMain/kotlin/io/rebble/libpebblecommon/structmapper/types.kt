@@ -14,7 +14,6 @@ import io.rebble.libpebblecommon.util.DataBuffer
 interface Mappable {
     /**
      * Serializes/packs the mappable to its raw equivalent
-     * @param endianness the endianness
      * @return The serialized mappable
      */
     fun toBytes(): UByteArray
@@ -25,6 +24,10 @@ interface Mappable {
      * @param bytes the data to read, seek position is incremented
      */
     fun fromBytes(bytes: DataBuffer)
+}
+
+interface NumberStructElement {
+    val valueNumber: Long
 }
 
 /**
@@ -41,6 +44,17 @@ open class StructElement<T>(
     endianness: Char = '|'
 ) : Mappable { //TODO: Element-level endianness on deserialization
     var size = size
+        get() {
+            return linkedSize?.valueNumber?.toInt() ?: field
+        }
+        set(value) {
+            field = value
+            linkedSize = null
+        }
+
+    private var linkedSize: NumberStructElement? = null
+        private set
+
     private val mapIndex = mapper.register(this)
     private var value: T = default
     var isLittleEndian = endianness == '<'
@@ -58,28 +72,74 @@ open class StructElement<T>(
         if (size < 0) throw PacketDecodeException("Invalid StructElement size: $size")
         else if (size == 0) return ubyteArrayOf()
         val buf = DataBuffer(size)
+        buf.setEndian(if (isLittleEndian) '<' else '>')
         putType(buf, this)
-        return if (isLittleEndian) buf.array().reversedArray() else buf.array()
+        return buf.array()
     }
 
     override fun fromBytes(bytes: DataBuffer) {
+        bytes.setEndian(if (isLittleEndian) '<' else '>')
         getType(bytes, this)
     }
 
     fun setEndiannes(endianness: Char) {
         isLittleEndian = endianness == '<'
     }
+
+    /**
+     * Link the size of this element to the value of another struct element. Size will
+     * automatically match value of the target element.
+     */
+    fun linkWithSize(numberStructElement: NumberStructElement) {
+        linkedSize = numberStructElement
+    }
+
+    override fun toString(): String {
+        return "StructElement(size=$size, linkedSize=${linkedSize?.valueNumber}, " +
+                "value=$value, isLittleEndian=$isLittleEndian)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as StructElement<*>
+
+        if (value != other.value) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return value?.hashCode() ?: 0
+    }
 }
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class SByte(mapper: StructMapper, default: UByte = 0u) :
+class SUByte(mapper: StructMapper, default: UByte = 0u) :
     StructElement<UByte>(
-        { buf, el -> buf.putByte(el.get()) },
-        { buf, el -> el.set(buf.getByte()) },
+        { buf, el -> buf.putUByte(el.get()) },
+        { buf, el -> el.set(buf.getUByte()) },
         mapper,
         UByte.SIZE_BYTES,
         default
-    )
+    ), NumberStructElement {
+    override val valueNumber: Long
+        get() = get().toLong()
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+class SByte(mapper: StructMapper, default: Byte = 0) :
+    StructElement<Byte>(
+        { buf, el -> buf.putByte(el.get()) },
+        { buf, el -> el.set(buf.getByte()) },
+        mapper,
+        Byte.SIZE_BYTES,
+        default
+    ), NumberStructElement {
+    override val valueNumber: Long
+        get() = get().toLong()
+}
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class SUInt(mapper: StructMapper, default: UInt = 0u, endianness: Char = '|') :
@@ -90,7 +150,24 @@ class SUInt(mapper: StructMapper, default: UInt = 0u, endianness: Char = '|') :
         UInt.SIZE_BYTES,
         default,
         endianness
-    )
+    ), NumberStructElement {
+    override val valueNumber: Long
+        get() = get().toLong()
+}
+
+@OptIn(ExperimentalUnsignedTypes::class)
+class SInt(mapper: StructMapper, default: Int = 0, endianness: Char = '|') :
+    StructElement<Int>(
+        { buf, el -> buf.putInt(el.get()) },
+        { buf, el -> el.set(buf.getInt()) },
+        mapper,
+        Int.SIZE_BYTES,
+        default,
+        endianness
+    ), NumberStructElement {
+    override val valueNumber: Long
+        get() = get().toLong()
+}
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class SULong(mapper: StructMapper, default: ULong = 0u) :
@@ -100,7 +177,10 @@ class SULong(mapper: StructMapper, default: ULong = 0u) :
         mapper,
         ULong.SIZE_BYTES,
         default
-    )
+    ), NumberStructElement {
+    override val valueNumber: Long
+        get() = get().toLong()
+}
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class SUShort(mapper: StructMapper, default: UShort = 0u, endianness: Char = '|') :
@@ -111,17 +191,24 @@ class SUShort(mapper: StructMapper, default: UShort = 0u, endianness: Char = '|'
         UShort.SIZE_BYTES,
         default,
         endianness
-    )
+    ), NumberStructElement {
+    override val valueNumber: Long
+        get() = get().toLong()
+}
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class SShort(mapper: StructMapper, default: Short = 0) :
+class SShort(mapper: StructMapper, default: Short = 0, endianness: Char = '|') :
     StructElement<Short>(
         { buf, el -> buf.putShort(el.get()) },
         { buf, el -> el.set(buf.getShort()) },
         mapper,
         Short.SIZE_BYTES,
-        default
-    )
+        default,
+        endianness = endianness
+    ), NumberStructElement {
+    override val valueNumber: Long
+        get() = get().toLong()
+}
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class SUUID(mapper: StructMapper, default: Uuid = Uuid(0, 0)) :
@@ -141,12 +228,12 @@ class SUUID(mapper: StructMapper, default: Uuid = Uuid(0, 0)) :
 class SString(mapper: StructMapper, default: String = "") :
     StructElement<String>(
         { buf, el ->
-            buf.putByte(el.get().length.toUByte()); buf.putBytes(
+            buf.putUByte(el.get().length.toUByte()); buf.putBytes(
             el.get().encodeToByteArray().toUByteArray()
         )
         },
         { buf, el ->
-            val len = buf.getByte().toInt()
+            val len = buf.getUByte().toInt()
             el.set(buf.getBytes(len).toByteArray().decodeToString(), len)
         }, mapper, default.length, default
     )
@@ -171,24 +258,57 @@ class SBytes(
                 } else if (mValue.size < length) {
                     mValue += UByteArray(length - el.size)// Pad if too short
                 }
-                buf.putBytes(mValue)
+                buf.putBytes(if (el.isLittleEndian) mValue.reversedArray() else mValue)
             }
         },
         { buf, el ->
-            el.set(buf.getBytes(el.size))
+            val value = buf.getBytes(el.size)
+            el.set(if (el.isLittleEndian) value.reversedArray() else value)
         },
         mapper, length, default, endianness
-    )
+    ) {
+    override fun toString(): String {
+        return "SBytes(value=${get().contentToString()}, size=$size)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SBytes) return false
+        if (!this.get().contentEquals(other.get())) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return this.get().hashCode()
+    }
+}
 
 /**
  * Represents a fixed size list of T
  * @param T the type (must inherit Mappable)
  */
 @OptIn(ExperimentalUnsignedTypes::class)
-class SFixedList<T>(mapper: StructMapper, count: Int, default: List<T?> = List(count) { null }) :
+class SFixedList<T : Mappable>(
+    mapper: StructMapper,
+    count: Int,
+    default: List<T> = emptyList(),
+    private val itemFactory: () -> T
+) :
     Mappable {
+
+    var count = count
+        set(value) {
+            field = value
+            linkedCount = null
+        }
+
+    var linkedCount: NumberStructElement? = null
+        private set
+
+
     private val mapIndex = mapper.register(this)
-    private val list = default
+    var list = default
+        private set
 
     init {
         if (count != default.size) throw PacketEncodeException("Fixed list count does not match default value count")
@@ -197,16 +317,40 @@ class SFixedList<T>(mapper: StructMapper, count: Int, default: List<T?> = List(c
     override fun toBytes(): UByteArray {
         val bytes: MutableList<UByte> = mutableListOf()
         list.forEach {
-            if (it != null) {
-                bytes += (it as Mappable).toBytes()
-            } else {
-                println("Warning: FixedList contained null element, ignoring")
-            }
+            bytes += it.toBytes()
         }
         return bytes.toUByteArray()
     }
 
     override fun fromBytes(bytes: DataBuffer) {
-        TODO("Not yet implemented")
+        val count = linkedCount?.valueNumber?.toInt() ?: count
+        list = List(count) {
+            itemFactory().apply { fromBytes(bytes) }
+        }
+    }
+
+    /**
+     * Link the count of this element to the value of another struct element. Count will
+     * automatically match value of the target element.
+     */
+    fun linkWithCount(numberStructElement: NumberStructElement) {
+        linkedCount = numberStructElement
+    }
+
+    override fun toString(): String {
+        return "SFixedList(list=$list)"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SFixedList<*>) return false
+
+        if (list != other.list) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return list.hashCode()
     }
 }

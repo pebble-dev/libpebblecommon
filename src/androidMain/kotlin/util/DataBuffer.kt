@@ -24,10 +24,15 @@ actual class DataBuffer {
     }
     actual fun getShort(): Short = actualBuf.short
 
-    actual fun putByte(byte: UByte) {
+    actual fun putUByte(byte: UByte) {
         actualBuf.put(byte.toByte())
     }
-    actual fun getByte(): UByte = actualBuf.get().toUByte()
+    actual fun getUByte(): UByte = actualBuf.get().toUByte()
+
+    actual fun putByte(byte: Byte) {
+        actualBuf.put(byte)
+    }
+    actual fun getByte(): Byte = actualBuf.get()
 
     actual fun putBytes(bytes: UByteArray) {
         actualBuf.put(bytes.toByteArray())
@@ -46,6 +51,11 @@ actual class DataBuffer {
             '<' -> actualBuf.order(ByteOrder.LITTLE_ENDIAN)
         }
     }
+
+    actual fun putInt(int: Int) {
+        actualBuf.putInt(int)
+    }
+    actual fun getInt(): Int = actualBuf.int
 
     actual fun putUInt(uint: UInt) {
         actualBuf.putInt(uint.toInt())
