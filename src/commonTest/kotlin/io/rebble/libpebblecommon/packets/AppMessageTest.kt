@@ -1,11 +1,12 @@
 package io.rebble.libpebblecommon.packets
 
+import assertIs
 import assertUByteArrayEquals
 import com.benasher44.uuid.Uuid
 import com.benasher44.uuid.uuidFrom
-import com.soywiz.klock.DateTime.Companion.fromString
-import io.rebble.libpebblecommon.util.DataBuffer
-import kotlin.test.*
+import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalUnsignedTypes::class, ExperimentalStdlibApi::class)
 internal class AppMessageTest {
@@ -27,10 +28,9 @@ internal class AppMessageTest {
             )
         )
 
-        val bytes = testPushMessage.m.toBytes()
-        val newMessage = AppMessage.AppMessagePush().apply {
-            m.fromBytes(DataBuffer(bytes))
-        }
+        val bytes = testPushMessage.serialize()
+        val newMessage = PebblePacket.deserialize(bytes)
+        assertIs<AppMessage.AppMessagePush>(newMessage)
 
         val list = newMessage.dictionary.list
 
@@ -47,6 +47,32 @@ internal class AppMessageTest {
         assertEquals(2448461, list[8].dataAsUnsignedNumber)
 
         assertEquals(testPushMessage, newMessage)
+    }
+
+    @Test
+    fun serializeDeserializeAckMessage() {
+        val testPushMessage = AppMessage.AppMessageACK(
+            74u
+        )
+
+        val bytes = testPushMessage.serialize()
+        val newMessage = PebblePacket.deserialize(bytes)
+        assertIs<AppMessage.AppMessageACK>(newMessage)
+
+        assertEquals(74u, newMessage.transactionId.get())
+    }
+
+    @Test
+    fun serializeDeserializeNackMessage() {
+        val testPushMessage = AppMessage.AppMessageNACK(
+            244u
+        )
+
+        val bytes = testPushMessage.serialize()
+        val newMessage = PebblePacket.deserialize(bytes)
+        assertIs<AppMessage.AppMessageNACK>(newMessage)
+
+        assertEquals(244u, newMessage.transactionId.get())
     }
 
     @Test
