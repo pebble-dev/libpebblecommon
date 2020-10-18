@@ -1,10 +1,12 @@
 package io.rebble.libpebblecommon
 
+import io.rebble.libpebblecommon.packets.PhoneAppVersion
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.PhoneAppVersion.ProtocolCapsFlag
+import io.rebble.libpebblecommon.packets.PhoneAppVersion.ProtocolCapsFlag
+import io.rebble.libpebblecommon.packets.PingPong
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -19,8 +21,6 @@ class ProtocolHandlerImpl(private val bluetoothConnection: BluetoothConnection) 
     private val protocolMutex = Mutex()
 
     init {
-        PacketRegistry.setup()
-
         bluetoothConnection.setReceiveCallback(this::handle)
     }
 

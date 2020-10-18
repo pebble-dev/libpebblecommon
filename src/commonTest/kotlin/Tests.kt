@@ -1,17 +1,11 @@
-import io.rebble.libpebblecommon.PhoneAppVersion
-import io.rebble.libpebblecommon.PingPong
+import io.rebble.libpebblecommon.packets.PingPong
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
-import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.structmapper.SByte
-import io.rebble.libpebblecommon.structmapper.SUShort
-import kotlin.experimental.and
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
 @ExperimentalStdlibApi
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 class Tests {
     @ExperimentalStdlibApi
     private fun bytesToHex(bytes: UByteArray): String {
@@ -36,7 +30,6 @@ class Tests {
 
     @Test
     fun deserializeSimplePacket() {
-        PacketRegistry.setup()
         val expect = ubyteArrayOf(0x00u,0x05u,0x07u,0xD1u,0x00u,0x00u,0x00u,0xCAu,0xFEu)
 
         val bytes = byteArrayOf(0x00,0x05,0x07, 0xD1.toByte(),0x00,0x00,0x00, 0xCA.toByte(), 0xFE.toByte())

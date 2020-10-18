@@ -1,13 +1,12 @@
-package io.rebble.libpebblecommon
+package io.rebble.libpebblecommon.packets
 
-import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
 
-@ExperimentalUnsignedTypes
-open class TimeMessage(private val message: Message) : PebblePacket(
+@OptIn(ExperimentalUnsignedTypes::class)
+open class TimeMessage(message: Message) : PebblePacket(
     ProtocolEndpoint.TIME) {
     enum class Message(val value: UByte) {
         GetTimeRequest(0x00u),
@@ -15,7 +14,7 @@ open class TimeMessage(private val message: Message) : PebblePacket(
         SetLocalTime(0x02u),
         SetUTC(0x03u)
     }
-    val command = SByte(m, message.value)
+    val command = SUByte(m, message.value)
     init {
         type = command.get()
     }
@@ -28,7 +27,9 @@ open class TimeMessage(private val message: Message) : PebblePacket(
     class SetLocalTime(time: UInt = 0u) : TimeMessage(Message.SetLocalTime) {
         val time = SUInt(m, time)
     }
-    class SetUTC(unixTime: UInt = 0u, utcOffset: Short = 0, timeZoneName: String) : TimeMessage(Message.SetUTC) {
+    class SetUTC(unixTime: UInt = 0u, utcOffset: Short = 0, timeZoneName: String) : TimeMessage(
+        Message.SetUTC
+    ) {
         val unixTime = SUInt(m, unixTime)
         val utcOffset = SShort(m, utcOffset)
         @ExperimentalStdlibApi
@@ -36,13 +37,13 @@ open class TimeMessage(private val message: Message) : PebblePacket(
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
     enum class Message(val value: UByte, val instance: () -> PebblePacket) {
-        AppVersionRequest(0x00u, {AppVersionRequest()}),
-        AppVersionResponse(0x01u, {AppVersionResponse()})
+        AppVersionRequest(0x00u, { AppVersionRequest() }),
+        AppVersionResponse(0x01u, { AppVersionResponse() })
     }
-    val command = SByte(m, message.value)
+    val command = SUByte(m, message.value)
     init {
         type = command.get()
     }
@@ -79,7 +80,7 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
 
         companion object {
             fun makeFlags(vararg flags: ProtocolCapsFlag): UInt {
-                var ret: UInt = 0u
+                val ret: UInt = 0u
                 flags.forEach {flag ->
                     ret or flag.value
                 }
@@ -105,10 +106,10 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
         val protocolVersion = SUInt(m) // Unused as of v3.0
         val sessionCaps = SUInt(m) // Unused as of v3.0
         val platformFlags = SUInt(m)
-        val responseVersion = SByte(m, 2u)
-        val majorVersion = SByte(m)
-        val minorVersion = SByte(m)
-        val bugfixVersion = SByte(m)
+        val responseVersion = SUByte(m, 2u)
+        val majorVersion = SUByte(m)
+        val minorVersion = SUByte(m)
+        val bugfixVersion = SUByte(m)
         val protocolCaps = SULong(m)
     }
 
@@ -117,7 +118,7 @@ open class PhoneAppVersion(message: Message) : PebblePacket(endpoint) {
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class SystemMessage(message: Message) : PebblePacket(endpoint) {
     enum class Message(val value: UByte) {
         NewFirmwareAvailable(0x00u),
@@ -131,8 +132,8 @@ open class SystemMessage(message: Message) : PebblePacket(endpoint) {
         MAPEnabled(0x09u),
         FirmwareUpdateStartResponse(0x0au)
     }
-    val command = SByte(m, message.value)
-    val messageType = SByte(m)
+    val command = SUByte(m, message.value)
+    val messageType = SUByte(m)
     init {
         type = command.get()
         TODO("Incomplete packet declaration")
@@ -143,9 +144,11 @@ open class SystemMessage(message: Message) : PebblePacket(endpoint) {
     }
 }
 
-@ExperimentalUnsignedTypes
-class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : PebblePacket(endpoint) {
-    val command = SByte(m, opcode)
+@OptIn(ExperimentalUnsignedTypes::class)
+class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : PebblePacket(
+    endpoint
+) {
+    val command = SUByte(m, opcode)
     //val discoverable = SBool(m, discoverable)
     val duration = SUShort(m, duration)
     init {
@@ -157,13 +160,13 @@ class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) 
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class PingPong(message: Message, cookie: UInt): PebblePacket(endpoint) {
     enum class Message(val value: UByte) {
         Ping(0u),
         Pong(1u)
     }
-    val command = SByte(m, message.value)
+    val command = SUByte(m, message.value)
     val cookie = SUInt(m, cookie)
     init {
         type = command.get()
@@ -171,12 +174,12 @@ open class PingPong(message: Message, cookie: UInt): PebblePacket(endpoint) {
 
     class Ping(cookie: UInt = 0u) : PingPong(Message.Ping, cookie) {
         init {
-            PacketRegistry.register(endpoint, command.get(), {Ping()})
+            PacketRegistry.register(endpoint, command.get(), { Ping() })
         }
     }
     class Pong(cookie: UInt = 0u) : PingPong(Message.Pong, cookie) {
         init {
-            PacketRegistry.register(endpoint, command.get(), {Pong()})
+            PacketRegistry.register(endpoint, command.get(), { Pong() })
         }
     }
 
@@ -185,7 +188,7 @@ open class PingPong(message: Message, cookie: UInt): PebblePacket(endpoint) {
     }
 }
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 fun systemPacketsRegister() {
     PacketRegistry.register(PhoneAppVersion.endpoint, PhoneAppVersion.Message.AppVersionRequest.value) { PhoneAppVersion.AppVersionRequest() }
     PacketRegistry.register(PhoneAppVersion.endpoint, PhoneAppVersion.Message.AppVersionResponse.value) { PhoneAppVersion.AppVersionResponse() }

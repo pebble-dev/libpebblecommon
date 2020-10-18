@@ -1,9 +1,9 @@
-package io.rebble.libpebblecommon.blobdb
+package io.rebble.libpebblecommon.packets.blobdb
 
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.structmapper.SByte
+import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SBytes
 import io.rebble.libpebblecommon.structmapper.SUShort
 
@@ -26,14 +26,14 @@ open class BlobCommand constructor(message: Message, token: UShort, database: Bl
         AppGlance(11u)
     }
 
-    val command = SByte(m, message.value)
+    val command = SUByte(m, message.value)
     val token = SUShort(m, token)
-    val database = SByte(m, database.id)
+    val database = SUByte(m, database.id)
 
     open class InsertCommand(token: UShort, database: BlobDatabase, key: UByteArray, value: UByteArray) : BlobCommand(
         Message.Insert, token, database
     ) {
-        val keySize = SByte(m, key.size.toUByte())
+        val keySize = SUByte(m, key.size.toUByte())
         val targetKey = SBytes(m, key.size, key)
         val valSize = SUShort(m, value.size.toUShort(), endianness = '<')
         val targetValue = SBytes(m, value.size, value)
@@ -42,7 +42,7 @@ open class BlobCommand constructor(message: Message, token: UShort, database: Bl
     class DeleteCommand(token: UShort, database: BlobDatabase, key: UByteArray) : BlobCommand(
         Message.Delete, token, database
     ) {
-        val keySize = SByte(m, key.size.toUByte())
+        val keySize = SUByte(m, key.size.toUByte())
         val targetKey = SBytes(m, key.size, key)
     }
 
@@ -84,7 +84,7 @@ open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : Pebb
     class TryLater : BlobResponse(BlobStatus.TryLater)
 
     val token = SUShort(m)
-    val response = SByte(m, response.value)
+    val response = SUByte(m, response.value)
 
     companion object {
         val endpoint = ProtocolEndpoint.BLOBDB_V1

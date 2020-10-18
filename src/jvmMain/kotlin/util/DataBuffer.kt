@@ -3,7 +3,7 @@ package io.rebble.libpebblecommon.util
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 actual class DataBuffer {
     private val actualBuf: ByteBuffer
 
@@ -24,10 +24,15 @@ actual class DataBuffer {
     }
     actual fun getShort(): Short = actualBuf.short
 
-    actual fun putByte(byte: UByte) {
+    actual fun putUByte(byte: UByte) {
         actualBuf.put(byte.toByte())
     }
-    actual fun getByte(): UByte = actualBuf.get().toUByte()
+    actual fun getUByte(): UByte = actualBuf.get().toUByte()
+
+    actual fun putByte(byte: Byte) {
+        actualBuf.put(byte)
+    }
+    actual fun getByte(): Byte = actualBuf.get()
 
     actual fun putBytes(bytes: UByteArray) {
         actualBuf.put(bytes.toByteArray())
@@ -51,6 +56,11 @@ actual class DataBuffer {
         actualBuf.putInt(uint.toInt())
     }
     actual fun getUInt(): UInt = actualBuf.int.toUInt()
+
+    actual fun putInt(int: Int) {
+        actualBuf.putInt(int)
+    }
+    actual fun getInt(): Int = actualBuf.int
 
     actual fun putULong(ulong: ULong) {
         actualBuf.putLong(ulong.toLong())

@@ -9,7 +9,7 @@ import io.rebble.libpebblecommon.structmapper.StructMapper
 /**
  * Represents a pebble protocol packet
  */
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 open class PebblePacket{
     val endpoint: ProtocolEndpoint
     val m = StructMapper()

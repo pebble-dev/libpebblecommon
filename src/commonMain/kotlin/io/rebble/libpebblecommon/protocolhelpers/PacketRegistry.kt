@@ -1,11 +1,13 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
-import io.rebble.libpebblecommon.blobdb.blobDBPacketsRegister
-import io.rebble.libpebblecommon.blobdb.timelinePacketsRegister
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
-import io.rebble.libpebblecommon.systemPacketsRegister
+import io.rebble.libpebblecommon.packets.appRunStatePacketsRegister
+import io.rebble.libpebblecommon.packets.appmessagePacketsRegister
+import io.rebble.libpebblecommon.packets.blobdb.blobDBPacketsRegister
+import io.rebble.libpebblecommon.packets.blobdb.timelinePacketsRegister
+import io.rebble.libpebblecommon.packets.systemPacketsRegister
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 /**
  * Singleton to track endpoint / type discriminators for deserialization
  */
@@ -13,10 +15,12 @@ object PacketRegistry {
     private var typeOffsets: MutableMap<ProtocolEndpoint, Int> = mutableMapOf()
     private var decoders: MutableMap<ProtocolEndpoint, MutableMap<UByte, (UByteArray) -> PebblePacket>> = mutableMapOf()
 
-    fun setup() {
+    init {
         systemPacketsRegister()
         timelinePacketsRegister()
         blobDBPacketsRegister()
+        appmessagePacketsRegister()
+        appRunStatePacketsRegister()
     }
 
     /**

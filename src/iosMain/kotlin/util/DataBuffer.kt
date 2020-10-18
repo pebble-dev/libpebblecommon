@@ -3,9 +3,8 @@ package io.rebble.libpebblecommon.util
 import kotlinx.cinterop.*
 import platform.Foundation.*
 import platform.darwin.NSUInteger
-import kotlin.collections.get
 
-@ExperimentalUnsignedTypes
+@OptIn(ExperimentalUnsignedTypes::class)
 actual class DataBuffer {
     private val actualBuf: NSMutableData
     private var littleEndian = false
@@ -50,17 +49,32 @@ actual class DataBuffer {
         }
     }
 
-    actual fun putByte(byte: UByte) {
+    actual fun putUByte(byte: UByte) {
         memScoped {
             val pByte = alloc<UByteVar>()
             pByte.value = byte
             actualBuf.appendBytes(pByte.ptr, UByte.SIZE_BYTES.toULong())
         }
     }
-    actual fun getByte(): UByte {
+    actual fun getUByte(): UByte {
         memScoped {
             val pByte = alloc<UByteVar>()
             actualBuf.appendBytes(pByte.ptr, UByte.SIZE_BYTES.toULong())
+            return pByte.value
+        }
+    }
+
+    actual fun putByte(byte: Byte) {
+        memScoped {
+            val pByte = alloc<ByteVar>()
+            pByte.value = byte
+            actualBuf.appendBytes(pByte.ptr, Byte.SIZE_BYTES.toULong())
+        }
+    }
+    actual fun getByte(): Byte {
+        memScoped {
+            val pByte = alloc<ByteVar>()
+            actualBuf.appendBytes(pByte.ptr, Byte.SIZE_BYTES.toULong())
             return pByte.value
         }
     }
@@ -98,6 +112,21 @@ actual class DataBuffer {
             val pUInt = alloc<UIntVar>()
             actualBuf.getBytes(pUInt.ptr, UInt.SIZE_BYTES.toULong())
             return pUInt.value
+        }
+    }
+
+    actual fun putInt(int: Int) {
+        memScoped {
+            val pInt = alloc<IntVar>()
+            pInt.value = int
+            actualBuf.appendBytes(pInt.ptr, Int.SIZE_BYTES.toULong())
+        }
+    }
+    actual fun getInt(): Int {
+        memScoped {
+            val pInt = alloc<IntVar>()
+            actualBuf.getBytes(pInt.ptr, Int.SIZE_BYTES.toULong())
+            return pInt.value
         }
     }
 
