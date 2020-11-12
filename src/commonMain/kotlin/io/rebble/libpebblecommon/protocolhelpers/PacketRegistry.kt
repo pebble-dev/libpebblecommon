@@ -40,10 +40,12 @@ object PacketRegistry {
     }
 
     fun get(endpoint: ProtocolEndpoint, packet: UByteArray): PebblePacket {
-        val epdecoders = decoders[endpoint] ?: throw PacketDecodeException("No packet class registered for endpoint/type combo")
+        val epdecoders = decoders[endpoint]
+            ?: throw PacketDecodeException("No packet class registered for endpoint $endpoint")
 
         val typeOffset = if (typeOffsets[endpoint] != null) typeOffsets[endpoint]!! else 4
-        val decoder = epdecoders[packet[typeOffset]] ?: throw PacketDecodeException("No packet class registered for endpoint/type combo")
+        val decoder = epdecoders[packet[typeOffset]]
+            ?: throw PacketDecodeException("No packet class registered for endpoint $endpoint")
         return decoder(packet)
     }
 }

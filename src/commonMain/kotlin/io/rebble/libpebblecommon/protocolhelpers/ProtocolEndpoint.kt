@@ -36,6 +36,13 @@ enum class ProtocolEndpoint(val value: UShort) {
 
     companion object {
         private val values = values()
-        fun getByValue(value: UShort) = values.firstOrNull { it.value == value } ?: INVALID_ENDPOINT
+        fun getByValue(value: UShort) = values.firstOrNull { it.value == value }
+            ?: INVALID_ENDPOINT.also {
+                println(
+                    "Received unknown packet endpoint: 0x${
+                        value.toInt().toString(16)
+                    }"
+                )
+            }
     }
 }
