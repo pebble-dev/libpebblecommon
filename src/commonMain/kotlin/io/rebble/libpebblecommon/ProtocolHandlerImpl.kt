@@ -1,12 +1,9 @@
 package io.rebble.libpebblecommon
 
-import io.rebble.libpebblecommon.packets.PhoneAppVersion
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
-import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
+import io.rebble.libpebblecommon.packets.PingPong
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.packets.PhoneAppVersion.ProtocolCapsFlag
-import io.rebble.libpebblecommon.packets.PingPong
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 
@@ -15,8 +12,6 @@ import kotlinx.coroutines.sync.withLock
  */
 @OptIn(ExperimentalUnsignedTypes::class)
 class ProtocolHandlerImpl(private val bluetoothConnection: BluetoothConnection) : ProtocolHandler {
-    var protocolCaps: UInt = ProtocolCapsFlag.makeFlags(ProtocolCapsFlag.SupportsSendTextApp)
-
     private val receiveRegistry = HashMap<ProtocolEndpoint, suspend (PebblePacket) -> Unit>()
     private val protocolMutex = Mutex()
 
@@ -63,18 +58,6 @@ class ProtocolHandlerImpl(private val bluetoothConnection: BluetoothConnection) 
                 //TODO move this to separate service (PingPong service?)
                 is PingPong.Ping -> send(PingPong.Pong(packet.cookie.get()))
                 is PingPong.Pong -> println("Pong! ${packet.cookie.get()}")
-
-                is PhoneAppVersion.AppVersionRequest -> {
-                    val res = PhoneAppVersion.AppVersionResponse()
-                    res.protocolVersion.set(0xffffffffu)
-                    res.sessionCaps.    set(0u)
-                    res.platformFlags.  set(0u)
-                    res.majorVersion.   set(2u)
-                    res.minorVersion.   set(2u)
-                    res.bugfixVersion.  set(0u)
-                    res.platformFlags.  set(protocolCaps)
-                    send(res)
-                }
             }
 
             val receiveCallback = receiveRegistry[packet.endpoint]
