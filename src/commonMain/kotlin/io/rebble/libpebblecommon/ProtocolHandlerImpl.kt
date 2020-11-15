@@ -10,7 +10,6 @@ import kotlinx.coroutines.sync.withLock
 /**
  * Default pebble protocol handler
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 class ProtocolHandlerImpl(private val bluetoothConnection: BluetoothConnection) : ProtocolHandler {
     private val receiveRegistry = HashMap<ProtocolEndpoint, suspend (PebblePacket) -> Unit>()
     private val protocolMutex = Mutex()

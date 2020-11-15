@@ -8,7 +8,6 @@ import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
 import io.rebble.libpebblecommon.util.DataBuffer
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class TimelineItem(
     itemId: Uuid,
     parentId: Uuid, timestamp: UInt,
@@ -106,7 +105,6 @@ class TimelineItem(
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class TimelineAction(message: Message) : PebblePacket(endpoint) {
     val command = SUByte(m, message.value)
 
@@ -146,7 +144,6 @@ open class TimelineAction(message: Message) : PebblePacket(endpoint) {
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 fun timelinePacketsRegister() {
     PacketRegistry.register(
         TimelineAction.endpoint,

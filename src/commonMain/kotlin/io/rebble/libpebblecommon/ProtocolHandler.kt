@@ -3,7 +3,6 @@ package io.rebble.libpebblecommon
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 
-@OptIn(ExperimentalUnsignedTypes::class)
 interface ProtocolHandler {
     /**
      * Send data to the watch. MUST be called within [withWatchContext]

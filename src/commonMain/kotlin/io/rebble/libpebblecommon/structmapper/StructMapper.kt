@@ -5,7 +5,6 @@ import io.rebble.libpebblecommon.util.DataBuffer
 /**
  * Maps class properties to a struct equivalent
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 class StructMapper: Mappable {
     private var struct: MutableList<Mappable> = mutableListOf()
 

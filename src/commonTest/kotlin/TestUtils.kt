@@ -3,7 +3,6 @@ import kotlin.contracts.contract
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
-@OptIn(ExperimentalUnsignedTypes::class)
 fun assertUByteArrayEquals(expected: UByteArray, actual: UByteArray) {
     try {
         assertTrue(

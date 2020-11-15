@@ -9,7 +9,6 @@ import kotlin.random.Random
 /**
  * Singleton to handle sending notifications cleanly, as well as TODO: receiving/acting on action events
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 class NotificationService(private val blobDbService: BlobDBService) {
 
     /**

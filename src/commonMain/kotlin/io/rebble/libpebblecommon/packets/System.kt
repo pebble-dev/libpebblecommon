@@ -9,7 +9,6 @@ import io.rebble.libpebblecommon.structmapper.*
 
 sealed class SystemPacket(endpoint: ProtocolEndpoint) : PebblePacket(endpoint)
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class TimeMessage(message: Message) : SystemPacket(
     ProtocolEndpoint.TIME
 ) {
@@ -41,12 +40,10 @@ open class TimeMessage(message: Message) : SystemPacket(
         val unixTime = SUInt(m, unixTime)
         val utcOffset = SShort(m, utcOffset)
 
-        @ExperimentalStdlibApi
         val timeZoneName = SString(m, timeZoneName)
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class PhoneAppVersion(message: Message) : SystemPacket(endpoint) {
     enum class Message(val value: UByte, val instance: () -> PebblePacket) {
         AppVersionRequest(0x00u, { AppVersionRequest() }),
@@ -245,7 +242,6 @@ open class PhoneAppVersion(message: Message) : SystemPacket(endpoint) {
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class SystemMessage(message: Message) : SystemPacket(endpoint) {
     enum class Message(val value: UByte) {
         NewFirmwareAvailable(0x00u),
@@ -273,7 +269,6 @@ open class SystemMessage(message: Message) : SystemPacket(endpoint) {
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) : SystemPacket(
     endpoint
 ) {
@@ -292,7 +287,6 @@ class BLEControl(opcode: UByte = 0x4u, discoverable: Boolean, duration: UShort) 
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class PingPong(message: Message, cookie: UInt) : SystemPacket(endpoint) {
     enum class Message(val value: UByte) {
         Ping(0u),
@@ -323,7 +317,6 @@ open class PingPong(message: Message, cookie: UInt) : SystemPacket(endpoint) {
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 fun systemPacketsRegister() {
     PacketRegistry.register(
         PhoneAppVersion.endpoint,

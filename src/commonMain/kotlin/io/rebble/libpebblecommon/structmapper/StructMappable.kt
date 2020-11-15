@@ -2,7 +2,6 @@ package io.rebble.libpebblecommon.structmapper
 
 import io.rebble.libpebblecommon.util.DataBuffer
 
-@OptIn(ExperimentalUnsignedTypes::class)
 abstract class StructMappable : Mappable {
     val m = StructMapper()
 

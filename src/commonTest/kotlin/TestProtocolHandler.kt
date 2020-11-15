@@ -1,6 +1,6 @@
+import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.ProtocolHandler
 
 /**
  * Test double of the protocol handler.
@@ -10,7 +10,6 @@ import io.rebble.libpebblecommon.ProtocolHandler
  *
  * You can manually receive packets by calling [receivePacket].
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 class TestProtocolHandler(private val sender: (suspend TestProtocolHandler.(PebblePacket) -> Unit)? = null) :
     ProtocolHandler {
     val sentPackets = ArrayList<PebblePacket>()

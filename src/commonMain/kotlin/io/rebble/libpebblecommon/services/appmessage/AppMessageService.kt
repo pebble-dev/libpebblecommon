@@ -22,7 +22,6 @@ class AppMessageService(private val protocolHandler: ProtocolHandler) {
         }
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     fun receive(packet: PebblePacket) {
         if (packet !is AppMessage) {
             throw IllegalStateException("Received invalid packet type: $packet")

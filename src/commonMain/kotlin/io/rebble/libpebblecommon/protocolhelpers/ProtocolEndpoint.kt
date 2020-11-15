@@ -1,6 +1,5 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
-@OptIn(ExperimentalUnsignedTypes::class)
 enum class ProtocolEndpoint(val value: UShort) {
     TIME(11u),
     VERSIONS(16u),

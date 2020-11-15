@@ -10,7 +10,6 @@ import io.rebble.libpebblecommon.util.DataBuffer
 /**
  * Represents anything mappable to a struct via a StructMapper
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 interface Mappable {
     /**
      * Serializes/packs the mappable to its raw equivalent
@@ -34,7 +33,6 @@ interface NumberStructElement {
  * Represents a property mappable to a struct via a StructMapper
  * @param endianness represents endianness on serialization
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 open class StructElement<T>(
     private val putType: (DataBuffer, StructElement<T>) -> Unit,
     private val getType: (DataBuffer, StructElement<T>) -> Unit,
@@ -115,7 +113,6 @@ open class StructElement<T>(
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SUByte(mapper: StructMapper, default: UByte = 0u) :
     StructElement<UByte>(
         { buf, el -> buf.putUByte(el.get()) },
@@ -128,7 +125,6 @@ class SUByte(mapper: StructMapper, default: UByte = 0u) :
         get() = get().toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SByte(mapper: StructMapper, default: Byte = 0) :
     StructElement<Byte>(
         { buf, el -> buf.putByte(el.get()) },
@@ -141,7 +137,6 @@ class SByte(mapper: StructMapper, default: Byte = 0) :
         get() = get().toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SUInt(mapper: StructMapper, default: UInt = 0u, endianness: Char = '|') :
     StructElement<UInt>(
         { buf, el -> buf.putUInt(el.get()) },
@@ -155,7 +150,6 @@ class SUInt(mapper: StructMapper, default: UInt = 0u, endianness: Char = '|') :
         get() = get().toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SInt(mapper: StructMapper, default: Int = 0, endianness: Char = '|') :
     StructElement<Int>(
         { buf, el -> buf.putInt(el.get()) },
@@ -169,7 +163,6 @@ class SInt(mapper: StructMapper, default: Int = 0, endianness: Char = '|') :
         get() = get().toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SULong(mapper: StructMapper, default: ULong = 0u) :
     StructElement<ULong>(
         { buf, el -> buf.putULong(el.get()) },
@@ -182,7 +175,6 @@ class SULong(mapper: StructMapper, default: ULong = 0u) :
         get() = get().toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SUShort(mapper: StructMapper, default: UShort = 0u, endianness: Char = '|') :
     StructElement<UShort>(
         { buf, el -> buf.putUShort(el.get()) },
@@ -196,7 +188,6 @@ class SUShort(mapper: StructMapper, default: UShort = 0u, endianness: Char = '|'
         get() = get().toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SShort(mapper: StructMapper, default: Short = 0, endianness: Char = '|') :
     StructElement<Short>(
         { buf, el -> buf.putShort(el.get()) },
@@ -210,7 +201,6 @@ class SShort(mapper: StructMapper, default: Short = 0, endianness: Char = '|') :
         get() = get().toLong()
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class SUUID(mapper: StructMapper, default: Uuid = Uuid(0, 0)) :
     StructElement<Uuid>(
         { buf, el -> buf.putBytes(el.get().bytes.toUByteArray()) },
@@ -223,8 +213,6 @@ class SUUID(mapper: StructMapper, default: Uuid = Uuid(0, 0)) :
 /**
  * Represents a string (UTF-8) in a struct, includes framing for length
  */
-@OptIn(ExperimentalUnsignedTypes::class)
-@ExperimentalStdlibApi
 class SString(mapper: StructMapper, default: String = "") :
     StructElement<String>(
         { buf, el ->
@@ -242,7 +230,6 @@ class SString(mapper: StructMapper, default: String = "") :
  * Represents arbitrary bytes in a struct
  * @param length the number of bytes, when serializing this is used to pad/truncate the provided value to ensure it's 'length' bytes long
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 class SBytes(
     mapper: StructMapper,
     length: Int,
@@ -287,7 +274,6 @@ class SBytes(
  * Represents a fixed size list of T
  * @param T the type (must inherit Mappable)
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 class SFixedList<T : Mappable>(
     mapper: StructMapper,
     count: Int,

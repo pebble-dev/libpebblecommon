@@ -11,7 +11,6 @@ import runBlockingWithTimeout
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class NotificationServiceTest {
     @Test
     fun `Forward notification success`() = runBlockingWithTimeout {
@@ -90,7 +89,6 @@ class NotificationServiceTest {
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 private val TEST_NOTIFICATION = PushNotification(
     sender = "Test Notif",
     subject = "This is a test notification!",

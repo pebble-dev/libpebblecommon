@@ -1,15 +1,14 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
-import io.rebble.libpebblecommon.util.DataBuffer
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.exceptions.PacketEncodeException
 import io.rebble.libpebblecommon.structmapper.SUShort
 import io.rebble.libpebblecommon.structmapper.StructMapper
+import io.rebble.libpebblecommon.util.DataBuffer
 
 /**
  * Represents a pebble protocol packet
  */
-@OptIn(ExperimentalUnsignedTypes::class)
 open class PebblePacket{
     val endpoint: ProtocolEndpoint
     val m = StructMapper()

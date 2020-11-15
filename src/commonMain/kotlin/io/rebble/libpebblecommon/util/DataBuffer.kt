@@ -1,6 +1,5 @@
 package io.rebble.libpebblecommon.util
 
-@OptIn(ExperimentalUnsignedTypes::class)
 /**
  * Common DataBuffer with bindings for each platform
  */
