@@ -11,7 +11,7 @@ import kotlinx.coroutines.channels.Channel
 /**
  * Singleton to handle sending notifications cleanly, as well as TODO: receiving/acting on action events
  */
-class SystemService(private val protocolHandler: ProtocolHandler) {
+class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolService {
     val receivedMessages = Channel<SystemPacket>(Channel.BUFFERED)
 
     init {

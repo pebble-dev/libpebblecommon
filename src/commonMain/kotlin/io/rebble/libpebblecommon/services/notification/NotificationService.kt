@@ -2,6 +2,7 @@ package io.rebble.libpebblecommon.services.notification
 
 import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
 import io.rebble.libpebblecommon.packets.blobdb.PushNotification
+import io.rebble.libpebblecommon.services.ProtocolService
 import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 import kotlinx.coroutines.delay
 import kotlin.random.Random
@@ -9,7 +10,7 @@ import kotlin.random.Random
 /**
  * Singleton to handle sending notifications cleanly, as well as TODO: receiving/acting on action events
  */
-class NotificationService(private val blobDbService: BlobDBService) {
+class NotificationService(private val blobDbService: BlobDBService) : ProtocolService {
 
     /**
      * Send a PushNotification command

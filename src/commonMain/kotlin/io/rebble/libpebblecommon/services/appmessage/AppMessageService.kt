@@ -4,9 +4,10 @@ import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.packets.AppMessage
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
+import io.rebble.libpebblecommon.services.ProtocolService
 import kotlinx.coroutines.channels.Channel
 
-class AppMessageService(private val protocolHandler: ProtocolHandler) {
+class AppMessageService(private val protocolHandler: ProtocolHandler) : ProtocolService {
     val receivedMessages = Channel<AppMessage>(Channel.BUFFERED)
 
     init {
