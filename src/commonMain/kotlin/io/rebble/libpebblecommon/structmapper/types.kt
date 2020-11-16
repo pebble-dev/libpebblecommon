@@ -216,14 +216,16 @@ class SUUID(mapper: StructMapper, default: Uuid = Uuid(0, 0)) :
 class SString(mapper: StructMapper, default: String = "") :
     StructElement<String>(
         { buf, el ->
-            buf.putUByte(el.get().length.toUByte()); buf.putBytes(
-            el.get().encodeToByteArray().toUByteArray()
-        )
+            val bytes = el.get().encodeToByteArray()
+            buf.putUByte(bytes.size.toUByte())
+            buf.putBytes(
+                bytes.toUByteArray()
+            )
         },
         { buf, el ->
             val len = buf.getUByte().toInt()
             el.set(buf.getBytes(len).toByteArray().decodeToString(), len)
-        }, mapper, default.length, default
+        }, mapper, default.encodeToByteArray().size + 1, default
     )
 
 /**
