@@ -1,6 +1,8 @@
 package io.rebble.libpebblecommon.services
 
 import io.rebble.libpebblecommon.ProtocolHandler
+import io.rebble.libpebblecommon.getPlatform
+import io.rebble.libpebblecommon.packets.PhoneAppVersion
 import io.rebble.libpebblecommon.packets.SystemPacket
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
@@ -25,12 +27,40 @@ class SystemService(private val protocolHandler: ProtocolHandler) {
         }
     }
 
-    fun receive(packet: PebblePacket) {
+    suspend fun receive(packet: PebblePacket) {
         if (packet !is SystemPacket) {
             throw IllegalStateException("Received invalid packet type: $packet")
         }
 
-        receivedMessages.offer(packet)
+        when (packet) {
+            is PhoneAppVersion -> {
+                val responsePacket = PhoneAppVersion.AppVersionResponse(
+                    UInt.MAX_VALUE,
+
+                    0u,
+                    PhoneAppVersion.PlatformFlag.makeFlags(
+                        getPlatform(), emptyList()
+                    ),
+                    2u,
+                    4u,
+                    4u,
+                    2u,
+                    PhoneAppVersion.ProtocolCapsFlag.makeFlags(
+                        listOf(
+                            PhoneAppVersion.ProtocolCapsFlag.Supports8kAppMessage
+                        )
+                    )
+
+                )
+
+                protocolHandler.withWatchContext {
+                    protocolHandler.send(responsePacket)
+                }
+            }
+            else -> receivedMessages.offer(packet)
+        }
+
+
     }
 
 }
