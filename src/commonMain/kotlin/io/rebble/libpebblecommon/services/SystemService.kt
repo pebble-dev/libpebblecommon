@@ -22,9 +22,7 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
      * Send an AppMessage
      */
     suspend fun send(packet: SystemPacket) {
-        protocolHandler.withWatchContext {
-            protocolHandler.send(packet)
-        }
+        protocolHandler.send(packet)
     }
 
     suspend fun receive(packet: PebblePacket) {
@@ -53,9 +51,7 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
 
                 )
 
-                protocolHandler.withWatchContext {
-                    protocolHandler.send(responsePacket)
-                }
+                protocolHandler.send(responsePacket)
             }
             else -> receivedMessages.offer(packet)
         }

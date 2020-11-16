@@ -15,9 +15,7 @@ class AppRunStateService(private val protocolHandler: ProtocolHandler) : Protoco
     }
 
     suspend fun send(packet: AppRunStateMessage) {
-        protocolHandler.withWatchContext {
-            protocolHandler.send(packet)
-        }
+        protocolHandler.send(packet)
     }
 
     fun receive(packet: PebblePacket) {

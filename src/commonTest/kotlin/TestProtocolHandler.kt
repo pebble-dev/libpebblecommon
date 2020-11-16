@@ -1,3 +1,4 @@
+import io.rebble.libpebblecommon.PacketPriority
 import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
@@ -17,24 +18,26 @@ class TestProtocolHandler(private val sender: (suspend TestProtocolHandler.(Pebb
     private val receiveRegistry = HashMap<ProtocolEndpoint, suspend (PebblePacket) -> Unit>()
 
 
-    /**
-     * Send data to the watch. MUST be called within [withWatchContext]
-     */
-    override suspend fun send(packet: PebblePacket) {
+    override suspend fun send(packet: PebblePacket, priority: PacketPriority): Boolean {
         if (sender != null) {
             sender.invoke(this, packet)
         } else {
             sentPackets += packet
         }
+
+        return true
     }
 
-    /**
-     * Calls the specified block within watch sending context. Only one block within watch context
-     * can be active at the same time, ensuring atomic bluetooth sending.
-     */
-    override suspend fun <T> withWatchContext(block: suspend () -> T): T {
-        // Assume tests are run as single thread, no need for mutexes
-        return block()
+    override suspend fun send(packetData: UByteArray, priority: PacketPriority): Boolean {
+        throw UnsupportedOperationException("Not supported for TestProtocolHandler")
+    }
+
+    override suspend fun startPacketSendingLoop(rawSend: suspend (UByteArray) -> Boolean) {
+        throw UnsupportedOperationException("Not supported for TestProtocolHandler")
+    }
+
+    override suspend fun receivePacket(bytes: UByteArray): Boolean {
+        return receivePacket(PebblePacket.deserialize(bytes))
     }
 
     override fun registerReceiveCallback(

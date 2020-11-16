@@ -24,13 +24,16 @@ class BlobDBService(private val protocolHandler: ProtocolHandler) : ProtocolServ
      * @see BlobCommand
      * @see BlobResponse
      * @param packet the packet to send
+     *
+     * @return [BlobResponse] from the watch or *null* if the sending failed
      */
-    suspend fun send(packet: BlobCommand): BlobResponse {
+    suspend fun send(packet: BlobCommand): BlobResponse? {
         val result = CompletableDeferred<BlobResponse>()
         pending[packet.token.get()] = result
 
-        protocolHandler.withWatchContext {
-            protocolHandler.send(packet)
+        val sendingResult = protocolHandler.send(packet)
+        if (!sendingResult) {
+            return null
         }
 
         return result.await()

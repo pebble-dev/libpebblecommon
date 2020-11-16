@@ -18,9 +18,7 @@ class AppMessageService(private val protocolHandler: ProtocolHandler) : Protocol
      * Send an AppMessage
      */
     suspend fun send(packet: AppMessage) {
-        protocolHandler.withWatchContext {
-            protocolHandler.send(packet)
-        }
+        protocolHandler.send(packet)
     }
 
     fun receive(packet: PebblePacket) {

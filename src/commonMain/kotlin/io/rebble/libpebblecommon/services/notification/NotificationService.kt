@@ -16,8 +16,10 @@ class NotificationService(private val blobDbService: BlobDBService) : ProtocolSe
      * Send a PushNotification command
      * @param notif the notification to send
      * @see PushNotification
+     *
+     * @return notification [BlobResponse] from the watch or *null* if sending failed
      */
-    suspend fun send(notif: PushNotification): BlobResponse {
+    suspend fun send(notif: PushNotification): BlobResponse? {
         while (true) {
             val res = blobDbService.send(notif)
             if (res is BlobResponse.TryLater) {
