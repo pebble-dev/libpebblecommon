@@ -71,4 +71,22 @@ internal class SystemMessageTest {
             PhoneAppVersion.ProtocolCapsFlag.fromFlags(newMessage.protocolCaps.get()).toSet()
         )
     }
+
+    @Test
+    fun serializeDeserializeSetTimeUtcMessage() {
+        val originalMessage = TimeMessage.SetUTC(
+            12345678u,
+            2500,
+            "Europe/Berlin"
+        )
+
+        val bytes = originalMessage.serialize()
+        val newMessage = PebblePacket.deserialize(bytes)
+
+        assertIs<TimeMessage.SetUTC>(newMessage)
+
+        assertEquals(12345678u, newMessage.unixTime.get())
+        assertEquals(2500, newMessage.utcOffset.get())
+        assertEquals("Europe/Berlin", newMessage.timeZoneName.get())
+    }
 }

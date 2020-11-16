@@ -34,9 +34,10 @@ open class TimeMessage(message: Message) : SystemPacket(
         val time = SUInt(m, time)
     }
 
-    class SetUTC(unixTime: UInt = 0u, utcOffset: Short = 0, timeZoneName: String) : TimeMessage(
-        Message.SetUTC
-    ) {
+    class SetUTC(unixTime: UInt = 0u, utcOffset: Short = 0, timeZoneName: String = "") :
+        TimeMessage(
+            Message.SetUTC
+        ) {
         val unixTime = SUInt(m, unixTime)
         val utcOffset = SShort(m, utcOffset)
 
@@ -314,6 +315,12 @@ open class PingPong(message: Message, cookie: UInt) : SystemPacket(endpoint) {
 
     companion object {
         val endpoint = ProtocolEndpoint.PING
+    }
+}
+
+fun timePacketsRegister() {
+    PacketRegistry.register(ProtocolEndpoint.TIME, TimeMessage.Message.SetUTC.value) {
+        TimeMessage.SetUTC()
     }
 }
 

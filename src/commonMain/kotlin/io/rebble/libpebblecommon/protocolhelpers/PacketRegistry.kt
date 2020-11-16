@@ -6,6 +6,7 @@ import io.rebble.libpebblecommon.packets.appmessagePacketsRegister
 import io.rebble.libpebblecommon.packets.blobdb.blobDBPacketsRegister
 import io.rebble.libpebblecommon.packets.blobdb.timelinePacketsRegister
 import io.rebble.libpebblecommon.packets.systemPacketsRegister
+import io.rebble.libpebblecommon.packets.timePacketsRegister
 
 /**
  * Singleton to track endpoint / type discriminators for deserialization
@@ -16,6 +17,7 @@ object PacketRegistry {
 
     init {
         systemPacketsRegister()
+        timePacketsRegister()
         timelinePacketsRegister()
         blobDBPacketsRegister()
         appmessagePacketsRegister()

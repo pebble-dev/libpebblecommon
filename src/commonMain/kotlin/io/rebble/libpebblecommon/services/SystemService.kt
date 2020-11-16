@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.services
 
+import io.rebble.libpebblecommon.PacketPriority
 import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.getPlatform
 import io.rebble.libpebblecommon.packets.PhoneAppVersion
@@ -21,8 +22,8 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
     /**
      * Send an AppMessage
      */
-    suspend fun send(packet: SystemPacket) {
-        protocolHandler.send(packet)
+    suspend fun send(packet: SystemPacket, priority: PacketPriority = PacketPriority.NORMAL) {
+        protocolHandler.send(packet, priority)
     }
 
     suspend fun receive(packet: PebblePacket) {
