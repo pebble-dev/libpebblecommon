@@ -1,6 +1,5 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
-@OptIn(ExperimentalUnsignedTypes::class)
 enum class ProtocolEndpoint(val value: UShort) {
     TIME(11u),
     VERSIONS(16u),
@@ -36,6 +35,13 @@ enum class ProtocolEndpoint(val value: UShort) {
 
     companion object {
         private val values = values()
-        fun getByValue(value: UShort) = values.firstOrNull { it.value == value } ?: INVALID_ENDPOINT
+        fun getByValue(value: UShort) = values.firstOrNull { it.value == value }
+            ?: INVALID_ENDPOINT.also {
+                println(
+                    "Received unknown packet endpoint: 0x${
+                        value.toInt().toString(16)
+                    }"
+                )
+            }
     }
 }

@@ -3,17 +3,43 @@ package io.rebble.libpebblecommon
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 
-@OptIn(ExperimentalUnsignedTypes::class)
 interface ProtocolHandler {
     /**
-     * Send data to the watch. MUST be called within [withWatchContext]
+     * Send data to the watch.
+     *
+     * @param priority Priority of the packet. Higher priority items will be sent before
+     * low priority ones. Use low priority for background messages like sync and higher priority
+     * for user-initiated actions that should be transmitted faster
+     *
+     * @return *true* if sending was successful, *false* if packet sending failed due to
+     * unrecoverable circumstances (such as watch disconnecting completely).
      */
-    suspend fun send(packet: PebblePacket)
+    suspend fun send(
+        packet: PebblePacket,
+        priority: PacketPriority = PacketPriority.NORMAL
+    ): Boolean
 
     /**
-     * Calls the specified block within watch sending context. Only one block within watch context
-     * can be active at the same time, ensuring atomic bluetooth sending.
+     * Send raw data to the watch.
+     *
+     * @param priority Priority of the packet. Higher priority items will be sent before
+     * low priority ones. Use low priority for background messages like sync and higher priority
+     * for user-initiated actions that should be transmitted faster
+     *
+     * @return *true* if sending was successful, *false* if packet sending failed due to
+     * unrecoverable circumstances (such as watch disconnecting completely).
      */
-    suspend fun <T> withWatchContext(block: suspend () -> T): T
-    fun registerReceiveCallback(endpoint: ProtocolEndpoint, callback: suspend (PebblePacket) -> Unit)
+    suspend fun send(
+        packetData: UByteArray,
+        priority: PacketPriority = PacketPriority.NORMAL
+    ): Boolean
+
+    suspend fun startPacketSendingLoop(rawSend: suspend (UByteArray) -> Boolean)
+
+    fun registerReceiveCallback(
+        endpoint: ProtocolEndpoint,
+        callback: suspend (PebblePacket) -> Unit
+    )
+
+    suspend fun receivePacket(bytes: UByteArray): Boolean
 }

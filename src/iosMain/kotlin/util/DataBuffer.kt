@@ -4,7 +4,6 @@ import kotlinx.cinterop.*
 import platform.Foundation.*
 import platform.darwin.NSUInteger
 
-@OptIn(ExperimentalUnsignedTypes::class)
 actual class DataBuffer {
     private val actualBuf: NSMutableData
     private var littleEndian = false

@@ -2,6 +2,7 @@ package io.rebble.libpebblecommon.services.notification
 
 import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
 import io.rebble.libpebblecommon.packets.blobdb.PushNotification
+import io.rebble.libpebblecommon.services.ProtocolService
 import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 import kotlinx.coroutines.delay
 import kotlin.random.Random
@@ -9,15 +10,16 @@ import kotlin.random.Random
 /**
  * Singleton to handle sending notifications cleanly, as well as TODO: receiving/acting on action events
  */
-@OptIn(ExperimentalUnsignedTypes::class)
-class NotificationService(private val blobDbService: BlobDBService) {
+class NotificationService(private val blobDbService: BlobDBService) : ProtocolService {
 
     /**
      * Send a PushNotification command
      * @param notif the notification to send
      * @see PushNotification
+     *
+     * @return notification [BlobResponse] from the watch or *null* if sending failed
      */
-    suspend fun send(notif: PushNotification): BlobResponse {
+    suspend fun send(notif: PushNotification): BlobResponse? {
         while (true) {
             val res = blobDbService.send(notif)
             if (res is BlobResponse.TryLater) {

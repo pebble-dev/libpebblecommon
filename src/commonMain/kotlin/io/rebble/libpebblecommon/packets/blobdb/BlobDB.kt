@@ -3,11 +3,10 @@ package io.rebble.libpebblecommon.packets.blobdb
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SBytes
+import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SUShort
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class BlobCommand constructor(message: Message, token: UShort, database: BlobDatabase) : PebblePacket(
     endpoint
 ) {
@@ -55,7 +54,6 @@ open class BlobCommand constructor(message: Message, token: UShort, database: Bl
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : PebblePacket(endpoint) {
     enum class BlobStatus(val value: UByte) {
         Success(0x01u),
@@ -91,7 +89,6 @@ open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : Pebb
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 fun blobDBPacketsRegister() {
     PacketRegistry.registerCustomTypeOffset(BlobResponse.endpoint, 4 + UShort.SIZE_BYTES)
     PacketRegistry.register(BlobResponse.endpoint, BlobResponse.BlobStatus.Success.value) { BlobResponse.Success() }

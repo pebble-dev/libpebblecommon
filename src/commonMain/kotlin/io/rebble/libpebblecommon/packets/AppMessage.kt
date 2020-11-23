@@ -8,7 +8,6 @@ import io.rebble.libpebblecommon.structmapper.*
 import io.rebble.libpebblecommon.util.DataBuffer
 
 
-@OptIn(ExperimentalUnsignedTypes::class, ExperimentalStdlibApi::class)
 class AppMessageTuple() : StructMappable() {
     enum class Type(val value: UByte) {
         ByteArray(0u),
@@ -190,7 +189,6 @@ class AppMessageTuple() : StructMappable() {
     }
 }
 
-@OptIn(ExperimentalUnsignedTypes::class)
 sealed class AppMessage(message: Message, transactionId: UByte) : PebblePacket(endpoint) {
     val command = SUByte(m, message.value)
     val transactionId = SUByte(m, transactionId)
@@ -205,7 +203,6 @@ sealed class AppMessage(message: Message, transactionId: UByte) : PebblePacket(e
         AppMessageNACK(0x7fu)
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     class AppMessagePush(
         transactionId: UByte = 0u,
         uuid: Uuid = Uuid(0L, 0L),

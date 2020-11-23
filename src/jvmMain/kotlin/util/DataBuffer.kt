@@ -3,7 +3,6 @@ package io.rebble.libpebblecommon.util
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
 
-@OptIn(ExperimentalUnsignedTypes::class)
 actual class DataBuffer {
     private val actualBuf: ByteBuffer
 

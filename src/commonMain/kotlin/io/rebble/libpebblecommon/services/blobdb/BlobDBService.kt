@@ -5,14 +5,14 @@ import io.rebble.libpebblecommon.packets.blobdb.BlobCommand
 import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
+import io.rebble.libpebblecommon.services.ProtocolService
 import kotlinx.coroutines.CompletableDeferred
 
 /**
  * Singleton to handle sending BlobDB commands cleanly, by allowing registered callbacks to be triggered when the sending packet receives a BlobResponse
  * @see BlobResponse
  */
-@OptIn(ExperimentalUnsignedTypes::class)
-class BlobDBService(private val protocolHandler: ProtocolHandler) {
+class BlobDBService(private val protocolHandler: ProtocolHandler) : ProtocolService {
     private val pending: MutableMap<UShort, CompletableDeferred<BlobResponse>> = mutableMapOf()
 
     init {
@@ -24,13 +24,16 @@ class BlobDBService(private val protocolHandler: ProtocolHandler) {
      * @see BlobCommand
      * @see BlobResponse
      * @param packet the packet to send
+     *
+     * @return [BlobResponse] from the watch or *null* if the sending failed
      */
-    suspend fun send(packet: BlobCommand): BlobResponse {
+    suspend fun send(packet: BlobCommand): BlobResponse? {
         val result = CompletableDeferred<BlobResponse>()
         pending[packet.token.get()] = result
 
-        protocolHandler.withWatchContext {
-            protocolHandler.send(packet)
+        val sendingResult = protocolHandler.send(packet)
+        if (!sendingResult) {
+            return null
         }
 
         return result.await()

@@ -16,12 +16,12 @@ inline fun runBlockingWithTimeout(timeoutMs: Long = 5_000L, crossinline block: s
 }
 
 @OptIn(ExperimentalContracts::class)
-inline fun <reified T> assertIs(obj: Any, message: String? = null) {
+inline fun <reified T> assertIs(obj: Any?, message: String? = null) {
     contract { returns() implies (obj is T) }
     assertTrue(
         obj is T,
         messagePrefix(message) + "Expected provided object to be <${T::class.java}>, " +
-                "is <${obj::class.java}>."
+                "is <${obj?.javaClass}>."
     )
 }
 

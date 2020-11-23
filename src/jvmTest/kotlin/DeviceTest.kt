@@ -1,25 +1,24 @@
-import io.ktor.client.HttpClient
-import io.ktor.client.features.websocket.WebSockets
-import io.ktor.client.features.websocket.ws
-import io.ktor.http.cio.websocket.Frame
-import io.ktor.http.HttpMethod
+import io.ktor.client.*
+import io.ktor.client.features.websocket.*
+import io.ktor.http.*
+import io.ktor.http.cio.websocket.*
 import io.ktor.util.KtorExperimentalAPI
+import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.packets.PingPong
 import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
 import io.rebble.libpebblecommon.packets.blobdb.NotificationSource
 import io.rebble.libpebblecommon.packets.blobdb.PushNotification
-import io.rebble.libpebblecommon.exceptions.PacketDecodeException
-import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.services.blobdb.BlobDBService
 import io.rebble.libpebblecommon.services.notification.NotificationService
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import kotlin.test.Test
 import kotlin.test.Ignore
+import kotlin.test.Test
 import kotlin.test.assertTrue
+import kotlin.text.String
+import kotlin.text.toCharArray
 
-@OptIn(ExperimentalUnsignedTypes::class)
 @Ignore("This tests requires manual run.")
 class DeviceTests {
     private fun bytesToHex(bytes: UByteArray): String {
@@ -75,7 +74,6 @@ class DeviceTests {
     }
 
     @KtorExperimentalAPI
-    @ExperimentalStdlibApi
     @Test
     fun sendNotification() = runBlocking {
         val notif = PushNotification(

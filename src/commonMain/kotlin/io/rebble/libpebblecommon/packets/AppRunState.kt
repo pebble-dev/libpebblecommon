@@ -8,7 +8,6 @@ import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SUUID
 
 
-@OptIn(ExperimentalUnsignedTypes::class)
 sealed class AppRunStateMessage(message: Message) : PebblePacket(endpoint) {
     val command = SUByte(m, message.value)
 
@@ -22,7 +21,6 @@ sealed class AppRunStateMessage(message: Message) : PebblePacket(endpoint) {
         AppRunStateRequest(0x03u)
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     class AppRunStateStart(
         uuid: Uuid = Uuid(0L, 0L)
     ) :
@@ -49,7 +47,6 @@ sealed class AppRunStateMessage(message: Message) : PebblePacket(endpoint) {
         }
     }
 
-    @OptIn(ExperimentalUnsignedTypes::class)
     class AppRunStateStop(
         uuid: Uuid = Uuid(0L, 0L)
     ) :

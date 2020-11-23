@@ -154,6 +154,8 @@ kotlin {
         all {
             languageSettings {
                 useExperimentalAnnotation('kotlin.RequiresOptIn')
+                useExperimentalAnnotation('kotlin.ExperimentalUnsignedTypes')
+                useExperimentalAnnotation('kotlin.ExperimentalStdlibApi')
             }
         }
     }

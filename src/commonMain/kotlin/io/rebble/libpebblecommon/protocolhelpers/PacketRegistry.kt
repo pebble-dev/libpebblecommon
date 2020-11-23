@@ -6,8 +6,8 @@ import io.rebble.libpebblecommon.packets.appmessagePacketsRegister
 import io.rebble.libpebblecommon.packets.blobdb.blobDBPacketsRegister
 import io.rebble.libpebblecommon.packets.blobdb.timelinePacketsRegister
 import io.rebble.libpebblecommon.packets.systemPacketsRegister
+import io.rebble.libpebblecommon.packets.timePacketsRegister
 
-@OptIn(ExperimentalUnsignedTypes::class)
 /**
  * Singleton to track endpoint / type discriminators for deserialization
  */
@@ -17,6 +17,7 @@ object PacketRegistry {
 
     init {
         systemPacketsRegister()
+        timePacketsRegister()
         timelinePacketsRegister()
         blobDBPacketsRegister()
         appmessagePacketsRegister()
@@ -40,10 +41,12 @@ object PacketRegistry {
     }
 
     fun get(endpoint: ProtocolEndpoint, packet: UByteArray): PebblePacket {
-        val epdecoders = decoders[endpoint] ?: throw PacketDecodeException("No packet class registered for endpoint/type combo")
+        val epdecoders = decoders[endpoint]
+            ?: throw PacketDecodeException("No packet class registered for endpoint $endpoint")
 
         val typeOffset = if (typeOffsets[endpoint] != null) typeOffsets[endpoint]!! else 4
-        val decoder = epdecoders[packet[typeOffset]] ?: throw PacketDecodeException("No packet class registered for endpoint/type combo")
+        val decoder = epdecoders[packet[typeOffset]]
+            ?: throw PacketDecodeException("No packet class registered for endpoint $endpoint")
         return decoder(packet)
     }
 }

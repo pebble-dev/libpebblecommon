@@ -1,13 +1,9 @@
 import io.rebble.libpebblecommon.packets.PingPong
-import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@ExperimentalStdlibApi
-@OptIn(ExperimentalUnsignedTypes::class)
 class Tests {
-    @ExperimentalStdlibApi
     private fun bytesToHex(bytes: UByteArray): String {
         val hexArray = "0123456789ABCDEF".toCharArray()
         val hexChars = CharArray(bytes.size * 2)

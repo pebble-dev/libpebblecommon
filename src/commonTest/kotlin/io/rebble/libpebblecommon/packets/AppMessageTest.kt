@@ -8,7 +8,6 @@ import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-@OptIn(ExperimentalUnsignedTypes::class, ExperimentalStdlibApi::class)
 internal class AppMessageTest {
     @Test
     fun serializeDeserializePushMessage() {
