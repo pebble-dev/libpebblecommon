@@ -19,7 +19,14 @@ class TimelineItem(
     enum class Type(val value: UByte) {
         Notification(1u),
         Pin(2u),
-        Reminder(3u)
+        Reminder(3u);
+
+        companion object {
+            fun fromValue(value: UByte): Type {
+                return values().firstOrNull { it.value == value }
+                    ?: error("Unknown timeline item type: $value")
+            }
+        }
     }
 
     val itemId = SUUID(m, itemId)
@@ -90,7 +97,11 @@ class TimelineItem(
         val length = SUShort(m, endianness = '<')
         val content = SBytes(m, 0)
 
-        constructor(attributeId: UByte, content: UByteArray, contentEndianness: Char = '|'): this() {
+        constructor(
+            attributeId: UByte,
+            content: UByteArray,
+            contentEndianness: Char = '|'
+        ) : this() {
             this.attributeId.set(attributeId)
 
             this.length.set(content.size.toUShort())
@@ -101,6 +112,27 @@ class TimelineItem(
 
         init {
             content.linkWithSize(length)
+        }
+    }
+
+    enum class Flag(val value: Int) {
+        IS_VISIBLE(0),
+        IS_FLOATING(1),
+        IS_ALL_DAY(2),
+        FROM_WATCH(3),
+        FROM_ANCS(4),
+        PERSIST_QUICK_VIEW(5);
+
+        companion object {
+            fun makeFlags(flags: List<Flag>): UShort {
+                var short: UShort = 0u
+
+                for (flag in flags) {
+                    short = (1u shl flag.value).toUShort() or short
+                }
+
+                return short
+            }
         }
     }
 }
