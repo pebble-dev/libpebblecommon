@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.services.blobdb
 
+import io.rebble.libpebblecommon.PacketPriority
 import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.packets.blobdb.BlobCommand
 import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
@@ -27,13 +28,16 @@ class BlobDBService(private val protocolHandler: ProtocolHandler) : ProtocolServ
      *
      * @return [BlobResponse] from the watch or *null* if the sending failed
      */
-    suspend fun send(packet: BlobCommand): BlobResponse? {
+    suspend fun send(
+        packet: BlobCommand,
+        priority: PacketPriority = PacketPriority.NORMAL
+    ): BlobResponse {
         val result = CompletableDeferred<BlobResponse>()
         pending[packet.token.get()] = result
 
-        val sendingResult = protocolHandler.send(packet)
+        val sendingResult = protocolHandler.send(packet, priority)
         if (!sendingResult) {
-            return null
+            return BlobResponse(BlobResponse.BlobStatus.WatchDisconnected)
         }
 
         return result.await()

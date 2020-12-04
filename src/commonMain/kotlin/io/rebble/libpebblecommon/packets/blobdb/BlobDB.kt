@@ -7,9 +7,10 @@ import io.rebble.libpebblecommon.structmapper.SBytes
 import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SUShort
 
-open class BlobCommand constructor(message: Message, token: UShort, database: BlobDatabase) : PebblePacket(
-    endpoint
-) {
+open class BlobCommand constructor(message: Message, token: UShort, database: BlobDatabase) :
+    PebblePacket(
+        endpoint
+    ) {
     enum class Message(val value: UByte) {
         Insert(0x01u),
         Delete(0x04u),
@@ -29,7 +30,12 @@ open class BlobCommand constructor(message: Message, token: UShort, database: Bl
     val token = SUShort(m, token)
     val database = SUByte(m, database.id)
 
-    open class InsertCommand(token: UShort, database: BlobDatabase, key: UByteArray, value: UByteArray) : BlobCommand(
+    open class InsertCommand(
+        token: UShort,
+        database: BlobDatabase,
+        key: UByteArray,
+        value: UByteArray
+    ) : BlobCommand(
         Message.Insert, token, database
     ) {
         val keySize = SUByte(m, key.size.toUByte())
@@ -66,7 +72,10 @@ open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : Pebb
         DataStale(0x08u),
         NotSupported(0x09u),
         Locked(0xAu),
-        TryLater(0xBu)
+        TryLater(0xBu),
+
+        // Added status by libpebblecommon to expose watch connection error
+        WatchDisconnected(0xFFu),
     }
 
     class Success : BlobResponse(BlobStatus.Success)
@@ -84,6 +93,10 @@ open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : Pebb
     val token = SUShort(m)
     val response = SUByte(m, response.value)
 
+    val responseValue
+        get() = BlobStatus.values().firstOrNull { it.value == response.get() }
+            ?: error("Unknown blobdb response ${response.get()}")
+
     companion object {
         val endpoint = ProtocolEndpoint.BLOBDB_V1
     }
@@ -91,7 +104,10 @@ open class BlobResponse(response: BlobStatus = BlobStatus.GeneralFailure) : Pebb
 
 fun blobDBPacketsRegister() {
     PacketRegistry.registerCustomTypeOffset(BlobResponse.endpoint, 4 + UShort.SIZE_BYTES)
-    PacketRegistry.register(BlobResponse.endpoint, BlobResponse.BlobStatus.Success.value) { BlobResponse.Success() }
+    PacketRegistry.register(
+        BlobResponse.endpoint,
+        BlobResponse.BlobStatus.Success.value
+    ) { BlobResponse.Success() }
     PacketRegistry.register(
         BlobResponse.endpoint,
         BlobResponse.BlobStatus.GeneralFailure.value
@@ -116,11 +132,20 @@ fun blobDBPacketsRegister() {
         BlobResponse.endpoint,
         BlobResponse.BlobStatus.DatabaseFull.value
     ) { BlobResponse.DatabaseFull() }
-    PacketRegistry.register(BlobResponse.endpoint, BlobResponse.BlobStatus.DataStale.value) { BlobResponse.DataStale() }
+    PacketRegistry.register(
+        BlobResponse.endpoint,
+        BlobResponse.BlobStatus.DataStale.value
+    ) { BlobResponse.DataStale() }
     PacketRegistry.register(
         BlobResponse.endpoint,
         BlobResponse.BlobStatus.NotSupported.value
     ) { BlobResponse.NotSupported() }
-    PacketRegistry.register(BlobResponse.endpoint, BlobResponse.BlobStatus.Locked.value) { BlobResponse.Locked() }
-    PacketRegistry.register(BlobResponse.endpoint, BlobResponse.BlobStatus.TryLater.value) { BlobResponse.TryLater() }
+    PacketRegistry.register(
+        BlobResponse.endpoint,
+        BlobResponse.BlobStatus.Locked.value
+    ) { BlobResponse.Locked() }
+    PacketRegistry.register(
+        BlobResponse.endpoint,
+        BlobResponse.BlobStatus.TryLater.value
+    ) { BlobResponse.TryLater() }
 }
