@@ -2,6 +2,8 @@ package io.rebble.libpebblecommon.packets
 
 import io.rebble.libpebblecommon.packets.PhoneAppVersion.AppVersionRequest
 import io.rebble.libpebblecommon.packets.PhoneAppVersion.AppVersionResponse
+import io.rebble.libpebblecommon.packets.WatchVersion.WatchVersionRequest
+import io.rebble.libpebblecommon.packets.WatchVersion.WatchVersionResponse
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
@@ -46,9 +48,9 @@ open class TimeMessage(message: Message) : SystemPacket(
 }
 
 open class PhoneAppVersion(message: Message) : SystemPacket(endpoint) {
-    enum class Message(val value: UByte, val instance: () -> PebblePacket) {
-        AppVersionRequest(0x00u, { AppVersionRequest() }),
-        AppVersionResponse(0x01u, { AppVersionResponse() })
+    enum class Message(val value: UByte) {
+        AppVersionRequest(0x00u),
+        AppVersionResponse(0x01u)
     }
 
     val command = SUByte(m, message.value)
@@ -76,47 +78,6 @@ open class PhoneAppVersion(message: Message) : SystemPacket(endpoint) {
     enum class SessionCapsFlag(val value: UByte) {
         Geolocation(1u),
         GammaRay(Int.MIN_VALUE.toUByte())
-    }
-
-    enum class ProtocolCapsFlag(val value: Int) {
-        SupportsAppRunStateProtocol(0),
-        SupportsInfiniteLogDump(1),
-        SupportsExtendedMusicProtocol(2),
-        SupportsTwoWayDismissal(3),
-        SupportsLocalization(4),
-        Supports8kAppMessage(5),
-        SupportsHealthInsights(6),
-        SupportsSendTextApp(8),
-        SupportsUnreadCoreDump(10),
-        SupportsWeatherApp(11),
-        SupportsRemindersApp(12),
-        SupportsWorkoutApp(13),
-        SupportsFwUpdateAcrossDisconnection(21),
-        SupportsSmoothFwInstallProgress(14);
-
-        companion object {
-            fun makeFlags(flags: List<ProtocolCapsFlag>): UByteArray {
-                val bytes = UByteArray(8)
-
-                for (flag in flags) {
-                    val combinedPosition = flag.value
-                    val byteIndex: Int = combinedPosition / 8
-                    val positionInsideByte: Int = combinedPosition % 8
-                    bytes[byteIndex] = (1u shl positionInsideByte).toUByte() or bytes[byteIndex]
-                }
-
-                return bytes
-            }
-
-            fun fromFlags(flags: UByteArray): List<ProtocolCapsFlag> {
-                return values().filter {
-                    val combinedPosition = it.value
-                    val byteIndex: Int = combinedPosition / 8
-                    val positionInsideByte: Int = combinedPosition % 8
-                    ((1u shl positionInsideByte) and flags[byteIndex].toUInt()) != 0u
-                }
-            }
-        }
     }
 
     enum class PlatformFlag(val value: UInt) {
@@ -243,6 +204,139 @@ open class PhoneAppVersion(message: Message) : SystemPacket(endpoint) {
     }
 }
 
+open class WatchVersion(message: Message) : SystemPacket(endpoint) {
+    enum class Message(val value: UByte) {
+        WatchVersionRequest(0x00u),
+        WatchVersionResponse(0x01u)
+    }
+
+    val command = SUByte(m, message.value)
+
+    init {
+        type = command.get()
+    }
+
+    class WatchVersionRequest : WatchVersion(Message.WatchVersionRequest)
+    class WatchVersionResponse() : WatchVersion(Message.WatchVersionResponse) {
+        /**
+         * Version of the running firmware
+         */
+        val running = WatchFirmwareVersion().also { m.register(it) }
+
+        /**
+         * Version of the recovery firmware
+         */
+        val recovery = WatchFirmwareVersion().also { m.register(it) }
+
+        /**
+         * Likely the timestamp of the bootloader build
+         */
+        val bootloaderTimestamp = SUInt(m)
+
+        /**
+         * Board name
+         */
+        val board = SFixedString(m, 8)
+
+        /**
+         * Serial number of the watch
+         */
+        val serial = SFixedString(m, 12)
+
+        /**
+         * Bluetooth MAC address of the watch
+         */
+        val btAddress = SBytes(m, 6)
+
+        /**
+         * ???
+         */
+        val resourceCrc = SUInt(m)
+
+        /**
+         * ???
+         */
+        val resourceTimestamp = SUInt(m)
+
+        /**
+         * Currently selected language on the watch
+         */
+        val language = SFixedString(m, 6)
+
+        /**
+         * Version of the currently selected language
+         */
+        val languageVersion = SUShort(m)
+
+        /**
+         * Flags for supported protocol features.
+         *
+         * Use [ProtocolCapsFlag.makeFlags] to serialize and [ProtocolCapsFlag.fromFlags] to
+         * deserialize.
+         */
+        val capabilities = SBytes(m, 8)
+
+        /**
+         * When *true*, it means watch has been connected to a different phone before this phone.
+         */
+        val isUnfaithful = SBoolean(m)
+    }
+
+    companion object {
+        val endpoint = ProtocolEndpoint.WATCH_VERSION
+    }
+}
+
+enum class ProtocolCapsFlag(val value: Int) {
+    SupportsAppRunStateProtocol(0),
+    SupportsInfiniteLogDump(1),
+    SupportsExtendedMusicProtocol(2),
+    SupportsTwoWayDismissal(3),
+    SupportsLocalization(4),
+    Supports8kAppMessage(5),
+    SupportsHealthInsights(6),
+    SupportsSendTextApp(8),
+    SupportsUnreadCoreDump(10),
+    SupportsWeatherApp(11),
+    SupportsRemindersApp(12),
+    SupportsWorkoutApp(13),
+    SupportsFwUpdateAcrossDisconnection(21),
+    SupportsSmoothFwInstallProgress(14);
+
+    companion object {
+        fun makeFlags(flags: List<ProtocolCapsFlag>): UByteArray {
+            val bytes = UByteArray(8)
+
+            for (flag in flags) {
+                val combinedPosition = flag.value
+                val byteIndex: Int = combinedPosition / 8
+                val positionInsideByte: Int = combinedPosition % 8
+                bytes[byteIndex] = (1u shl positionInsideByte).toUByte() or bytes[byteIndex]
+            }
+
+            return bytes
+        }
+
+        fun fromFlags(flags: UByteArray): List<ProtocolCapsFlag> {
+            return values().filter {
+                val combinedPosition = it.value
+                val byteIndex: Int = combinedPosition / 8
+                val positionInsideByte: Int = combinedPosition % 8
+                ((1u shl positionInsideByte) and flags[byteIndex].toUInt()) != 0u
+            }
+        }
+    }
+}
+
+class WatchFirmwareVersion : StructMappable() {
+    val timestamp = SUInt(m)
+    val versionTag = SFixedString(m, 32)
+    val gitHash = SFixedString(m, 8)
+    val isRecovery = SBoolean(m)
+    val hardwarePlatform = SUByte(m)
+    val metadataVersion = SUByte(m)
+}
+
 open class SystemMessage(message: Message) : SystemPacket(endpoint) {
     enum class Message(val value: UByte) {
         NewFirmwareAvailable(0x00u),
@@ -328,11 +422,19 @@ fun systemPacketsRegister() {
     PacketRegistry.register(
         PhoneAppVersion.endpoint,
         PhoneAppVersion.Message.AppVersionRequest.value
-    ) { PhoneAppVersion.AppVersionRequest() }
+    ) { AppVersionRequest() }
     PacketRegistry.register(
         PhoneAppVersion.endpoint,
         PhoneAppVersion.Message.AppVersionResponse.value
-    ) { PhoneAppVersion.AppVersionResponse() }
+    ) { AppVersionResponse() }
+    PacketRegistry.register(
+        WatchVersion.endpoint,
+        WatchVersion.Message.WatchVersionRequest.value
+    ) { WatchVersionRequest() }
+    PacketRegistry.register(
+        WatchVersion.endpoint,
+        WatchVersion.Message.WatchVersionResponse.value
+    ) { WatchVersionResponse() }
 
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Ping.value) { PingPong.Ping() }
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Pong.value) { PingPong.Pong() }

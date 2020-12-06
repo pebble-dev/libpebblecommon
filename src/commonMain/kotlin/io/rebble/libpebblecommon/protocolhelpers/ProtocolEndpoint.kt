@@ -2,7 +2,7 @@ package io.rebble.libpebblecommon.protocolhelpers
 
 enum class ProtocolEndpoint(val value: UShort) {
     TIME(11u),
-    VERSIONS(16u),
+    WATCH_VERSION(16u),
     PHONE_VERSION(17u),
     SYSTEM_MESSAGE(18u),
     MUSIC_CONTROL(32u),
