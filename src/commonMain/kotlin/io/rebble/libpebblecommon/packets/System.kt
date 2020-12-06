@@ -287,6 +287,41 @@ open class WatchVersion(message: Message) : SystemPacket(endpoint) {
     }
 }
 
+/**
+ * Retreive various factory-embedded metadata from the watch.
+ *
+ * Current known keys:
+ *
+ * `mfg_color` - returns watch model number (UInt32)
+ */
+open class WatchFactoryData(message: Message) : SystemPacket(endpoint) {
+    enum class Message(val value: UByte) {
+        WatchModelRequest(0x00u),
+        WatchModelResponse(0x01u),
+        WatchModelError(0xffu)
+    }
+
+    val command = SUByte(m, message.value)
+
+    init {
+        type = command.get()
+    }
+
+    class WatchFactoryDataRequest(key: String) : WatchFactoryData(Message.WatchModelRequest) {
+        val key = SString(m, key)
+    }
+
+    class WatchFactoryDataError : WatchFactoryData(Message.WatchModelError)
+    class WatchFactoryDataResponse() : WatchFactoryData(Message.WatchModelResponse) {
+        val length = SUByte(m)
+        val model = SBytes(m, 0).apply { linkWithSize(length) }
+    }
+
+    companion object {
+        val endpoint = ProtocolEndpoint.FCT_REG
+    }
+}
+
 enum class ProtocolCapsFlag(val value: Int) {
     SupportsAppRunStateProtocol(0),
     SupportsInfiniteLogDump(1),
@@ -427,6 +462,7 @@ fun systemPacketsRegister() {
         PhoneAppVersion.endpoint,
         PhoneAppVersion.Message.AppVersionResponse.value
     ) { AppVersionResponse() }
+
     PacketRegistry.register(
         WatchVersion.endpoint,
         WatchVersion.Message.WatchVersionRequest.value
@@ -435,6 +471,19 @@ fun systemPacketsRegister() {
         WatchVersion.endpoint,
         WatchVersion.Message.WatchVersionResponse.value
     ) { WatchVersionResponse() }
+
+    PacketRegistry.register(
+        WatchFactoryData.endpoint,
+        WatchFactoryData.Message.WatchModelRequest.value
+    ) { WatchFactoryData.WatchFactoryDataRequest("") }
+    PacketRegistry.register(
+        WatchFactoryData.endpoint,
+        WatchFactoryData.Message.WatchModelResponse.value
+    ) { WatchFactoryData.WatchFactoryDataResponse() }
+    PacketRegistry.register(
+        WatchFactoryData.endpoint,
+        WatchFactoryData.Message.WatchModelError.value
+    ) { WatchFactoryData.WatchFactoryDataError() }
 
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Ping.value) { PingPong.Ping() }
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Pong.value) { PingPong.Pong() }
