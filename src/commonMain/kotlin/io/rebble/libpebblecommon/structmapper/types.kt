@@ -201,6 +201,15 @@ class SShort(mapper: StructMapper, default: Short = 0, endianness: Char = '|') :
         get() = get().toLong()
 }
 
+class SBoolean(mapper: StructMapper, default: Boolean = false) :
+    StructElement<Boolean>(
+        { buf, el -> buf.putUByte(if (el.get()) 1u else 0u) },
+        { buf, el -> el.set(buf.getUByte() != 0u.toUByte()) },
+        mapper,
+        UByte.SIZE_BYTES,
+        default
+    )
+
 class SUUID(mapper: StructMapper, default: Uuid = Uuid(0, 0)) :
     StructElement<Uuid>(
         { buf, el -> buf.putBytes(el.get().bytes.toUByteArray()) },
@@ -226,6 +235,34 @@ class SString(mapper: StructMapper, default: String = "") :
             val len = buf.getUByte().toInt()
             el.set(buf.getBytes(len).toByteArray().decodeToString(), len)
         }, mapper, default.encodeToByteArray().size + 1, default
+    )
+
+/**
+ * Represents a string (UTF-8) in a struct with a fixed length
+ */
+class SFixedString(mapper: StructMapper, size: Int, default: String = "") :
+    StructElement<String>(
+        { buf, el ->
+            var bytes = el.get().encodeToByteArray()
+            if (bytes.size > size) {
+                bytes = bytes.take(size).toByteArray()
+            }
+
+            buf.putBytes(
+                bytes.toUByteArray()
+            )
+
+            val amountPad = size - bytes.size
+            repeat(amountPad) {
+                buf.putUByte(0u)
+            }
+        },
+        { buf, el ->
+            el.set(
+                buf.getBytes(size).toByteArray().takeWhile { it > 0 }.toByteArray()
+                    .decodeToString(), size
+            )
+        }, mapper, size, default
     )
 
 /**

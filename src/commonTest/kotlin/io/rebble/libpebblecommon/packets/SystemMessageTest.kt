@@ -27,11 +27,11 @@ internal class SystemMessageTest {
         )
 
         val expectedProtocolCaps = listOf(
-            PhoneAppVersion.ProtocolCapsFlag.SupportsAppRunStateProtocol,
-            PhoneAppVersion.ProtocolCapsFlag.SupportsHealthInsights,
-            PhoneAppVersion.ProtocolCapsFlag.SupportsLocalization,
-            PhoneAppVersion.ProtocolCapsFlag.SupportsUnreadCoreDump,
-            PhoneAppVersion.ProtocolCapsFlag.SupportsWorkoutApp
+            ProtocolCapsFlag.SupportsAppRunStateProtocol,
+            ProtocolCapsFlag.SupportsHealthInsights,
+            ProtocolCapsFlag.SupportsLocalization,
+            ProtocolCapsFlag.SupportsUnreadCoreDump,
+            ProtocolCapsFlag.SupportsWorkoutApp
         )
 
         val originalMessage = PhoneAppVersion.AppVersionResponse(
@@ -45,7 +45,7 @@ internal class SystemMessageTest {
             12u,
             15u,
             1u,
-            PhoneAppVersion.ProtocolCapsFlag.makeFlags(expectedProtocolCaps)
+            ProtocolCapsFlag.makeFlags(expectedProtocolCaps)
         )
 
         val bytes = originalMessage.serialize()
@@ -68,7 +68,7 @@ internal class SystemMessageTest {
         assertEquals(15u, newMessage.minorVersion.get())
         assertEquals(
             expectedProtocolCaps.toSet(),
-            PhoneAppVersion.ProtocolCapsFlag.fromFlags(newMessage.protocolCaps.get()).toSet()
+            ProtocolCapsFlag.fromFlags(newMessage.protocolCaps.get()).toSet()
         )
     }
 
