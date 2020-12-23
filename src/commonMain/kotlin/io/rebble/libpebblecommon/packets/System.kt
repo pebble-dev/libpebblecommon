@@ -236,7 +236,7 @@ open class WatchVersion(message: Message) : SystemPacket(endpoint) {
         /**
          * Board name
          */
-        val board = SFixedString(m, 8)
+        val board = SFixedString(m, 9)
 
         /**
          * Serial number of the watch
