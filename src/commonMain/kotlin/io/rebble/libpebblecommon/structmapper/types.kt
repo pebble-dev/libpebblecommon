@@ -333,7 +333,6 @@ class SFixedList<T : Mappable>(
 
     private val mapIndex = mapper.register(this)
     var list = default
-        private set
 
     init {
         if (count != default.size) throw PacketEncodeException("Fixed list count does not match default value count")
