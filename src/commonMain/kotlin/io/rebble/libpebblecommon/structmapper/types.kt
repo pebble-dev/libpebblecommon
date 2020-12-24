@@ -378,3 +378,40 @@ class SFixedList<T : Mappable>(
         return list.hashCode()
     }
 }
+
+class SOptional<T>(
+    mapper: StructMapper,
+    val value: StructElement<T>,
+    var present: Boolean
+) : Mappable {
+    init {
+        mapper.register(this)
+    }
+
+    override fun toBytes(): UByteArray {
+        return if (present) value.toBytes() else UByteArray(0)
+    }
+
+    override fun fromBytes(bytes: DataBuffer) {
+        val leftBytes = bytes.length - bytes.readPosition
+        if (leftBytes < value.size) {
+            present = false
+        } else {
+            present = true
+            value.fromBytes(bytes)
+        }
+    }
+
+    fun get(): T? {
+        return if (present) value.get() else null
+    }
+
+    fun set(value: T?) {
+        if (value != null) {
+            present = true
+            this.value.set(value)
+        } else {
+            present = false
+        }
+    }
+}

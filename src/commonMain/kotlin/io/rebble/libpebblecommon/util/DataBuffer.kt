@@ -34,4 +34,14 @@ expect class DataBuffer {
     fun array(): UByteArray
 
     fun setEndian(endian: Char)
+
+    /**
+     * Total length of the buffer
+     */
+    val length: Int
+
+    /**
+     * Current position in the buffer
+     */
+    val readPosition: Int
 }
