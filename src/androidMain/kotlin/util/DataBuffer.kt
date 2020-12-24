@@ -9,18 +9,33 @@ actual class DataBuffer {
     actual constructor(size: Int) {
         actualBuf = ByteBuffer.allocate(size)
     }
+
     actual constructor(bytes: UByteArray) {
         actualBuf = ByteBuffer.wrap(bytes.toByteArray())
     }
 
+    /**
+     * Total length of the buffer
+     */
+    actual val length: Int
+        get() = actualBuf.capacity()
+
+    /**
+     * Current position in the buffer
+     */
+    actual val readPosition: Int
+        get() = actualBuf.position()
+
     actual fun putUShort(short: UShort) {
         actualBuf.putShort(short.toShort())
     }
+
     actual fun getUShort(): UShort = actualBuf.short.toUShort()
 
     actual fun putShort(short: Short) {
         actualBuf.putShort(short)
     }
+
     actual fun getShort(): Short = actualBuf.short
 
     actual fun putUByte(byte: UByte) {

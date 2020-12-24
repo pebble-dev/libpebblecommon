@@ -2,20 +2,36 @@ package io.rebble.libpebblecommon.util
 
 import kotlinx.cinterop.*
 import platform.Foundation.*
-import platform.darwin.NSUInteger
 
 actual class DataBuffer {
     private val actualBuf: NSMutableData
     private var littleEndian = false
 
+    /**
+     * Total length of the buffer
+     */
+    actual val length: Int
+        get() = actualBuf.length.toInt()
+
+    private var _readPosition: Int = 0
+
+    /**
+     * Current position in the buffer
+     */
+    actual val readPosition: Int
+        get() = _readPosition
+
     actual constructor(size: Int) {
         actualBuf = NSMutableData.dataWithLength(size.toULong())!!
         actualBuf.setLength(size.toULong())
     }
+
     actual constructor(bytes: UByteArray) {
         actualBuf = NSMutableData()
-        actualBuf.setData(NSString.create(string = bytes.toString())
-                .dataUsingEncoding(NSUTF8StringEncoding, false)!!)
+        actualBuf.setData(
+            NSString.create(string = bytes.toString())
+                .dataUsingEncoding(NSUTF8StringEncoding, false)!!
+        )
     }
 
     actual fun putUShort(short: UShort) {
@@ -29,6 +45,7 @@ actual class DataBuffer {
         memScoped {
             val pShort = alloc<UShortVar>()
             actualBuf.getBytes(pShort.ptr, UShort.SIZE_BYTES.toULong())
+            _readPosition += UShort.SIZE_BYTES
             return pShort.value
         }
     }
@@ -44,6 +61,7 @@ actual class DataBuffer {
         memScoped {
             val pShort = alloc<ShortVar>()
             actualBuf.getBytes(pShort.ptr, Short.SIZE_BYTES.toULong())
+            _readPosition += Short.SIZE_BYTES
             return pShort.value
         }
     }
@@ -59,6 +77,7 @@ actual class DataBuffer {
         memScoped {
             val pByte = alloc<UByteVar>()
             actualBuf.appendBytes(pByte.ptr, UByte.SIZE_BYTES.toULong())
+            _readPosition += UByte.SIZE_BYTES
             return pByte.value
         }
     }
@@ -74,6 +93,7 @@ actual class DataBuffer {
         memScoped {
             val pByte = alloc<ByteVar>()
             actualBuf.appendBytes(pByte.ptr, Byte.SIZE_BYTES.toULong())
+            _readPosition += Byte.SIZE_BYTES
             return pByte.value
         }
     }
@@ -88,6 +108,7 @@ actual class DataBuffer {
         memScoped {
             val pBytes = allocArray<UByteVar>(count)
             actualBuf.getBytes(pBytes.getPointer(this), length = count.toULong())
+            _readPosition += count
             return pBytes.readBytes(count).toUByteArray()
         }
     }
@@ -110,6 +131,7 @@ actual class DataBuffer {
         memScoped {
             val pUInt = alloc<UIntVar>()
             actualBuf.getBytes(pUInt.ptr, UInt.SIZE_BYTES.toULong())
+            _readPosition += UInt.SIZE_BYTES
             return pUInt.value
         }
     }
@@ -125,6 +147,7 @@ actual class DataBuffer {
         memScoped {
             val pInt = alloc<IntVar>()
             actualBuf.getBytes(pInt.ptr, Int.SIZE_BYTES.toULong())
+            _readPosition += Int.SIZE_BYTES
             return pInt.value
         }
     }
@@ -133,13 +156,14 @@ actual class DataBuffer {
         memScoped {
             val pULong = alloc<ULongVar>()
             pULong.value = ulong
-            actualBuf.appendBytes(pULong.ptr, UByte.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pULong.ptr, ULong.SIZE_BYTES.toULong())
         }
     }
     actual fun getULong(): ULong {
         memScoped {
             val pULong = alloc<ULongVar>()
             actualBuf.getBytes(pULong.ptr, ULong.SIZE_BYTES.toULong())
+            _readPosition += ULong.SIZE_BYTES
             return pULong.value
         }
     }
