@@ -86,7 +86,8 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
                     2u,
                     ProtocolCapsFlag.makeFlags(
                         listOf(
-                            ProtocolCapsFlag.Supports8kAppMessage
+                            ProtocolCapsFlag.Supports8kAppMessage,
+                            ProtocolCapsFlag.SupportsExtendedMusicProtocol
                         )
                     )
 

@@ -1,12 +1,9 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
-import io.rebble.libpebblecommon.packets.appRunStatePacketsRegister
-import io.rebble.libpebblecommon.packets.appmessagePacketsRegister
+import io.rebble.libpebblecommon.packets.*
 import io.rebble.libpebblecommon.packets.blobdb.blobDBPacketsRegister
 import io.rebble.libpebblecommon.packets.blobdb.timelinePacketsRegister
-import io.rebble.libpebblecommon.packets.systemPacketsRegister
-import io.rebble.libpebblecommon.packets.timePacketsRegister
 
 /**
  * Singleton to track endpoint / type discriminators for deserialization
@@ -22,6 +19,7 @@ object PacketRegistry {
         blobDBPacketsRegister()
         appmessagePacketsRegister()
         appRunStatePacketsRegister()
+        musicPacketsRegister()
     }
 
     /**
