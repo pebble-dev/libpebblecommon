@@ -46,7 +46,7 @@ object PacketRegistry {
 
         val typeOffset = if (typeOffsets[endpoint] != null) typeOffsets[endpoint]!! else 4
         val decoder = epdecoders[packet[typeOffset]]
-            ?: throw PacketDecodeException("No packet class registered for endpoint $endpoint")
+            ?: throw PacketDecodeException("No packet class registered for type ${packet[typeOffset]} of $endpoint")
         return decoder(packet)
     }
 }
