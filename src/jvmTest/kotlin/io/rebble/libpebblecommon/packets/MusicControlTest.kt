@@ -25,9 +25,9 @@ class MusicControlTest {
             1u, 65u,
             1u, 66u,
             1u, 67u,
-            0u, 0u, 0u, 10u,
-            0u, 0u, 0u, 20u,
-            0u, 0u, 0u, 30u
+            10u, 0u, 0u, 0u,
+            20u, 0u, 0u, 0u,
+            30u, 0u, 0u, 0u
         )
 
         val actualData = packet.serialize()
@@ -66,9 +66,9 @@ class MusicControlTest {
             1u, 65u,
             1u, 66u,
             1u, 67u,
-            0u, 0u, 0u, 10u,
-            0u, 0u, 0u, 20u,
-            0u, 0u, 0u, 30u
+            10u, 0u, 0u, 0u,
+            20u, 0u, 0u, 0u,
+            30u, 0u, 0u, 0u
         )
 
         val packet = PebblePacket.deserialize(data) as MusicControl.UpdateCurrentTrack
