@@ -31,6 +31,9 @@ open class MusicControl(val message: Message) : PebblePacket(ProtocolEndpoint.MU
         artist: String = "",
         album: String = "",
         title: String = "",
+        /**
+         * Length of current track in milliseconds
+         */
         trackLength: Int? = null,
         trackCount: Int? = null,
         currentTrack: Int? = null
@@ -57,7 +60,13 @@ open class MusicControl(val message: Message) : PebblePacket(ProtocolEndpoint.MU
 
     class UpdatePlayStateInfo(
         playbackState: PlaybackState = PlaybackState.Unknown,
+        /**
+         * Current playback position in milliseconds
+         */
         trackPosition: UInt = 0u,
+        /**
+         * Play rate in percentage (100 = normal speed)
+         */
         playRate: UInt = 0u,
         shuffle: ShuffleState = ShuffleState.Unknown,
         repeat: RepeatState = RepeatState.Unknown
