@@ -36,13 +36,22 @@ class TimelineItem(
      * Timeline pin timestamp in unix time
      */
     val timestamp = SUInt(m, timestamp, endianness = '<')
+
+    /**
+     * Duration of the pin in minutes
+     */
     val duration = SUShort(m, duration, endianness = '<')
+
+    /**
+     * Serialization of [Type]. Use [Type.value].
+     */
     val type = SUByte(m, type.value)
 
     /**
      * Serialization of [Flag] entries. Use [Flag.makeFlags].
      */
     val flags = SUShort(m, flags, endianness = '<')
+
     val layout = SUByte(m, layout)
     val dataLength = SUShort(m, endianness = '<')
     val attrCount = SUByte(m, attributes.size.toUByte())
