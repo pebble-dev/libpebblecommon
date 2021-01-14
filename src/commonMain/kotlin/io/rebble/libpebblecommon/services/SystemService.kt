@@ -74,7 +74,10 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
                 watchModelCallback = null
             }
             is PhoneAppVersion.AppVersionRequest -> {
-                appVersionRequestHandler?.invoke()
+                val res = appVersionRequestHandler?.invoke()
+                if (res != null) {
+                    send(res) // Cannot be low priority
+                }
             }
             else -> receivedMessages.offer(packet)
         }
