@@ -17,6 +17,7 @@ import kotlinx.coroutines.channels.Channel
  */
 class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolService {
     val receivedMessages = Channel<SystemPacket>(Channel.BUFFERED)
+    public final var appVersionRequestHandler: (suspend () -> PhoneAppVersion.AppVersionResponse)? = null
 
     private var watchVersionCallback: CompletableDeferred<WatchVersion.WatchVersionResponse>? = null
     private var watchModelCallback: CompletableDeferred<UByteArray>? = null
@@ -72,28 +73,8 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
                 watchModelCallback?.completeExceptionally(Exception("Failed to fetch watch model"))
                 watchModelCallback = null
             }
-            is PhoneAppVersion -> {
-                val responsePacket = PhoneAppVersion.AppVersionResponse(
-                    UInt.MAX_VALUE,
-
-                    0u,
-                    PhoneAppVersion.PlatformFlag.makeFlags(
-                        getPlatform(), emptyList()
-                    ),
-                    2u,
-                    4u,
-                    4u,
-                    2u,
-                    ProtocolCapsFlag.makeFlags(
-                        listOf(
-                            ProtocolCapsFlag.Supports8kAppMessage,
-                            ProtocolCapsFlag.SupportsExtendedMusicProtocol
-                        )
-                    )
-
-                )
-
-                protocolHandler.send(responsePacket)
+            is PhoneAppVersion.AppVersionRequest -> {
+                appVersionRequestHandler?.invoke()
             }
             else -> receivedMessages.offer(packet)
         }
