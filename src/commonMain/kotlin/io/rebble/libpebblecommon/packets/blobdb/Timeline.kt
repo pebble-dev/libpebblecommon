@@ -31,10 +31,27 @@ class TimelineItem(
 
     val itemId = SUUID(m, itemId)
     val parentId = SUUID(m, parentId)
+
+    /**
+     * Timeline pin timestamp in unix time
+     */
     val timestamp = SUInt(m, timestamp, endianness = '<')
+
+    /**
+     * Duration of the pin in minutes
+     */
     val duration = SUShort(m, duration, endianness = '<')
+
+    /**
+     * Serialization of [Type]. Use [Type.value].
+     */
     val type = SUByte(m, type.value)
+
+    /**
+     * Serialization of [Flag] entries. Use [Flag.makeFlags].
+     */
     val flags = SUShort(m, flags, endianness = '<')
+
     val layout = SUByte(m, layout)
     val dataLength = SUShort(m, endianness = '<')
     val attrCount = SUByte(m, attributes.size.toUByte())
@@ -116,11 +133,30 @@ class TimelineItem(
     }
 
     enum class Flag(val value: Int) {
+        /**
+         * ???
+         *
+         * Name suggests that setting this to false would hide the pin on the watch,
+         * but it does not seem to do anything
+         */
         IS_VISIBLE(0),
+
+        /**
+         * When set, pin is always displayed in UTC timezone on the watch
+         */
         IS_FLOATING(1),
+
+        /**
+         * Whether pin spans throughout the whole day
+         */
         IS_ALL_DAY(2),
+
         FROM_WATCH(3),
         FROM_ANCS(4),
+
+        /**
+         * When set, quick view will be displayed on the watchface when event in progress.
+         */
         PERSIST_QUICK_VIEW(5);
 
         companion object {

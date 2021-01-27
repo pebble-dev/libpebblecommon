@@ -278,6 +278,10 @@ open class WatchVersion(message: Message) : SystemPacket(endpoint) {
 
         /**
          * When *true*, it means watch has been connected to a different phone before this phone.
+         *
+         * Flag remains true until
+         * [io.rebble.libpebblecommon.packets.blobdb.BlobCommand.ClearCommand] is
+         * sent to the watch
          */
         val isUnfaithful = SBoolean(m)
     }
