@@ -47,7 +47,7 @@ android { // android specific configuration
         minSdkVersion 15 // min SDK version supported by this lib
         targetSdkVersion 29 // max SDK version supported by this lib
         versionCode 1
-        versionName '0.0.1'
+        versionName getVersion()
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner' // See notes #1
     }
 

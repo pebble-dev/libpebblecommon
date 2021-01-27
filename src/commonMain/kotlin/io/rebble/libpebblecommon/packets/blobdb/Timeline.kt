@@ -156,6 +156,10 @@ open class TimelineAction(message: Message) : PebblePacket(endpoint) {
         val actionID = SUByte(m, actionID)
         val numAttributes = SUByte(m, attributes.size.toUByte())
         val attributes = SFixedList(m, attributes.size, attributes, ::Attribute)
+
+        init {
+            this.attributes.linkWithCount(numAttributes)
+        }
     }
 
     class ActionResponse(
