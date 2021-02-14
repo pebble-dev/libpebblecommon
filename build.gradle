@@ -68,8 +68,6 @@ android { // android specific configuration
             res.srcDirs = ['src/androidMain/res']
         }
     }
-    publishNonDefault true
-    defaultPublishConfig "release"
 }
 
 dependencies {
@@ -89,7 +87,7 @@ kotlin {
     }
     // use the android preset
     android {
-
+        publishLibraryVariants("release", "debug")
         publishLibraryVariantsGroupedByFlavor = true
     }
 
