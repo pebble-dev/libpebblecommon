@@ -267,11 +267,11 @@ class SFixedString(mapper: StructMapper, size: Int, default: String = "") :
 
 /**
  * Represents arbitrary bytes in a struct
- * @param length the number of bytes, when serializing this is used to pad/truncate the provided value to ensure it's 'length' bytes long
+ * @param length the number of bytes, when serializing this is used to pad/truncate the provided value to ensure it's 'length' bytes long (-1 to disable this)
  */
 class SBytes(
     mapper: StructMapper,
-    length: Int,
+    length: Int = -1,
     default: UByteArray = ubyteArrayOf(),
     endianness: Char = '|'
 ) :
@@ -279,9 +279,9 @@ class SBytes(
         { buf, el ->
             if (el.size != 0) {
                 var mValue = el.get()
-                if (mValue.size > el.size) {
+                if (el.size != -1 && mValue.size > el.size) {
                     mValue = el.get().sliceArray(0 until length - 1) // Truncate if too long
-                } else if (mValue.size < length) {
+                } else if (el.size != -1 && mValue.size < length) {
                     mValue += UByteArray(length - el.size)// Pad if too short
                 }
                 buf.putBytes(if (el.isLittleEndian) mValue.reversedArray() else mValue)
