@@ -52,10 +52,11 @@ android { // android specific configuration
     }
 
     buildTypes { // the build variants for the lib
-        release {
-            minifyEnabled true
+        getByName("release") {
+            minifyEnabled false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
         }
-        debug {
+        getByName("debug") {
             minifyEnabled false
         }
     }
@@ -85,10 +86,8 @@ kotlin {
         }
     }
     // use the android preset
-    android("android") {
-        // you can also publish both "release" and "debug"
-        publishLibraryVariants("release")
-        publishLibraryVariants("debug")
+    android {
+        publishLibraryVariants("release", "debug")
     }
 
     sourceSets {
