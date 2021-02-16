@@ -12,4 +12,6 @@ abstract class StructMappable : Mappable {
     override fun fromBytes(bytes: DataBuffer) {
         m.fromBytes(bytes)
     }
+
+    override val size get() = m.size
 }

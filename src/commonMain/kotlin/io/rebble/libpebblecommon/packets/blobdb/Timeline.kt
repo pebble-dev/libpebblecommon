@@ -99,6 +99,9 @@ class TimelineItem(
         override fun toBytes(): UByteArray = m.toBytes()
 
         override fun fromBytes(bytes: DataBuffer) = m.fromBytes(bytes)
+
+        override val size: Int
+            get() = m.size
     }
 
     class Attribute() : StructMappable() {

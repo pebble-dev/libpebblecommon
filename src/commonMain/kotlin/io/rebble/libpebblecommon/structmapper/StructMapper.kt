@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.structmapper
 
+import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.util.DataBuffer
 
 /**
@@ -38,4 +39,7 @@ class StructMapper: Mappable {
             it.fromBytes(bytes)
         }
     }
+
+    override val size: Int
+        get() = getStruct().fold(0, {t,el -> t+el.size})
 }
