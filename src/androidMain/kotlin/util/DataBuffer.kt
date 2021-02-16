@@ -80,4 +80,8 @@ actual class DataBuffer {
         actualBuf.putLong(ulong.toLong())
     }
     actual fun getULong(): ULong = actualBuf.long.toULong()
+
+    actual fun rewind() {
+        actualBuf.rewind()
+    }
 }

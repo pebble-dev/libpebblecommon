@@ -167,4 +167,8 @@ actual class DataBuffer {
             return pULong.value
         }
     }
+
+    actual fun rewind() {
+        TODO("iOS rewind buffer")
+    }
 }

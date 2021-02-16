@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.structmapper
 
+import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.util.DataBuffer
 
 /**
@@ -34,8 +35,16 @@ class StructMapper: Mappable {
     }
 
     override fun fromBytes(bytes: DataBuffer) {
-        getStruct().forEach {
-            it.fromBytes(bytes)
+        getStruct().forEachIndexed { i: Int, mappable: Mappable ->
+            try {
+                mappable.fromBytes(bytes)
+            }catch (e: Exception) {
+                throw PacketDecodeException("Unable to deserialize mappable ${mappable::class.simpleName} at index $i (${mappable})", e)
+            }
+
         }
     }
+
+    override val size: Int
+        get() = getStruct().fold(0, {t,el -> t+el.size})
 }

@@ -23,6 +23,11 @@ interface Mappable {
      * @param bytes the data to read, seek position is incremented
      */
     fun fromBytes(bytes: DataBuffer)
+
+    /**
+     * The projected size in bytes of the raw data returned by [toBytes]
+     */
+    val size: Int
 }
 
 interface NumberStructElement {
@@ -41,7 +46,7 @@ open class StructElement<T>(
     default: T,
     endianness: Char = '|'
 ) : Mappable { //TODO: Element-level endianness on deserialization
-    var size = size
+    override var size = size
         get() {
             return linkedSize?.valueNumber?.toInt() ?: field
         }
@@ -49,7 +54,6 @@ open class StructElement<T>(
             field = value
             linkedSize = null
         }
-
     private var linkedSize: NumberStructElement? = null
         private set
 
@@ -353,6 +357,9 @@ class SFixedList<T : Mappable>(
         }
     }
 
+    override val size: Int
+        get() = list.fold(0, {t,el -> t+el.size})
+
     /**
      * Link the count of this element to the value of another struct element. Count will
      * automatically match value of the target element.
@@ -401,6 +408,9 @@ class SOptional<T>(
             value.fromBytes(bytes)
         }
     }
+
+    override val size: Int
+        get() = if (present) value.size else 0
 
     fun get(): T? {
         return if (present) value.get() else null

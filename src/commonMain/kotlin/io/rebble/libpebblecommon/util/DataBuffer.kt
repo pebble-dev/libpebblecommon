@@ -35,6 +35,8 @@ expect class DataBuffer {
 
     fun setEndian(endian: Char)
 
+    fun rewind()
+
     /**
      * Total length of the buffer
      */

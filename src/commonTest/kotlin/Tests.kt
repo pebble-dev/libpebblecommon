@@ -1,4 +1,5 @@
 import io.rebble.libpebblecommon.packets.PingPong
+import io.rebble.libpebblecommon.packets.QemuPacket
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -32,5 +33,11 @@ class Tests {
         val packet = PebblePacket.deserialize(bytes.toUByteArray())
 
         assertEquals(bytesToHex(expect), bytesToHex(packet.serialize()))
+    }
+
+    @Test
+    fun serializeQemuPacket() {
+        val packet = QemuPacket.QemuSPP(ubyteArrayOf(0xCAu,0xFEu,0x10u))
+        assertUByteArrayEquals(ubyteArrayOf(0xFEu, 0xEDu, 0x00u, 0x01u, 0x00u, 0x03u, 0xCAu, 0xFEu, 0x10u, 0xBEu, 0xEFu), packet.serialize())
     }
 }
