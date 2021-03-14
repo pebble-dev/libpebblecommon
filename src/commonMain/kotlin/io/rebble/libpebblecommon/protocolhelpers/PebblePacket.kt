@@ -17,12 +17,13 @@ open class PebblePacket{
     constructor(endpoint: ProtocolEndpoint) { //TODO: Packet-level endianness?
         this.endpoint = endpoint
     }
-    constructor(packet: UByteArray, endianness: Char = '>') {
+
+    constructor(packet: UByteArray) {
         val meta = StructMapper()
         val length = SUShort(meta)
         val ep = SUShort(meta)
         meta.fromBytes(DataBuffer(packet))
-        if (length.get() != (packet.size - (UShort.SIZE_BYTES*2)).toUShort())
+        if (length.get() != (packet.size - (UShort.SIZE_BYTES * 2)).toUShort())
             throw IllegalArgumentException("Length in packet does not match packet actual size, likely malformed")
 
         println("Importing packet: Len $length | EP $ep")
