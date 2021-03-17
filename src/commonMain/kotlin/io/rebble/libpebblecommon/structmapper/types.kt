@@ -270,6 +270,24 @@ class SFixedString(mapper: StructMapper, size: Int, default: String = "") :
     )
 
 /**
+ * Upload-only type that writes String as unbound null-terminated byte array.
+ */
+class SNullTerminatedString(mapper: StructMapper, default: String = "") :
+    StructElement<String>(
+        { buf, el ->
+            val bytes = el.get().encodeToByteArray()
+
+            buf.putBytes(
+                bytes.toUByteArray()
+            )
+            buf.putUByte(0u)
+        },
+        { buf, el ->
+            throw UnsupportedOperationException("SNullTerminatedString is upload-only")
+        }, mapper, 0, default
+    )
+
+/**
  * Represents arbitrary bytes in a struct
  * @param length the number of bytes, when serializing this is used to pad/truncate the provided value to ensure it's 'length' bytes long (-1 to disable this)
  */
@@ -358,7 +376,7 @@ class SFixedList<T : Mappable>(
     }
 
     override val size: Int
-        get() = list.fold(0, {t,el -> t+el.size})
+        get() = list.fold(0, { t, el -> t + el.size })
 
     /**
      * Link the count of this element to the value of another struct element. Count will

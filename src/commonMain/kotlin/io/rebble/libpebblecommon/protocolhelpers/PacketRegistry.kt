@@ -20,6 +20,8 @@ object PacketRegistry {
         appmessagePacketsRegister()
         appRunStatePacketsRegister()
         musicPacketsRegister()
+        appFetchIncomingPacketsRegister()
+        putBytesIncomingPacketsRegister()
     }
 
     /**
