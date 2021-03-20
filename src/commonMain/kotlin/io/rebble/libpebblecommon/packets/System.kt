@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.packets
 
+import io.rebble.libpebblecommon.metadata.WatchHardwarePlatform
 import io.rebble.libpebblecommon.packets.PhoneAppVersion.AppVersionRequest
 import io.rebble.libpebblecommon.packets.PhoneAppVersion.AppVersionResponse
 import io.rebble.libpebblecommon.packets.WatchVersion.WatchVersionRequest
@@ -372,9 +373,14 @@ class WatchFirmwareVersion : StructMappable() {
     val versionTag = SFixedString(m, 32)
     val gitHash = SFixedString(m, 8)
     val isRecovery = SBoolean(m)
+
+    /**
+     * See [WatchHardwarePlatform]
+     */
     val hardwarePlatform = SUByte(m)
     val metadataVersion = SUByte(m)
 }
+
 
 open class SystemMessage(message: Message) : SystemPacket(endpoint) {
     enum class Message(val value: UByte) {
