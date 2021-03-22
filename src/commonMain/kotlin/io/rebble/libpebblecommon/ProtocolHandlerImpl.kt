@@ -16,8 +16,8 @@ import kotlin.jvm.Volatile
 class ProtocolHandlerImpl() : ProtocolHandler {
     private val receiveRegistry = HashMap<ProtocolEndpoint, suspend (PebblePacket) -> Unit>()
 
-    private val normalPriorityPackets = Channel<PendingPacket>(Channel.BUFFERED)
-    private val lowPriorityPackets = Channel<PendingPacket>(Channel.BUFFERED)
+    private val normalPriorityPackets = Channel<ProtocolHandler.PendingPacket>(Channel.BUFFERED)
+    private val lowPriorityPackets = Channel<ProtocolHandler.PendingPacket>(Channel.BUFFERED)
 
     @Volatile
     private var idlePacketLoop: Job? = null
@@ -33,13 +33,21 @@ class ProtocolHandlerImpl() : ProtocolHandler {
         }
 
         val callback = CompletableDeferred<Boolean>()
-        targetChannel.send(PendingPacket(packetData, callback))
+        targetChannel.send(ProtocolHandler.PendingPacket(packetData, callback))
 
         return callback.await()
     }
 
     override suspend fun send(packet: PebblePacket, priority: PacketPriority): Boolean {
         return send(packet.serialize(), priority)
+    }
+
+    override suspend fun openProtocol() {
+        idlePacketLoop?.cancelAndJoin()
+    }
+
+    override suspend fun closeProtocol() {
+        startIdlePacketLoop()
     }
 
     /**
@@ -50,32 +58,43 @@ class ProtocolHandlerImpl() : ProtocolHandler {
      * *false* if packet sending failed due to unrecoverable circumstances
      * (such as watch disconnecting completely)
      *
-     * When lambda returns false, this method terminates
+     * When lambda returns false, this method terminates.
+     *
+     * This method automatically calls [openProtocol] and [closeProtocol] for you.
      */
     override suspend fun startPacketSendingLoop(rawSend: suspend (UByteArray) -> Boolean) {
-        idlePacketLoop?.cancelAndJoin()
+        openProtocol()
 
         try {
             while (coroutineContext.isActive) {
-                // Receive packet first from normalPriorityPackets or from
-                // lowPriorityPackets if there is no normal packet
-                val packet = select<PendingPacket> {
-                    normalPriorityPackets.onReceive { it }
-                    lowPriorityPackets.onReceive { it }
-                }
-
+                val packet = waitForNextPacket()
                 val success = rawSend(packet.data)
 
                 if (success) {
-                    packet.callback.complete(true)
+                    packet.notifyPacketStatus(true)
                 } else {
-                    packet.callback.complete(false)
+                    packet.notifyPacketStatus(false)
                     break
                 }
             }
         } finally {
-            startIdlePacketLoop()
+            closeProtocol()
         }
+    }
+
+
+    override suspend fun waitForNextPacket(): ProtocolHandler.PendingPacket {
+        // Receive packet first from normalPriorityPackets or from
+        // lowPriorityPackets if there is no normal packet
+
+        return select {
+            normalPriorityPackets.onReceive { it }
+            lowPriorityPackets.onReceive { it }
+        }
+    }
+
+    override suspend fun getNextPacketOrNull(): ProtocolHandler.PendingPacket? {
+        return normalPriorityPackets.poll() ?: lowPriorityPackets.poll()
     }
 
     /**
@@ -85,12 +104,9 @@ class ProtocolHandlerImpl() : ProtocolHandler {
     private fun startIdlePacketLoop() {
         idlePacketLoop = GlobalScope.launch {
             while (isActive) {
-                val packet = select<PendingPacket> {
-                    normalPriorityPackets.onReceive { it }
-                    lowPriorityPackets.onReceive { it }
-                }
+                val packet = waitForNextPacket()
 
-                packet.callback.complete(false)
+                packet.notifyPacketStatus(false)
             }
         }
     }
@@ -138,8 +154,4 @@ class ProtocolHandlerImpl() : ProtocolHandler {
         return true
     }
 
-    private class PendingPacket(
-        val data: UByteArray,
-        val callback: CompletableDeferred<Boolean>
-    )
 }
