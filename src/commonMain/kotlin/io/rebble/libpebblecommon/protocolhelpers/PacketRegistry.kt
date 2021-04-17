@@ -25,6 +25,7 @@ object PacketRegistry {
         musicPacketsRegister()
         appFetchIncomingPacketsRegister()
         putBytesIncomingPacketsRegister()
+        appReorderIncomingRegister()
     }
 
     /**
