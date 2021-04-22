@@ -36,9 +36,26 @@ class TestProtocolHandler(private val sender: (suspend TestProtocolHandler.(Pebb
         throw UnsupportedOperationException("Not supported for TestProtocolHandler")
     }
 
+    override suspend fun openProtocol() {
+        throw UnsupportedOperationException("Not supported for TestProtocolHandler")
+    }
+
+    override suspend fun closeProtocol() {
+        throw UnsupportedOperationException("Not supported for TestProtocolHandler")
+    }
+
+    override suspend fun waitForNextPacket(): ProtocolHandler.PendingPacket {
+        throw UnsupportedOperationException("Not supported for TestProtocolHandler")
+    }
+
+    override suspend fun getNextPacketOrNull(): ProtocolHandler.PendingPacket? {
+        throw UnsupportedOperationException("Not supported for TestProtocolHandler")
+    }
+
     override suspend fun receivePacket(bytes: UByteArray): Boolean {
         return receivePacket(PebblePacket.deserialize(bytes))
     }
+
 
     override fun registerReceiveCallback(
         endpoint: ProtocolEndpoint,
