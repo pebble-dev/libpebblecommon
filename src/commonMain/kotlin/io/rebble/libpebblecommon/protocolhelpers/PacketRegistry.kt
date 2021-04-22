@@ -10,7 +10,10 @@ import io.rebble.libpebblecommon.packets.blobdb.timelinePacketsRegister
  */
 object PacketRegistry {
     private var typeOffsets: MutableMap<ProtocolEndpoint, Int> = mutableMapOf()
-    private var decoders: MutableMap<ProtocolEndpoint, MutableMap<UByte, (UByteArray) -> PebblePacket>> = mutableMapOf()
+    private var typedDecoders: MutableMap<ProtocolEndpoint, MutableMap<UByte, (UByteArray) -> PebblePacket>> =
+        mutableMapOf()
+    private var universalDecoders: MutableMap<ProtocolEndpoint, (UByteArray) -> PebblePacket> =
+        mutableMapOf()
 
     init {
         systemPacketsRegister()
@@ -22,6 +25,7 @@ object PacketRegistry {
         musicPacketsRegister()
         appFetchIncomingPacketsRegister()
         putBytesIncomingPacketsRegister()
+        appReorderIncomingRegister()
     }
 
     /**
@@ -33,15 +37,21 @@ object PacketRegistry {
         typeOffsets[endpoint] = offset
     }
 
+    fun register(endpoint: ProtocolEndpoint, decoder: (UByteArray) -> PebblePacket) {
+        universalDecoders[endpoint] = decoder
+    }
+
     fun register(endpoint: ProtocolEndpoint, type: UByte, decoder: (UByteArray) -> PebblePacket) {
-        if (decoders[endpoint] == null) {
-            decoders[endpoint] = mutableMapOf()
+        if (typedDecoders[endpoint] == null) {
+            typedDecoders[endpoint] = mutableMapOf()
         }
-        decoders[endpoint]!![type] = decoder
+        typedDecoders[endpoint]!![type] = decoder
     }
 
     fun get(endpoint: ProtocolEndpoint, packet: UByteArray): PebblePacket {
-        val epdecoders = decoders[endpoint]
+        universalDecoders[endpoint]?.let { return it(packet) }
+
+        val epdecoders = typedDecoders[endpoint]
             ?: throw PacketDecodeException("No packet class registered for endpoint $endpoint")
 
         val typeOffset = if (typeOffsets[endpoint] != null) typeOffsets[endpoint]!! else 4
