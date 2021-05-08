@@ -332,6 +332,44 @@ class SBytes(
 }
 
 /**
+ * Byte array without bounded size. It reads until whole packet buffer is read.
+ *
+ * This must be declared as last object
+ *
+ * Only for reading from watch.
+ */
+class SUnboundBytes(
+    mapper: StructMapper,
+    endianness: Char = '|'
+) : StructElement<UByteArray>(
+    { buf, el ->
+        throw UnsupportedOperationException("SUnboundBytes is read-only")
+    },
+    { buf, el ->
+        val leftBytes = buf.length - buf.readPosition
+        val value = buf.getBytes(leftBytes)
+        el.set(if (el.isLittleEndian) value.reversedArray() else value)
+    },
+    mapper, 0, ubyteArrayOf(), endianness
+) {
+
+    override fun toString(): String {
+        return "SUnboundBytes(value=${get().contentToString()})"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is SUnboundBytes) return false
+        if (get() != other.get()) return false
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return get().hashCode()
+    }
+}
+
+/**
  * Represents a fixed size list of T
  * @param T the type (must inherit Mappable)
  */
