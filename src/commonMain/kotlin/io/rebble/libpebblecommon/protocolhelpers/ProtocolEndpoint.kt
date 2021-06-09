@@ -8,6 +8,7 @@ enum class ProtocolEndpoint(val value: UShort) {
     MUSIC_CONTROL(32u),
     PHONE_CONTROL(33u),
     APP_MESSAGE(48u),
+    LEGACY_APP_LAUNCH(49u),
     APP_CUSTOMIZE(50u),
     BLE_CONTROL(51u),
     APP_RUN_STATE(52u),
