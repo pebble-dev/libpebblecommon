@@ -27,6 +27,7 @@ object PacketRegistry {
         putBytesIncomingPacketsRegister()
         appReorderIncomingRegister()
         screenshotPacketsRegister()
+        appLogPacketsRegister()
     }
 
     /**
