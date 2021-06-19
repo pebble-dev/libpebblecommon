@@ -244,29 +244,29 @@ class SString(mapper: StructMapper, default: String = "") :
 /**
  * Represents a string (UTF-8) in a struct with a fixed length
  */
-class SFixedString(mapper: StructMapper, size: Int, default: String = "") :
+class SFixedString(mapper: StructMapper, initialSize: Int, default: String = "") :
     StructElement<String>(
         { buf, el ->
             var bytes = el.get().encodeToByteArray()
-            if (bytes.size > size) {
-                bytes = bytes.take(size).toByteArray()
+            if (bytes.size > el.size) {
+                bytes = bytes.take(el.size).toByteArray()
             }
 
             buf.putBytes(
                 bytes.toUByteArray()
             )
 
-            val amountPad = size - bytes.size
+            val amountPad = el.size - bytes.size
             repeat(amountPad) {
                 buf.putUByte(0u)
             }
         },
         { buf, el ->
             el.set(
-                buf.getBytes(size).toByteArray().takeWhile { it > 0 }.toByteArray()
-                    .decodeToString(), size
+                buf.getBytes(el.size).toByteArray().takeWhile { it > 0 }.toByteArray()
+                    .decodeToString(), el.size
             )
-        }, mapper, size, default
+        }, mapper, initialSize, default
     )
 
 /**
