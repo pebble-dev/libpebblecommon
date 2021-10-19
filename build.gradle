@@ -80,9 +80,11 @@ kotlin {
         compilations.test.runtimeDependencyFiles // get the test runtime classpath
     }
 
-    iosArm64("ios") {
+    iosX64("ios") {
         binaries {
-            framework()
+            framework {
+                baseName = "libpebblecommon"
+            }
         }
     }
     // use the android preset

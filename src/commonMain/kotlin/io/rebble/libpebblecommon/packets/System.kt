@@ -441,15 +441,9 @@ open class PingPong(message: Message, cookie: UInt) : SystemPacket(endpoint) {
     }
 
     class Ping(cookie: UInt = 0u) : PingPong(Message.Ping, cookie) {
-        init {
-            PacketRegistry.register(endpoint, command.get(), { Ping() })
-        }
     }
 
     class Pong(cookie: UInt = 0u) : PingPong(Message.Pong, cookie) {
-        init {
-            PacketRegistry.register(endpoint, command.get(), { Pong() })
-        }
     }
 
     companion object {
