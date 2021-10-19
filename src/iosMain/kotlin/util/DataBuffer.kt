@@ -22,47 +22,55 @@ actual class DataBuffer {
         get() = _readPosition
 
     actual constructor(size: Int) {
-        actualBuf = NSMutableData.dataWithLength(size.toULong())!!
-        actualBuf.setLength(size.toULong())
+        actualBuf = NSMutableData.dataWithCapacity(size.toULong())!!
     }
 
     actual constructor(bytes: UByteArray) {
         actualBuf = NSMutableData()
-        actualBuf.setData(
-            NSString.create(string = bytes.toString())
-                .dataUsingEncoding(NSUTF8StringEncoding, false)!!
-        )
+        memScoped {
+            actualBuf.setData(
+                NSData.create(bytes = allocArrayOf(bytes.toByteArray()), length = bytes.size.toULong())
+            )
+        }
+    }
+
+    private fun shouldReverse(): Boolean {
+        return if (isPlatformBigEndian() && !littleEndian) {
+            false
+        }else if (isPlatformBigEndian() && littleEndian) {
+            true
+        }else !isPlatformBigEndian() && !littleEndian
     }
 
     actual fun putUShort(short: UShort) {
         memScoped {
             val pShort = alloc<UShortVar>()
-            pShort.value = short
+            pShort.value = if (shouldReverse())  reverseOrd(short) else short
             actualBuf.appendBytes(pShort.ptr, UShort.SIZE_BYTES.toULong())
         }
     }
     actual fun getUShort(): UShort {
         memScoped {
             val pShort = alloc<UShortVar>()
-            actualBuf.getBytes(pShort.ptr, UShort.SIZE_BYTES.toULong())
+            actualBuf.getBytes(pShort.ptr, NSMakeRange(_readPosition.toULong(), UShort.SIZE_BYTES.toULong()))
             _readPosition += UShort.SIZE_BYTES
-            return pShort.value
+            return if (shouldReverse()) reverseOrd(pShort.value) else pShort.value
         }
     }
 
     actual fun putShort(short: Short) {
         memScoped {
             val pShort = alloc<ShortVar>()
-            pShort.value = short
+            pShort.value = if (shouldReverse()) reverseOrd(short.toUShort()).toShort() else short
             actualBuf.appendBytes(pShort.ptr, Short.SIZE_BYTES.toULong())
         }
     }
     actual fun getShort(): Short {
         memScoped {
             val pShort = alloc<ShortVar>()
-            actualBuf.getBytes(pShort.ptr, Short.SIZE_BYTES.toULong())
+            actualBuf.getBytes(pShort.ptr, NSMakeRange(_readPosition.toULong(), Short.SIZE_BYTES.toULong()))
             _readPosition += Short.SIZE_BYTES
-            return pShort.value
+            return if (shouldReverse()) reverseOrd(pShort.value.toUShort()).toShort() else pShort.value
         }
     }
 
@@ -76,7 +84,7 @@ actual class DataBuffer {
     actual fun getUByte(): UByte {
         memScoped {
             val pByte = alloc<UByteVar>()
-            actualBuf.appendBytes(pByte.ptr, UByte.SIZE_BYTES.toULong())
+            actualBuf.getBytes(pByte.ptr, NSMakeRange(_readPosition.toULong(), UByte.SIZE_BYTES.toULong()))
             _readPosition += UByte.SIZE_BYTES
             return pByte.value
         }
@@ -92,7 +100,7 @@ actual class DataBuffer {
     actual fun getByte(): Byte {
         memScoped {
             val pByte = alloc<ByteVar>()
-            actualBuf.appendBytes(pByte.ptr, Byte.SIZE_BYTES.toULong())
+            actualBuf.getBytes(pByte.ptr, NSMakeRange(_readPosition.toULong(), Byte.SIZE_BYTES.toULong()))
             _readPosition += Byte.SIZE_BYTES
             return pByte.value
         }
@@ -107,7 +115,7 @@ actual class DataBuffer {
     actual fun getBytes(count: Int): UByteArray {
         memScoped {
             val pBytes = allocArray<UByteVar>(count)
-            actualBuf.getBytes(pBytes.getPointer(this), length = count.toULong())
+            actualBuf.getBytes(pBytes.getPointer(this), NSMakeRange(_readPosition.toULong(), count.toULong()))
             _readPosition += count
             return pBytes.readBytes(count).toUByteArray()
         }
@@ -117,54 +125,53 @@ actual class DataBuffer {
 
     actual fun setEndian(endian: Char) {
         littleEndian = endian == '<'
-        if (littleEndian) TODO("iOS little endian")
     }
 
     actual fun putUInt(uint: UInt) {
         memScoped {
             val pUInt = alloc<UIntVar>()
-            pUInt.value = uint
+            pUInt.value = if (shouldReverse()) reverseOrd(uint) else uint
             actualBuf.appendBytes(pUInt.ptr, UInt.SIZE_BYTES.toULong())
         }
     }
     actual fun getUInt(): UInt {
         memScoped {
             val pUInt = alloc<UIntVar>()
-            actualBuf.getBytes(pUInt.ptr, UInt.SIZE_BYTES.toULong())
+            actualBuf.getBytes(pUInt.ptr, NSMakeRange(_readPosition.toULong(), UInt.SIZE_BYTES.toULong()))
             _readPosition += UInt.SIZE_BYTES
-            return pUInt.value
+            return if (shouldReverse()) reverseOrd(pUInt.value) else pUInt.value
         }
     }
 
     actual fun putInt(int: Int) {
         memScoped {
             val pInt = alloc<IntVar>()
-            pInt.value = int
+            pInt.value = if (shouldReverse()) reverseOrd(int.toUInt()).toInt() else int
             actualBuf.appendBytes(pInt.ptr, Int.SIZE_BYTES.toULong())
         }
     }
     actual fun getInt(): Int {
         memScoped {
             val pInt = alloc<IntVar>()
-            actualBuf.getBytes(pInt.ptr, Int.SIZE_BYTES.toULong())
+            actualBuf.getBytes(pInt.ptr, NSMakeRange(_readPosition.toULong(), Int.SIZE_BYTES.toULong()))
             _readPosition += Int.SIZE_BYTES
-            return pInt.value
+            return if (shouldReverse()) reverseOrd(pInt.value.toUInt()).toInt() else pInt.value
         }
     }
 
     actual fun putULong(ulong: ULong) {
         memScoped {
             val pULong = alloc<ULongVar>()
-            pULong.value = ulong
+            pULong.value = if (shouldReverse()) reverseOrd(ulong) else ulong
             actualBuf.appendBytes(pULong.ptr, ULong.SIZE_BYTES.toULong())
         }
     }
     actual fun getULong(): ULong {
         memScoped {
             val pULong = alloc<ULongVar>()
-            actualBuf.getBytes(pULong.ptr, ULong.SIZE_BYTES.toULong())
+            actualBuf.getBytes(pULong.ptr, NSMakeRange(_readPosition.toULong(), ULong.SIZE_BYTES.toULong()))
             _readPosition += ULong.SIZE_BYTES
-            return pULong.value
+            return if (shouldReverse()) reverseOrd(pULong.value) else pULong.value
         }
     }
 
