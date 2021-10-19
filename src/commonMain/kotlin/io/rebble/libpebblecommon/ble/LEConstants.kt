@@ -1,7 +1,5 @@
 package io.rebble.libpebblecommon.ble
 
-import java.util.*
-
 object LEConstants {
     object UUIDs {
         val CHARACTERISTIC_CONFIGURATION_DESCRIPTOR = "00002902-0000-1000-8000-00805f9b34fb"
