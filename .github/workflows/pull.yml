@@ -7,6 +7,14 @@ jobs:
     runs-on: macos-latest
 
     steps:
+      - name: Cache build deps
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.konan/cache
+            ~/.konan/dependencies
+          key: build-deps-${{ hashFiles('**/*gradle*') }}
       - name: Checkout source
         uses: actions/checkout@v1
       - name: Build
