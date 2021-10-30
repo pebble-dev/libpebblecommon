@@ -1,6 +1,8 @@
 package io.rebble.libpebblecommon.services.appmessage
 
 import io.rebble.libpebblecommon.ProtocolHandler
+import io.rebble.libpebblecommon.packets.AppCustomizationSetStockAppIconMessage
+import io.rebble.libpebblecommon.packets.AppCustomizationSetStockAppTitleMessage
 import io.rebble.libpebblecommon.packets.AppMessage
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
@@ -18,6 +20,14 @@ class AppMessageService(private val protocolHandler: ProtocolHandler) : Protocol
      * Send an AppMessage
      */
     suspend fun send(packet: AppMessage) {
+        protocolHandler.send(packet)
+    }
+
+    suspend fun send(packet: AppCustomizationSetStockAppIconMessage) {
+        protocolHandler.send(packet)
+    }
+
+    suspend fun send(packet: AppCustomizationSetStockAppTitleMessage) {
         protocolHandler.send(packet)
     }
 
