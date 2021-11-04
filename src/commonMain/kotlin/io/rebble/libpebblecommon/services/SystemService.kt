@@ -2,8 +2,10 @@ package io.rebble.libpebblecommon.services
 
 import io.rebble.libpebblecommon.PacketPriority
 import io.rebble.libpebblecommon.ProtocolHandler
-import io.rebble.libpebblecommon.getPlatform
-import io.rebble.libpebblecommon.packets.*
+import io.rebble.libpebblecommon.packets.PhoneAppVersion
+import io.rebble.libpebblecommon.packets.SystemPacket
+import io.rebble.libpebblecommon.packets.WatchFactoryData
+import io.rebble.libpebblecommon.packets.WatchVersion
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.SInt
