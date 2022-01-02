@@ -2,6 +2,7 @@ package io.rebble.libpebblecommon.util
 
 import kotlinx.cinterop.*
 import platform.Foundation.*
+import platform.darwin.UInt8Var
 
 actual class DataBuffer {
     private val actualBuf: NSMutableData
@@ -29,7 +30,7 @@ actual class DataBuffer {
         actualBuf = NSMutableData()
         memScoped {
             actualBuf.setData(
-                NSData.create(bytes = allocArrayOf(bytes.toByteArray()), length = bytes.size.toULong())
+                NSData.create(bytes = allocArrayOf(bytes.asByteArray()), length = bytes.size.toULong())
             )
         }
     }
@@ -176,6 +177,6 @@ actual class DataBuffer {
     }
 
     actual fun rewind() {
-        TODO("iOS rewind buffer")
+        _readPosition = 0
     }
 }
