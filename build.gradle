@@ -10,18 +10,21 @@ buildscript {
 }
 
 plugins {
-    id 'org.jetbrains.kotlin.multiplatform' version '1.4.10'
+    id 'org.jetbrains.kotlin.multiplatform' version '1.6.0-RC'
     id("maven-publish")
 }
 
 def klockVersion = "1.12.0"
 def ktorVersion = "1.4.0"
-def coroutinesVersion = "1.3.9"
+def coroutinesVersion = "1.5.1-new-mm-dev2"
 
 repositories {
     mavenCentral()
     google()
     jcenter()
+    maven {
+        url "https://maven.pkg.jetbrains.space/public/p/kotlinx-coroutines/maven"
+    }
 }
 
 apply plugin: 'com.android.library'
@@ -80,13 +83,21 @@ kotlin {
         compilations.test.runtimeDependencyFiles // get the test runtime classpath
     }
 
-    iosX64("ios") {
+    /*iosX64("ios") { // Simulator
+        binaries {
+            framework {
+                baseName = "libpebblecommon"
+            }
+        }
+    }*/
+    iosArm64("ios") {
         binaries {
             framework {
                 baseName = "libpebblecommon"
             }
         }
     }
+
     // use the android preset
     android {
         publishLibraryVariants("release", "debug")
@@ -97,7 +108,11 @@ kotlin {
         jvmMain {
             dependencies {
                 implementation kotlin('stdlib')
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion") {
+                    version {
+                        strictly coroutinesVersion
+                    }
+                }
                 implementation "com.soywiz.korlibs.klock:klock-jvm:$klockVersion"
                 implementation "com.benasher44:uuid-jvm:0.2.2"
             }
@@ -119,7 +134,11 @@ kotlin {
                 implementation kotlin('stdlib-common')
                 implementation "com.benasher44:uuid:0.2.2"
                 implementation "com.soywiz.korlibs.klock:klock:$klockVersion"
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion") {
+                    version {
+                        strictly coroutinesVersion
+                    }
+                }
             }
         }
         commonTest {
@@ -132,7 +151,11 @@ kotlin {
         androidMain {
             dependencies {
                 implementation kotlin('stdlib')
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion") {
+                    version {
+                        strictly coroutinesVersion
+                    }
+                }
                 implementation "com.soywiz.korlibs.klock:klock-android:$klockVersion"
                 implementation "com.benasher44:uuid-jvm:0.2.2"
             }
@@ -148,16 +171,20 @@ kotlin {
         iosMain {
             dependencies {
                 implementation kotlin('stdlib')
-                implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion"
+                implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion") {
+                    version {
+                        strictly coroutinesVersion
+                    }
+                }
             }
         }
     }
     sourceSets {
         all {
             languageSettings {
-                useExperimentalAnnotation('kotlin.RequiresOptIn')
-                useExperimentalAnnotation('kotlin.ExperimentalUnsignedTypes')
-                useExperimentalAnnotation('kotlin.ExperimentalStdlibApi')
+                optIn('kotlin.ExperimentalUnsignedTypes')
+                optIn('kotlin.ExperimentalStdlibApi')
+                optIn('kotlin.RequiresOptIn')
             }
         }
     }
