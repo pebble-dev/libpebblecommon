@@ -148,7 +148,6 @@ class ProtocolHandlerImpl() : ProtocolHandler {
             }
 
         } catch (e: PacketDecodeException) {
-            e.printStackTrace()
             println("Warning: failed to decode a packet: '${e.message}'")
             return false
         }
