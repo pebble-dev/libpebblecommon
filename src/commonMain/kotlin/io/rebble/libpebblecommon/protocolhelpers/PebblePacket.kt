@@ -61,8 +61,9 @@ open class PebblePacket{
             meta.fromBytes(buf)
             if (packet.size <= (2 * UShort.SIZE_BYTES))
                 throw PacketDecodeException("Malformed packet: contents empty")
-            if (length.get().toInt() != (packet.size - (2 * UShort.SIZE_BYTES)))
-                throw PacketDecodeException("Malformed packet: bad length")
+            val lengthVal = length.get().toInt()
+            if (lengthVal != (packet.size - (2 * UShort.SIZE_BYTES)))
+                throw PacketDecodeException("Malformed packet: bad length (expected ${length.get()}, got ${packet.size - (2 * UShort.SIZE_BYTES)})")
             val ret = PacketRegistry.get(
                 ProtocolEndpoint.getByValue(ep.get()),
                 packet
