@@ -48,10 +48,14 @@ open class PushNotification(subject: String, sender: String? = null, message: St
             subject.encodeToByteArray().toUByteArray()
         )
 
-        if (backgroundColor != null) attributes += TimelineItem.Attribute(
-            TimelineItem.Attribute.Timeline.BackgroundCol.id,
-            ubyteArrayOf(backgroundColor)
-        )
+        if (backgroundColor != null) {
+            // XXX: https://youtrack.jetbrains.com/issue/KT-49366
+            val bgColTemp = backgroundColor.toUByte()
+            attributes += TimelineItem.Attribute(
+                TimelineItem.Attribute.Timeline.BackgroundCol.id,
+                ubyteArrayOf(bgColTemp)
+            )
+        }
 
         val actions = mutableListOf(
             TimelineItem.Action(
