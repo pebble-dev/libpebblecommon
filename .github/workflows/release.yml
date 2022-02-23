@@ -33,3 +33,46 @@ jobs:
           echo "New version: ${NEW_VERSION}"
           echo "Github username: ${GITHUB_ACTOR}"
           ./gradlew -Pversion=${NEW_VERSION} publish
+
+      - name: Build XCFrameworks
+        run: ./gradlew assembleXCFramework
+
+      - name: Zip release XCFramework
+        uses: action-zip@v1
+        with:
+          files: build/XCFrameworks/release/libpebblecommon.xcframework
+          dest: build/xcframework-release.zip
+
+      - name: Zip debug XCFramework
+        uses: action-zip@v1
+        with:
+          files: build/XCFrameworks/debug/libpebblecommon.xcframework
+          dest: build/xcframework-debug.zip
+
+      - name: Add release artifacts
+        id: release_artifacts
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.event.release.tag_name }}
+          files: |
+            build/xcframework-debug.zip
+            build/xcframework-release.zip
+
+      - name: Calculate checksums for XCFrameworks
+        run: |
+          echo ::set-env name=DEBUG_CHECKSUM::$(swift package compute-checksum build/xcframework-debug.zip)
+          echo ::set-env name=RELEASE_CHECKSUM::$(swift package compute-checksum build/xcframework-release.zip)
+
+      - name: Update swift package
+        run: |
+          sed -e 's/DEBUG-URL/${{ fromJSON(steps.release_artifacts.outputs.assets)[0].browser_download_url }}/;w Package.swift' Package.swift.template
+          sed -e 's/DEBUG-CHECKSUM/${{ env.DEBUG_CHECKSUM }}/;w Package.swift.tmp' Package.swift
+          sed -e 's/RELEASE-URL/${{ fromJSON(steps.release_artifacts.outputs.assets)[0].browser_download_url }}/;w Package.swift.tmp2' Package.swift.tmp
+          sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp2
+
+      - name: Commit swift package
+        uses: EndBug/add-and-comit@v8
+        with:
+          add: 'Package.swift'
+          message: '[CI] Update swift package'
+          push: true
