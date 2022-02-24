@@ -60,6 +60,7 @@ jobs:
 
       - name: Calculate checksums for XCFrameworks
         run: |
+          cp Package.swift.template Package.swift
           echo DEBUG_CHECKSUM=$(swift package compute-checksum build/xcframework-debug.zip) >> $GITHUB_ENV
           echo RELEASE_CHECKSUM=$(swift package compute-checksum build/xcframework-release.zip) >> $GITHUB_ENV
           
