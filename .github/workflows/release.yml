@@ -38,13 +38,13 @@ jobs:
         run: ./gradlew assembleXCFramework
 
       - name: Zip release XCFramework
-        uses: action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: build/XCFrameworks/release/libpebblecommon.xcframework
           dest: build/xcframework-release.zip
 
       - name: Zip debug XCFramework
-        uses: action-zip@v1
+        uses: vimtor/action-zip@v1
         with:
           files: build/XCFrameworks/debug/libpebblecommon.xcframework
           dest: build/xcframework-debug.zip
