@@ -40,13 +40,13 @@ jobs:
       - name: Zip release XCFramework
         uses: vimtor/action-zip@v1
         with:
-          files: build/XCFrameworks/release/libpebblecommon.xcframework
+          files: build/XCFrameworks/release/
           dest: build/xcframework-release.zip
 
       - name: Zip debug XCFramework
         uses: vimtor/action-zip@v1
         with:
-          files: build/XCFrameworks/debug/libpebblecommon.xcframework
+          files: build/XCFrameworks/debug/
           dest: build/xcframework-debug.zip
 
       - name: Add release artifacts
@@ -75,6 +75,11 @@ jobs:
       - name: Get release url
         id: jq_release
         run: 'echo ::set-output name=value::$(echo ${{ steps.release_artifacts.outputs.assets }} | ./jq --raw-output ".[1].browser_download_url")'
+        
+      - name: Checkout master
+        uses: actions/checkout@v1
+        with:
+          ref: 'master'
 
       - name: Update swift package
         run: |
@@ -88,4 +93,5 @@ jobs:
         with:
           add: 'Package.swift'
           message: '[CI] Update swift package'
+          tag: '${{ github.event.release.tag_name }}'
           push: true
