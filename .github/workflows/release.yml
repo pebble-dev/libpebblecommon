@@ -71,7 +71,7 @@ jobs:
           sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp2
 
       - name: Commit swift package
-        uses: EndBug/add-and-comit@v8
+        uses: EndBug/add-and-commit@v8
         with:
           add: 'Package.swift'
           message: '[CI] Update swift package'
