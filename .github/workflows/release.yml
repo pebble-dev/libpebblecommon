@@ -49,19 +49,6 @@ jobs:
           cp Package.swift.template Package.swift
           echo DEBUG_CHECKSUM=$(swift package compute-checksum build/xcframework-debug.zip) >> $GITHUB_ENV
           echo RELEASE_CHECKSUM=$(swift package compute-checksum build/xcframework-release.zip) >> $GITHUB_ENV
-          
-      - name: Download jq
-        run: |
-          wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64
-          chmod +x jq
-          
-      - name: Get debug url
-        id: jq_debug
-        run: 'echo ::set-output name=value::$(echo ${{ steps.release_artifacts.outputs.assets }} | ./jq --raw-output ".[0].browser_download_url")'
-      
-      - name: Get release url
-        id: jq_release
-        run: 'echo ::set-output name=value::$(echo ${{ steps.release_artifacts.outputs.assets }} | ./jq --raw-output ".[1].browser_download_url")'
         
       - name: Checkout master
         uses: actions/checkout@v2
@@ -70,9 +57,9 @@ jobs:
 
       - name: Update swift package
         run: |
-          sed -e 's|DEBUG-URL|${{ steps.jq_debug.outputs.value }}|;w Package.swift' Package.swift.template
+          sed -e 's|DEBUG-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework-debug.zip|;w Package.swift' Package.swift.template
           sed -e 's/DEBUG-CHECKSUM/${{ env.DEBUG_CHECKSUM }}/;w Package.swift.tmp' Package.swift
-          sed -e 's|RELEASE-URL|${{ steps.jq_release.outputs.value }}|;w Package.swift.tmp2' Package.swift.tmp
+          sed -e 's|RELEASE-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework-release.zip|;w Package.swift.tmp2' Package.swift.tmp
           sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp2
 
       - name: Commit swift package
