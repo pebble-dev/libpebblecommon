@@ -95,5 +95,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Package.swift
           git commit -m "[CI] Update swift package"
-          git tag -f ${{ github.event.release.tag_name }}
+          git tag -d ${{ github.event.release.tag_name }}
+          git push --delete origin ${{ github.event.release.tag_name }}
+          git tag ${{ github.event.release.tag_name }}
           git push origin ${{ github.event.release.tag_name }}
