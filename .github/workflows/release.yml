@@ -60,14 +60,14 @@ jobs:
 
       - name: Calculate checksums for XCFrameworks
         run: |
-          echo ::set-env name=DEBUG_CHECKSUM::$(swift package compute-checksum build/xcframework-debug.zip)
-          echo ::set-env name=RELEASE_CHECKSUM::$(swift package compute-checksum build/xcframework-release.zip)
+          echo DEBUG_CHECKSUM=$(swift package compute-checksum build/xcframework-debug.zip) >> $GITHUB_ENV
+          echo RELEASE_CHECKSUM=$(swift package compute-checksum build/xcframework-release.zip) >> $GITHUB_ENV
 
       - name: Update swift package
         run: |
           sed -e 's/DEBUG-URL/${{ fromJSON(steps.release_artifacts.outputs.assets)[0].browser_download_url }}/;w Package.swift' Package.swift.template
           sed -e 's/DEBUG-CHECKSUM/${{ env.DEBUG_CHECKSUM }}/;w Package.swift.tmp' Package.swift
-          sed -e 's/RELEASE-URL/${{ fromJSON(steps.release_artifacts.outputs.assets)[0].browser_download_url }}/;w Package.swift.tmp2' Package.swift.tmp
+          sed -e 's/RELEASE-URL/${{ fromJSON(steps.release_artifacts.outputs.assets)[1].browser_download_url }}/;w Package.swift.tmp2' Package.swift.tmp
           sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp2
 
       - name: Commit swift package
