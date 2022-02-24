@@ -19,7 +19,7 @@ jobs:
           key: build-deps-${{ hashFiles('~/.gradle/**') }}-${{ hashFiles('~/.konan/**') }}
 
       - name: Checkout source
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
 
       - name: Publish artifact
         env:
@@ -51,7 +51,7 @@ jobs:
 
       - name: Add release artifacts
         id: release_artifacts
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v0.1.14
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
@@ -78,7 +78,7 @@ jobs:
         run: 'echo ::set-output name=value::$(echo ${{ steps.release_artifacts.outputs.assets }} | ./jq --raw-output ".[1].browser_download_url")'
         
       - name: Checkout master
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
         with:
           ref: 'master'
 
@@ -90,9 +90,10 @@ jobs:
           sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp2
 
       - name: Commit swift package
-        uses: EndBug/add-and-commit@v8
-        with:
-          add: 'Package.swift'
-          message: '[CI] Update swift package'
-          tag: '-f ${{ github.event.release.tag_name }}'
-          push: true
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add Package.swift
+          git commit -m "[CI] Update swift package"
+          git tag -f ${{ github.event.release.tag_name }}
+          git push origin ${{ github.event.release.tag_name }}
