@@ -5,9 +5,8 @@ on:
     types: [published]
 
 jobs:
-  publish-release:
+  publish-swift:
     runs-on: macos-latest
-
     steps:
       - name: Cache build deps
         uses: actions/cache@v2
@@ -17,23 +16,10 @@ jobs:
             ~/.konan/cache
             ~/.konan/dependencies
           key: build-deps-${{ hashFiles('~/.gradle/**') }}-${{ hashFiles('~/.konan/**') }}
-
+      
       - name: Checkout source
         uses: actions/checkout@v2
-
-      - name: Publish artifact
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-        # The GITHUB_REF tag comes in the format 'refs/tags/xxx'.
-        # If we split on '/' and take the 3rd value,
-        # we can get the release name.
-        run: |
-          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
-          echo "New version: ${NEW_VERSION}"
-          echo "Github username: ${GITHUB_ACTOR}"
-          ./gradlew -Pversion=${NEW_VERSION} publish
-
+      
       - name: Build XCFrameworks
         run: ./gradlew assembleXCFramework
 
@@ -95,7 +81,34 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add Package.swift
           git commit -m "[CI] Update swift package"
-          git tag -d ${{ github.event.release.tag_name }}
-          git push --delete origin ${{ github.event.release.tag_name }}
-          git tag ${{ github.event.release.tag_name }}
-          git push origin ${{ github.event.release.tag_name }}
+          git tag swiftpm-${{ github.event.release.tag_name }}
+          git push origin swiftpm-${{ github.event.release.tag_name }}
+
+  publish-maven:
+    runs-on: macos-latest
+
+    steps:
+      - name: Cache build deps
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/wrapper
+            ~/.konan/cache
+            ~/.konan/dependencies
+          key: build-deps-${{ hashFiles('~/.gradle/**') }}-${{ hashFiles('~/.konan/**') }}
+
+      - name: Checkout source
+        uses: actions/checkout@v2
+
+      - name: Publish artifact
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+        # The GITHUB_REF tag comes in the format 'refs/tags/xxx'.
+        # If we split on '/' and take the 3rd value,
+        # we can get the release name.
+        run: |
+          NEW_VERSION=$(echo "${GITHUB_REF}" | cut -d "/" -f3)
+          echo "New version: ${NEW_VERSION}"
+          echo "Github username: ${GITHUB_ACTOR}"
+          ./gradlew -Pversion=${NEW_VERSION} publish
