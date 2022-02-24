@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFrameworkConfig
 buildscript {
+    ext.kotlin_version = '1.6.20-RC'
     repositories {
         mavenCentral()
         google()
@@ -7,6 +8,7 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.6.3'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
@@ -29,6 +31,7 @@ repositories {
 }
 
 apply plugin: 'com.android.library'
+//apply plugin: 'kotlin-android'
 
 apply plugin: 'maven-publish'
 
@@ -75,6 +78,7 @@ android { // android specific configuration
 }
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //androidTestImplementation 'com.android.support.test:runner:1.0.2'
 }
 
@@ -94,6 +98,15 @@ kotlin {
         }
     }
     iosArm64("ios") {
+        binaries {
+            framework {
+                baseName = "libpebblecommon"
+                xcf.add(it)
+            }
+        }
+    }
+
+    iosArm32("iosArmv7") {
         binaries {
             framework {
                 baseName = "libpebblecommon"
@@ -198,6 +211,11 @@ project.afterEvaluate {
     tasks.withType(PublishToMavenRepository) {
         onlyIf {
             !publication.name.contains("ios")
+        }
+    }
+    tasks.withType(Jar) {
+        onlyIf {
+            !name.contains("ios")
         }
     }
 }

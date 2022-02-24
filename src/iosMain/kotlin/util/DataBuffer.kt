@@ -2,7 +2,6 @@ package io.rebble.libpebblecommon.util
 
 import kotlinx.cinterop.*
 import platform.Foundation.*
-import platform.darwin.UInt8Var
 
 actual class DataBuffer {
     private val actualBuf: NSMutableData
@@ -23,14 +22,14 @@ actual class DataBuffer {
         get() = _readPosition
 
     actual constructor(size: Int) {
-        actualBuf = NSMutableData.dataWithCapacity(size.toULong())!!
+        actualBuf = NSMutableData.dataWithCapacity(castToNativeSize(size))!!
     }
 
     actual constructor(bytes: UByteArray) {
         actualBuf = NSMutableData()
         memScoped {
             actualBuf.setData(
-                NSData.create(bytes = allocArrayOf(bytes.asByteArray()), length = bytes.size.toULong())
+                NSData.create(bytes = allocArrayOf(bytes.asByteArray()), length = castToNativeSize(bytes.size))
             )
         }
     }
@@ -47,13 +46,13 @@ actual class DataBuffer {
         memScoped {
             val pShort = alloc<UShortVar>()
             pShort.value = if (shouldReverse())  reverseOrd(short) else short
-            actualBuf.appendBytes(pShort.ptr, UShort.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pShort.ptr, castToNativeSize(UShort.SIZE_BYTES))
         }
     }
     actual fun getUShort(): UShort {
         memScoped {
             val pShort = alloc<UShortVar>()
-            actualBuf.getBytes(pShort.ptr, NSMakeRange(_readPosition.toULong(), UShort.SIZE_BYTES.toULong()))
+            actualBuf.getBytes(pShort.ptr, NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(UShort.SIZE_BYTES)))
             _readPosition += UShort.SIZE_BYTES
             return if (shouldReverse()) reverseOrd(pShort.value) else pShort.value
         }
@@ -63,13 +62,13 @@ actual class DataBuffer {
         memScoped {
             val pShort = alloc<ShortVar>()
             pShort.value = if (shouldReverse()) reverseOrd(short.toUShort()).toShort() else short
-            actualBuf.appendBytes(pShort.ptr, Short.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pShort.ptr, castToNativeSize(Short.SIZE_BYTES))
         }
     }
     actual fun getShort(): Short {
         memScoped {
             val pShort = alloc<ShortVar>()
-            actualBuf.getBytes(pShort.ptr, NSMakeRange(_readPosition.toULong(), Short.SIZE_BYTES.toULong()))
+            actualBuf.getBytes(pShort.ptr, NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(Short.SIZE_BYTES)))
             _readPosition += Short.SIZE_BYTES
             return if (shouldReverse()) reverseOrd(pShort.value.toUShort()).toShort() else pShort.value
         }
@@ -79,13 +78,13 @@ actual class DataBuffer {
         memScoped {
             val pByte = alloc<UByteVar>()
             pByte.value = byte
-            actualBuf.appendBytes(pByte.ptr, UByte.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pByte.ptr, castToNativeSize(UByte.SIZE_BYTES))
         }
     }
     actual fun getUByte(): UByte {
         memScoped {
             val pByte = alloc<UByteVar>()
-            actualBuf.getBytes(pByte.ptr, NSMakeRange(_readPosition.toULong(), UByte.SIZE_BYTES.toULong()))
+            actualBuf.getBytes(pByte.ptr, NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(UByte.SIZE_BYTES)))
             _readPosition += UByte.SIZE_BYTES
             return pByte.value
         }
@@ -95,13 +94,13 @@ actual class DataBuffer {
         memScoped {
             val pByte = alloc<ByteVar>()
             pByte.value = byte
-            actualBuf.appendBytes(pByte.ptr, Byte.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pByte.ptr, castToNativeSize(Byte.SIZE_BYTES))
         }
     }
     actual fun getByte(): Byte {
         memScoped {
             val pByte = alloc<ByteVar>()
-            actualBuf.getBytes(pByte.ptr, NSMakeRange(_readPosition.toULong(), Byte.SIZE_BYTES.toULong()))
+            actualBuf.getBytes(pByte.ptr, NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(Byte.SIZE_BYTES)))
             _readPosition += Byte.SIZE_BYTES
             return pByte.value
         }
@@ -110,13 +109,13 @@ actual class DataBuffer {
     actual fun putBytes(bytes: UByteArray) {
         memScoped {
             val pBytes = allocArrayOf(bytes.toByteArray())
-            actualBuf.appendBytes(pBytes, bytes.size.toULong())
+            actualBuf.appendBytes(pBytes, castToNativeSize(bytes.size))
         }
     }
     actual fun getBytes(count: Int): UByteArray {
         memScoped {
             val pBytes = allocArray<UByteVar>(count)
-            actualBuf.getBytes(pBytes.getPointer(this), NSMakeRange(_readPosition.toULong(), count.toULong()))
+            actualBuf.getBytes(pBytes.getPointer(this), NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(count)))
             _readPosition += count
             return pBytes.readBytes(count).toUByteArray()
         }
@@ -132,13 +131,13 @@ actual class DataBuffer {
         memScoped {
             val pUInt = alloc<UIntVar>()
             pUInt.value = if (shouldReverse()) reverseOrd(uint) else uint
-            actualBuf.appendBytes(pUInt.ptr, UInt.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pUInt.ptr, castToNativeSize(UInt.SIZE_BYTES))
         }
     }
     actual fun getUInt(): UInt {
         memScoped {
             val pUInt = alloc<UIntVar>()
-            actualBuf.getBytes(pUInt.ptr, NSMakeRange(_readPosition.toULong(), UInt.SIZE_BYTES.toULong()))
+            actualBuf.getBytes(pUInt.ptr, NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(UInt.SIZE_BYTES)))
             _readPosition += UInt.SIZE_BYTES
             return if (shouldReverse()) reverseOrd(pUInt.value) else pUInt.value
         }
@@ -148,13 +147,13 @@ actual class DataBuffer {
         memScoped {
             val pInt = alloc<IntVar>()
             pInt.value = if (shouldReverse()) reverseOrd(int.toUInt()).toInt() else int
-            actualBuf.appendBytes(pInt.ptr, Int.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pInt.ptr, castToNativeSize(Int.SIZE_BYTES))
         }
     }
     actual fun getInt(): Int {
         memScoped {
             val pInt = alloc<IntVar>()
-            actualBuf.getBytes(pInt.ptr, NSMakeRange(_readPosition.toULong(), Int.SIZE_BYTES.toULong()))
+            actualBuf.getBytes(pInt.ptr, NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(Int.SIZE_BYTES)))
             _readPosition += Int.SIZE_BYTES
             return if (shouldReverse()) reverseOrd(pInt.value.toUInt()).toInt() else pInt.value
         }
@@ -164,13 +163,13 @@ actual class DataBuffer {
         memScoped {
             val pULong = alloc<ULongVar>()
             pULong.value = if (shouldReverse()) reverseOrd(ulong) else ulong
-            actualBuf.appendBytes(pULong.ptr, ULong.SIZE_BYTES.toULong())
+            actualBuf.appendBytes(pULong.ptr, castToNativeSize(ULong.SIZE_BYTES))
         }
     }
     actual fun getULong(): ULong {
         memScoped {
             val pULong = alloc<ULongVar>()
-            actualBuf.getBytes(pULong.ptr, NSMakeRange(_readPosition.toULong(), ULong.SIZE_BYTES.toULong()))
+            actualBuf.getBytes(pULong.ptr, NSMakeRange(castToNativeSize(_readPosition), castToNativeSize(ULong.SIZE_BYTES)))
             _readPosition += ULong.SIZE_BYTES
             return if (shouldReverse()) reverseOrd(pULong.value) else pULong.value
         }

@@ -7,6 +7,7 @@ import platform.Foundation.create
 import platform.darwin.UInt8
 import platform.darwin.UInt8Var
 import platform.posix.memcpy
+import platform.posix.size_t
 import kotlin.native.internal.NativePtr
 
 actual fun runBlocking(block: suspend () -> Unit) = kotlinx.coroutines.runBlocking{block()}
@@ -27,7 +28,7 @@ internal fun reverseOrd(varr: UInt): UInt = ((reverseOrd((varr and 0xffffu).toUS
 internal fun reverseOrd(varr: ULong): ULong = ((reverseOrd((varr and 0xffffffffu).toUInt()).toLong() shl 32) or (reverseOrd((varr shr 32).toUInt()).toLong() and 0xffffffff)).toULong()
 
 fun ByteArray.toNative(): NSData = memScoped {
-    NSData.create(bytes = allocArrayOf(this@toNative), length = this@toNative.size.toULong())
+    NSData.create(bytes = allocArrayOf(this@toNative), length = castToNativeSize(this@toNative.size))
 }
 
 fun KUtil.byteArrayFromNative(arr: NSData): ByteArray = ByteArray(arr.length.toInt()).apply {
@@ -35,5 +36,14 @@ fun KUtil.byteArrayFromNative(arr: NSData): ByteArray = ByteArray(arr.length.toI
         usePinned {
             memcpy(it.addressOf(0), arr.bytes, arr.length)
         }
+    }
+}
+
+internal fun castToNativeSize(v: Int): size_t {
+    @Suppress("CAST_NEVER_SUCCEEDS", "USELESS_CAST") // Depending on the platform different side of if will trigger, lets ignore
+    return if (size_t.SIZE_BITS == 32) {
+        v.toUInt() as size_t
+    }else {
+        v.toULong() as size_t
     }
 }
