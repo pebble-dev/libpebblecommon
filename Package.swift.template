@@ -19,7 +19,7 @@ let package = Package(
             name: "libpebblecommon-debug",
             url: "DEBUG-URL",
             checksum: "DEBUG-CHECKSUM"
-        )
+        ),
         .binaryTarget(
             name: "libpebblecommon-release",
             url: "RELEASE-URL",
