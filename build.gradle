@@ -194,6 +194,14 @@ kotlin {
     }
 }
 
+project.afterEvaluate {
+    tasks.withType(PublishToMavenRepository) {
+        onlyIf {
+            !publication.name.contains("ios")
+        }
+    }
+}
+
 /*task iosTest {
     def device = project.findProperty("iosDevice")?.toString() ?: "iPhone 8"
     dependsOn kotlin.targets.ios.binaries.getTest('DEBUG').linkTaskName
