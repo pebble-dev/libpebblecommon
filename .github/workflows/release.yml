@@ -63,17 +63,18 @@ jobs:
           echo DEBUG_CHECKSUM=$(swift package compute-checksum build/xcframework-debug.zip) >> $GITHUB_ENV
           echo RELEASE_CHECKSUM=$(swift package compute-checksum build/xcframework-release.zip) >> $GITHUB_ENV
           
+      - name: Download jq
+        run: |
+          wget -O jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-osx-amd64
+          chmod +x jq
+          
       - name: Get debug url
         id: jq_debug
-        uses: sergeysova/jq-action@v2
-        with:
-          cmd: 'echo ${{ steps.release_artifacts.outputs.assets }} | jq --raw-output ".[0].browser_download_url"'
+        run: 'echo ::set-output name=value::$(echo ${{ steps.release_artifacts.outputs.assets }} | ./jq --raw-output ".[0].browser_download_url")'
       
       - name: Get release url
         id: jq_release
-        uses: sergeysova/jq-action@v2
-        with:
-          cmd: 'echo ${{ steps.release_artifacts.outputs.assets }} | jq --raw-output ".[1].browser_download_url"'
+        run: 'echo ::set-output name=value::$(echo ${{ steps.release_artifacts.outputs.assets }} | ./jq --raw-output ".[1].browser_download_url")'
 
       - name: Update swift package
         run: |
