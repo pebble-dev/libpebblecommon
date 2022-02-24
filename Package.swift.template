@@ -9,7 +9,10 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "libpebblecommon",
-            targets: ["libpebblecommon-debug", "libpebblecommon-release"])
+            targets: ["libpebblecommon-release"]),
+        .library(
+            name: "libpebblecommon-debug",
+            targets: ["libpebblecommon-debug"])
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
