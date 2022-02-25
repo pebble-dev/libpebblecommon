@@ -1,4 +1,1 @@
 rootProject.name = 'libpebblecommon'
-
-
-enableFeaturePreview('GRADLE_METADATA')
