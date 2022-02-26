@@ -23,6 +23,6 @@ class AppLogService(private val protocolHandler: ProtocolHandler) : ProtocolServ
             throw IllegalStateException("Received invalid packet type: $packet")
         }
 
-        receivedMessages.offer(packet)
+        receivedMessages.trySend(packet)
     }
 }

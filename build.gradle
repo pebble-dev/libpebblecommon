@@ -18,8 +18,8 @@ plugins {
 }
 
 def klockVersion = "2.4.13"
-def ktorVersion = "1.4.0"
-def coroutinesVersion = "1.5.1-new-mm-dev2"
+def ktorVersion = "1.6.7"
+def coroutinesVersion = "1.6.0"
 
 repositories {
     mavenCentral()
@@ -48,10 +48,10 @@ publishing {
 }
 
 android { // android specific configuration
-    compileSdkVersion 29 // SDK version to compile against
+    compileSdkVersion 31 // SDK version to compile against
     defaultConfig {
         minSdkVersion 15 // min SDK version supported by this lib
-        targetSdkVersion 29 // max SDK version supported by this lib
+        targetSdkVersion 31 // max SDK version supported by this lib
         versionCode 1
         versionName getVersion()
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner' // See notes #1

@@ -81,7 +81,7 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
                     send(res) // Cannot be low priority
                 }
             }
-            else -> receivedMessages.offer(packet)
+            else -> receivedMessages.trySend(packet)
         }
     }
 

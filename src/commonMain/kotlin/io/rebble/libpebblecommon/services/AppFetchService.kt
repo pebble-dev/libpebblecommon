@@ -23,7 +23,7 @@ class AppFetchService(private val protocolHandler: ProtocolHandler) : ProtocolSe
             throw IllegalStateException("Received invalid packet type: $packet")
         }
 
-        receivedMessages.offer(packet)
+        receivedMessages.trySend(packet)
     }
 
 }

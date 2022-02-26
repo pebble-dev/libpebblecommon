@@ -23,7 +23,7 @@ class ScreenshotService(private val protocolHandler: ProtocolHandler) : Protocol
             throw IllegalStateException("Received invalid packet type: $packet")
         }
 
-        receivedMessages.offer(packet)
+        receivedMessages.trySend(packet)
     }
 
 }

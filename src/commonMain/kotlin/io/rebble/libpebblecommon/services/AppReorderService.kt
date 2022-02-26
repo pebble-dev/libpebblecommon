@@ -31,6 +31,6 @@ class AppReorderService(private val protocolHandler: ProtocolHandler) : Protocol
         }
 
         lastOrderPacket = null
-        receivedMessages.offer(packet)
+        receivedMessages.trySend(packet)
     }
 }

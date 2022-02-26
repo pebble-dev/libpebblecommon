@@ -94,7 +94,7 @@ class ProtocolHandlerImpl() : ProtocolHandler {
     }
 
     override suspend fun getNextPacketOrNull(): ProtocolHandler.PendingPacket? {
-        return normalPriorityPackets.poll() ?: lowPriorityPackets.poll()
+        return normalPriorityPackets.tryReceive().getOrNull() ?: lowPriorityPackets.tryReceive().getOrNull()
     }
 
     /**

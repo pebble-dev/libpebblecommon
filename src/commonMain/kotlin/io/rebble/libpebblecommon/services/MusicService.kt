@@ -22,7 +22,7 @@ class MusicService(private val protocolHandler: ProtocolHandler) : ProtocolServi
             throw IllegalStateException("Received invalid packet type: $packet")
         }
 
-        receivedMessages.offer(packet)
+        receivedMessages.trySend(packet)
     }
 
 }
