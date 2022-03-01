@@ -5,5 +5,32 @@ enum class WatchType(val codename: String) {
     BASALT("basalt"),
     CHALK("chalk"),
     DIORITE("diorite"),
-    EMERY("emery")
+    EMERY("emery");
+
+    fun getCompatibleAppVariants(): List<WatchType> {
+        return when (this) {
+            APLITE -> listOf(APLITE)
+            BASALT -> listOf(BASALT, APLITE)
+            CHALK -> listOf(CHALK)
+            DIORITE -> listOf(DIORITE, APLITE)
+            EMERY -> listOf(
+                EMERY,
+                BASALT,
+                DIORITE,
+                APLITE
+            )
+        }
+    }
+
+    /**
+     * Get the most compatible variant for this WatchType
+     * @param availableAppVariants List of variants, from [io.rebble.libpebblecommon.metadata.pbw.appinfo.PbwAppInfo.targetPlatforms]
+     */
+    fun getBestVariant(availableAppVariants: List<String>): WatchType? {
+        val compatibleVariants = getCompatibleAppVariants()
+
+        return compatibleVariants.firstOrNull() { variant ->
+            availableAppVariants.contains(variant.codename)
+        }
+    }
 }
