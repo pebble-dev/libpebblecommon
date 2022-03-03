@@ -46,4 +46,9 @@ expect class DataBuffer {
      * Current position in the buffer
      */
     val readPosition: Int
+
+    /**
+     * Remaining bytes in the buffer
+     */
+    val remaining: Int
 }

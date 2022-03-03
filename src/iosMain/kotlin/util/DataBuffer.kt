@@ -13,6 +13,9 @@ actual class DataBuffer {
     actual val length: Int
         get() = actualBuf.length.toInt()
 
+    actual val remaining: Int
+        get() = actualBuf.length().toInt()-_readPosition
+
     private var _readPosition: Int = 0
 
     /**

@@ -26,6 +26,9 @@ actual class DataBuffer {
     actual val readPosition: Int
         get() = actualBuf.position()
 
+    actual val remaining: Int
+        get() = actualBuf.remaining()
+
 
     actual fun putUShort(short: UShort) {
         actualBuf.putShort(short.toShort())

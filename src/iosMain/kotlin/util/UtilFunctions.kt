@@ -1,14 +1,9 @@
 package io.rebble.libpebblecommon.util
-
 import kotlinx.cinterop.*
-import platform.Foundation.NSArray
 import platform.Foundation.NSData
 import platform.Foundation.create
-import platform.darwin.UInt8
-import platform.darwin.UInt8Var
 import platform.posix.memcpy
 import platform.posix.size_t
-import kotlin.native.internal.NativePtr
 
 actual fun runBlocking(block: suspend () -> Unit) = kotlinx.coroutines.runBlocking{block()}
 
