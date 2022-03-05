@@ -5,11 +5,12 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import io.rebble.libpebblecommon.metadata.StringOrBoolean
 
 class TestAppInfo {
     companion object {
         const val APP_INFO_JSON_SIMPLICITY = "{\"versionLabel\": \"3.2\", \"companyName\": \"Pebble Technology\", \"targetPlatforms\": [\"aplite\", \"basalt\", \"chalk\"], \"resources\": {\"media\": [{\"name\": \"IMAGE_MENU_ICON\", \"type\": \"png\", \"file\": \"images/menu_icon_simplicity.png\", \"menuIcon\": true}]}, \"sdkVersion\": \"3\", \"longName\": \"Simplicity\", \"watchapp\": {\"watchface\": true}, \"projectType\": \"native\", \"capabilities\": [\"\"], \"uuid\": \"54eada19-67fd-4947-a7c5-256f24e3a7d7\", \"shortName\": \"Simplicity\", \"appKeys\": {}}"
-        const val APP_INFO_JSON_DIALER_FOR_PEBBLE = "{\"targetPlatforms\":[\"aplite\",\"basalt\",\"chalk\"],\"projectType\":\"native\",\"messageKeys\":{},\"companyName\":\"matejdro\",\"enableMultiJS\":false,\"watchapp\":{\"onlyShownOnCommunication\":false,\"hiddenApp\":false,\"watchface\":false},\"versionLabel\":\"3.3\",\"longName\":\"Dialer\",\"shortName\":\"Dialer\",\"name\":\"Dialer\",\"sdkVersion\":\"3\",\"displayName\":\"Dialer\",\"uuid\":\"158a074d-85ce-43d2-ab7d-14416ddc1058\",\"appKeys\":{},\"capabilities\":[],\"resources\":{\"media\":[{\"menuIcon\":true,\"type\":\"bitmap\",\"name\":\"ICON\",\"file\":\"icon.png\"},{\"type\":\"bitmap\",\"name\":\"ANSWER\",\"file\":\"answer.png\"},{\"type\":\"bitmap\",\"name\":\"ENDCALL\",\"file\":\"endcall.png\"},{\"type\":\"bitmap\",\"name\":\"MIC_OFF\",\"file\":\"mic_off.png\"},{\"type\":\"bitmap\",\"name\":\"MIC_ON\",\"file\":\"micon.png\"},{\"type\":\"bitmap\",\"name\":\"SPEAKER_ON\",\"file\":\"speakeron.png\"},{\"type\":\"bitmap\",\"name\":\"SPEAKER_OFF\",\"file\":\"speakeroff.png\"},{\"type\":\"bitmap\",\"name\":\"VOLUME_UP\",\"file\":\"volumeup.png\"},{\"type\":\"bitmap\",\"name\":\"VOLUME_DOWN\",\"file\":\"volumedown.png\"},{\"type\":\"bitmap\",\"name\":\"CALL_HISTORY\",\"file\":\"callhistory.png\"},{\"type\":\"bitmap\",\"name\":\"CONTACTS\",\"file\":\"contacts.png\"},{\"type\":\"bitmap\",\"name\":\"CONTACT_GROUP\",\"file\":\"contactgroup.png\"},{\"type\":\"bitmap\",\"name\":\"INCOMING_CALL\",\"file\":\"incomingcall.png\"},{\"type\":\"bitmap\",\"name\":\"OUTGOING_CALL\",\"file\":\"outgoingcall.png\"},{\"type\":\"bitmap\",\"name\":\"MISSED_CALL\",\"file\":\"missedcall.png\"},{\"type\":\"bitmap\",\"name\":\"MESSAGE\",\"file\":\"message.png\"},{\"type\":\"bitmap\",\"name\":\"CALL\",\"file\":\"call.png\"}]}}"
+        const val APP_INFO_JSON_DIALER_FOR_PEBBLE = "{\"targetPlatforms\":[\"aplite\",\"basalt\",\"chalk\"],\"projectType\":\"native\",\"messageKeys\":{},\"companyName\":\"matejdro\",\"enableMultiJS\":false,\"watchapp\":{\"onlyShownOnCommunication\":false,\"hiddenApp\":false,\"watchface\":false},\"versionLabel\":\"3.3\",\"longName\":\"Dialer\",\"shortName\":\"Dialer\",\"name\":\"Dialer\",\"sdkVersion\":\"3\",\"displayName\":\"Dialer\",\"uuid\":\"158a074d-85ce-43d2-ab7d-14416ddc1058\",\"appKeys\":{},\"capabilities\":[],\"resources\":{\"media\":[{\"menuIcon\":\"true\",\"type\":\"bitmap\",\"name\":\"ICON\",\"file\":\"icon.png\"},{\"type\":\"bitmap\",\"name\":\"ANSWER\",\"file\":\"answer.png\"},{\"type\":\"bitmap\",\"name\":\"ENDCALL\",\"file\":\"endcall.png\"},{\"type\":\"bitmap\",\"name\":\"MIC_OFF\",\"file\":\"mic_off.png\"},{\"type\":\"bitmap\",\"name\":\"MIC_ON\",\"file\":\"micon.png\"},{\"type\":\"bitmap\",\"name\":\"SPEAKER_ON\",\"file\":\"speakeron.png\"},{\"type\":\"bitmap\",\"name\":\"SPEAKER_OFF\",\"file\":\"speakeroff.png\"},{\"type\":\"bitmap\",\"name\":\"VOLUME_UP\",\"file\":\"volumeup.png\"},{\"type\":\"bitmap\",\"name\":\"VOLUME_DOWN\",\"file\":\"volumedown.png\"},{\"type\":\"bitmap\",\"name\":\"CALL_HISTORY\",\"file\":\"callhistory.png\"},{\"type\":\"bitmap\",\"name\":\"CONTACTS\",\"file\":\"contacts.png\"},{\"type\":\"bitmap\",\"name\":\"CONTACT_GROUP\",\"file\":\"contactgroup.png\"},{\"type\":\"bitmap\",\"name\":\"INCOMING_CALL\",\"file\":\"incomingcall.png\"},{\"type\":\"bitmap\",\"name\":\"OUTGOING_CALL\",\"file\":\"outgoingcall.png\"},{\"type\":\"bitmap\",\"name\":\"MISSED_CALL\",\"file\":\"missedcall.png\"},{\"type\":\"bitmap\",\"name\":\"MESSAGE\",\"file\":\"message.png\"},{\"type\":\"bitmap\",\"name\":\"CALL\",\"file\":\"call.png\"}]}}"
 
         val APP_INFO_OBJ_SIMPLICITY = PbwAppInfo(
             uuid = "54eada19-67fd-4947-a7c5-256f24e3a7d7",
@@ -22,7 +23,7 @@ class TestAppInfo {
                 media = listOf(
                     Media(
                         resourceFile = "images/menu_icon_simplicity.png",
-                        menuIcon = true,
+                        menuIcon = StringOrBoolean(true),
                         name = "IMAGE_MENU_ICON",
                         type = "png"
                     )
@@ -45,7 +46,7 @@ class TestAppInfo {
                 media = listOf(
                     Media(
                         resourceFile = "icon.png",
-                        menuIcon = true,
+                        menuIcon = StringOrBoolean(true),
                         name = "ICON",
                         type = "bitmap"
                     ),
