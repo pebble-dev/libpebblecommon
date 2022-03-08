@@ -14,6 +14,13 @@ import kotlinx.coroutines.withTimeout
 
 class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolService {
     val receivedMessages = Channel<PutBytesResponse>(Channel.BUFFERED)
+    val progressUpdates = Channel<PutBytesProgress>(Channel.BUFFERED)
+
+    data class PutBytesProgress(
+        val count: Int,
+        val total: Int,
+        val cookie: UInt
+    )
 
     init {
         protocolHandler.registerReceiveCallback(ProtocolEndpoint.PUT_BYTES, this::receive)
@@ -78,8 +85,12 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
         watchVersion: WatchVersion.WatchVersionResponse
     ): UInt {
         try {
+            val totalToPut = byteArray.size
             val cookie = awaitAck().cookie.get()
             lastCookie = cookie
+            progressUpdates.trySend(
+                PutBytesProgress(0, totalToPut, cookie)
+            )
 
             val maxDataSize = getPutBytesMaximumDataSize(watchVersion)
             val buffer = DataBuffer(byteArray.asUByteArray())
@@ -98,8 +109,11 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
                 send(PutBytesPut(cookie, payload))
                 awaitAck()
                 totalBytes += dataToRead
+                progressUpdates.trySend(
+                    PutBytesProgress(totalBytes, totalToPut, cookie)
+                )
             }
-            println("$totalBytes/${byteArray.size}")
+            //println("$totalBytes/${byteArray.size}")
             val calculatedCrc = crcCalculator.finalize()
             if (expectedCrc != null && calculatedCrc != expectedCrc.toUInt()) {
                 throw IllegalStateException(
