@@ -11,5 +11,7 @@ data class Media(
     val resourceFile: String,
     val menuIcon: StringOrBoolean = StringOrBoolean(false),
     val name: String,
-    val type: String
+    val type: String,
+    val targetPlatforms: List<String>? = null,
+    val characterRegex: String? = null
 )
