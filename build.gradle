@@ -20,6 +20,7 @@ plugins {
 def klockVersion = "2.4.13"
 def ktorVersion = "1.6.7"
 def coroutinesVersion = "1.6.0"
+def uuidVersion = "0.4.1"
 
 repositories {
     mavenCentral()
@@ -135,7 +136,6 @@ kotlin {
                     }
                 }
                 implementation "com.soywiz.korlibs.klock:klock-jvm:$klockVersion"
-                implementation "com.benasher44:uuid-jvm:0.2.2"
             }
         }
         jvmTest {
@@ -153,7 +153,7 @@ kotlin {
         commonMain {
             dependencies {
                 implementation kotlin('stdlib-common')
-                implementation "com.benasher44:uuid:0.2.2"
+                implementation "com.benasher44:uuid:$uuidVersion"
                 implementation "com.soywiz.korlibs.klock:klock:$klockVersion"
                 implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion") {
                     version {
@@ -179,7 +179,6 @@ kotlin {
                     }
                 }
                 implementation "com.soywiz.korlibs.klock:klock-android:$klockVersion"
-                implementation "com.benasher44:uuid-jvm:0.2.2"
             }
         }
         androidTest {
