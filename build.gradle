@@ -1,4 +1,5 @@
-import org.jetbrains.kotlin.gradle.plugin.mpp.apple.XCFrameworkConfig
+import org.apache.tools.ant.taskdefs.condition.Os
+
 buildscript {
     ext.kotlin_version = '1.6.21'
     repositories {
@@ -88,7 +89,6 @@ dependencies {
 }
 
 kotlin {
-    def xcf = new XCFrameworkConfig(project)
     jvm {
         compilations.main.output // get the main compilation output
         compilations.test.runtimeDependencyFiles // get the test runtime classpath
@@ -98,7 +98,6 @@ kotlin {
         binaries {
             framework {
                 baseName = "libpebblecommon"
-                xcf.add(it)
             }
         }
     }
@@ -106,7 +105,6 @@ kotlin {
         binaries {
             framework {
                 baseName = "libpebblecommon"
-                xcf.add(it)
             }
         }
     }
@@ -115,7 +113,14 @@ kotlin {
         binaries {
             framework {
                 baseName = "libpebblecommon"
-                xcf.add(it)
+            }
+        }
+    }
+
+    iosSimulatorArm64("iosSimulatorArm64") {
+        binaries {
+            framework {
+                baseName = "libpebblecommon"
             }
         }
     }
@@ -237,3 +242,123 @@ project.afterEvaluate {
         }
     }
 }*/
+
+tasks.register("iosSimulatorFatFramework", PlatformFatFramework) {
+    def iosX64Task = kotlin.targets.getByName("iosX64").binaries.getFramework("RELEASE")
+    def iosSimulatorArm64Task = kotlin.targets.getByName("iosSimulatorArm64").binaries.getFramework("RELEASE")
+    dependsOn iosX64Task.linkTask
+    dependsOn iosSimulatorArm64Task.linkTask
+
+    platform = "simulator"
+
+    inputFrameworks.setFrom(project.files(iosX64Task.outputFile, iosSimulatorArm64Task.outputFile))
+    inputFrameworkDSYMs.setFrom(project.files(iosX64Task.outputFile.path+".dSYM", iosX64Task.outputFile.path+".dSYM"))
+}
+
+tasks.register("iosDeviceFatFramework", PlatformFatFramework) {
+    def iosTask = kotlin.targets.getByName("ios").binaries.getFramework("RELEASE")
+    def iosArmv7Task = kotlin.targets.getByName("iosArmv7").binaries.getFramework("RELEASE")
+    dependsOn iosTask.linkTask
+    dependsOn iosArmv7Task.linkTask
+
+    platform = "device"
+
+    inputFrameworks.setFrom(project.files(iosTask.outputFile, iosArmv7Task.outputFile))
+    inputFrameworkDSYMs.setFrom(project.files(iosTask.outputFile.path+".dSYM", iosArmv7Task.outputFile.path+".dSYM"))
+}
+
+tasks.register("assembleXCFramework") {
+    def deviceTask = tasks.getByName("iosDeviceFatFramework")
+    def simulatorTask = tasks.getByName("iosSimulatorFatFramework")
+    dependsOn deviceTask
+    dependsOn simulatorTask
+    outputs.dir(layout.buildDirectory.dir("xcframework")).withPropertyName("outputDir")
+    logger.log(LogLevel.ERROR, deviceTask.outputDir.dir("libpebblecommon.framework").get().asFile.path)
+    logger.log(LogLevel.ERROR, simulatorTask.outputDir.dir("libpebblecommon.framework").get().asFile.path)
+
+    String outputPath = layout.buildDirectory.dir("xcframework").get().asFile.path + "/libpebblecommon.xcframework"
+
+    doLast {
+        delete outputPath
+        exec {
+            commandLine (
+                "xcodebuild", "-create-xcframework",
+                "-framework", deviceTask.outputDir.dir("libpebblecommon.framework").get().asFile.path,
+                "-debug-symbols", deviceTask.outputDir.dir("libpebblecommon.framework.dSYM").get().asFile.path,
+                "-framework", simulatorTask.outputDir.dir("libpebblecommon.framework").get().asFile.path,
+                "-debug-symbols", simulatorTask.outputDir.dir("libpebblecommon.framework.dSYM").get().asFile.path,
+                "-output", outputPath
+            )
+        }
+    }
+}
+
+public abstract class PlatformFatFramework extends DefaultTask {
+    PlatformFatFramework() {
+        onlyIf {
+            Os.isFamily(Os.FAMILY_MAC)
+        }
+    }
+
+    @Input
+    abstract Property<String> getPlatform()
+
+    @InputFiles
+    final abstract ConfigurableFileCollection inputFrameworks = project.objects.fileCollection()
+
+    @InputFiles
+    final abstract ConfigurableFileCollection inputFrameworkDSYMs = project.objects.fileCollection()
+
+    @OutputDirectory
+    DirectoryProperty getOutputDir() {
+        return project.objects.directoryProperty().convention(project.layout.buildDirectory.dir("platform-fat-framework/${platform.get()}"))
+    }
+
+    private void copyFramework() {
+        File file = inputFrameworks.getFiles().toArray()[0]
+        project.copy {
+            from file
+            into outputDir.get().asFile.toPath().resolve(file.name)
+        }
+    }
+
+    private void copyFrameworkDSYM() {
+        File file = inputFrameworkDSYMs.getFiles().toArray()[0]
+        project.copy {
+            from file
+            into outputDir.get().asFile.toPath().resolve(file.name)
+        }
+    }
+
+    private void lipoMergeFrameworks() {
+        ArrayList<String> inputs = []
+        inputFrameworks.forEach {
+            inputs.add(it.toPath().resolve("libpebblecommon")).toString()
+        }
+        String out = outputDir.get().asFile.toPath()
+                .resolve(inputFrameworks.getFiles().toArray()[0].name+"/libpebblecommon").toString()
+        project.exec {
+            commandLine ((["lipo", "-create"] + inputs) + ["-output", out])
+        }
+    }
+
+    private void lipoMergeFrameworkDSYMs() {
+        ArrayList<String> inputs = []
+        inputFrameworkDSYMs.forEach {
+            inputs.add(it.toPath().resolve("Contents/Resources/DWARF/libpebblecommon")).toString()
+        }
+        String out = outputDir.get().asFile.toPath()
+                .resolve(inputFrameworkDSYMs.getFiles().toArray()[0].name+"/Contents/Resources/DWARF/libpebblecommon").toString()
+        project.exec {
+            commandLine ((["lipo", "-create"] + inputs) + ["-output", out])
+        }
+    }
+
+    @TaskAction
+    void createPlatformFatFramework() {
+        copyFramework()
+        copyFrameworkDSYM()
+        lipoMergeFrameworks()
+        lipoMergeFrameworkDSYMs()
+    }
+}
