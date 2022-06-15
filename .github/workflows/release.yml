@@ -22,23 +22,12 @@ jobs:
       
       - name: Build XCFrameworks
         run: ./gradlew assembleXCFramework
-        
-      - name: Rename XCFrameworks
-        run: |
-          mv build/XCFrameworks/debug/libpebblecommon.xcframework build/XCFrameworks/debug/libpebblecommon-debug.xcframework
-          mv build/XCFrameworks/release/libpebblecommon.xcframework build/XCFrameworks/release/libpebblecommon-release.xcframework
 
-      - name: Zip release XCFramework
+      - name: Zip XCFramework
         uses: vimtor/action-zip@v1
         with:
-          files: build/XCFrameworks/release/
-          dest: build/xcframework-release.zip
-
-      - name: Zip debug XCFramework
-        uses: vimtor/action-zip@v1
-        with:
-          files: build/XCFrameworks/debug/
-          dest: build/xcframework-debug.zip
+          files: build/xcframework/
+          dest: build/xcframework.zip
 
       - name: Add release artifacts
         id: release_artifacts
@@ -46,14 +35,12 @@ jobs:
         with:
           tag_name: ${{ github.event.release.tag_name }}
           files: |
-            build/xcframework-debug.zip
-            build/xcframework-release.zip
+            build/xcframework.zip
 
       - name: Calculate checksums for XCFrameworks
         run: |
           cp Package.swift.template Package.swift
-          echo DEBUG_CHECKSUM=$(swift package compute-checksum build/xcframework-debug.zip) >> $GITHUB_ENV
-          echo RELEASE_CHECKSUM=$(swift package compute-checksum build/xcframework-release.zip) >> $GITHUB_ENV
+          echo DEBUG_CHECKSUM=$(swift package compute-checksum build/xcframework.zip) >> $GITHUB_ENV
         
       - name: Checkout master
         uses: actions/checkout@v2
@@ -62,10 +49,8 @@ jobs:
 
       - name: Update swift package
         run: |
-          sed -e 's|DEBUG-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework-debug.zip|;w Package.swift' Package.swift.template
-          sed -e 's/DEBUG-CHECKSUM/${{ env.DEBUG_CHECKSUM }}/;w Package.swift.tmp' Package.swift
-          sed -e 's|RELEASE-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework-release.zip|;w Package.swift.tmp2' Package.swift.tmp
-          sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp2
+          sed -e 's|DEBUG-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework.zip|;w Package.swift.tmp' Package.swift.template
+          sed -e 's/DEBUG-CHECKSUM/${{ env.DEBUG_CHECKSUM }}/;w Package.swift' Package.swift.tmp
 
       - name: Commit swift package
         run: |
