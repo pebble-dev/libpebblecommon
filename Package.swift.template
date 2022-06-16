@@ -9,22 +9,15 @@ let package = Package(
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "libpebblecommon",
-            targets: ["libpebblecommon-release"]),
-        .library(
-            name: "libpebblecommon-debug",
-            targets: ["libpebblecommon-debug"])
+            targets: ["libpebblecommon"]
+        )
     ],
     dependencies: [
         // Dependencies declare other packages that this package depends on.
     ],
     targets: [
         .binaryTarget(
-            name: "libpebblecommon-debug",
-            url: "DEBUG-URL",
-            checksum: "DEBUG-CHECKSUM"
-        ),
-        .binaryTarget(
-            name: "libpebblecommon-release",
+            name: "libpebblecommon",
             url: "RELEASE-URL",
             checksum: "RELEASE-CHECKSUM"
         )

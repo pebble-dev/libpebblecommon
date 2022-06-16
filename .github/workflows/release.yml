@@ -40,7 +40,7 @@ jobs:
       - name: Calculate checksums for XCFrameworks
         run: |
           cp Package.swift.template Package.swift
-          echo DEBUG_CHECKSUM=$(swift package compute-checksum build/xcframework.zip) >> $GITHUB_ENV
+          echo RELEASE_CHECKSUM=$(swift package compute-checksum build/xcframework.zip) >> $GITHUB_ENV
         
       - name: Checkout master
         uses: actions/checkout@v2
@@ -49,8 +49,8 @@ jobs:
 
       - name: Update swift package
         run: |
-          sed -e 's|DEBUG-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework.zip|;w Package.swift.tmp' Package.swift.template
-          sed -e 's/DEBUG-CHECKSUM/${{ env.DEBUG_CHECKSUM }}/;w Package.swift' Package.swift.tmp
+          sed -e 's|RELEASE-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework.zip|;w Package.swift.tmp' Package.swift.template
+          sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp
 
       - name: Commit swift package
         run: |
