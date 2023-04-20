@@ -283,8 +283,9 @@ open class WatchVersion(message: Message) : SystemPacket(endpoint) {
          * Flag remains true until
          * [io.rebble.libpebblecommon.packets.blobdb.BlobCommand.ClearCommand] is
          * sent to the watch
+         * Note: currently always present when serialized, but optional when deserialized
          */
-        val isUnfaithful = SBoolean(m)
+        val isUnfaithful = SOptional(m, SBoolean(StructMapper()), true)
     }
 
     companion object {
