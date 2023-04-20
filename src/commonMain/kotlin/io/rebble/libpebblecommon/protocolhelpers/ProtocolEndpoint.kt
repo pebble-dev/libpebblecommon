@@ -1,5 +1,7 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
+import co.touchlab.kermit.Logger
+
 enum class ProtocolEndpoint(val value: UShort) {
     TIME(11u),
     WATCH_VERSION(16u),
@@ -38,11 +40,9 @@ enum class ProtocolEndpoint(val value: UShort) {
         private val values = values()
         fun getByValue(value: UShort) = values.firstOrNull { it.value == value }
             ?: INVALID_ENDPOINT.also {
-                println(
-                    "Received unknown packet endpoint: 0x${
-                        value.toInt().toString(16)
-                    }"
-                )
+                Logger.e {
+                    "Received unknown packet endpoint: 0x${value.toInt().toString(16)}"
+                }
             }
     }
 }

@@ -1,7 +1,7 @@
 import org.apache.tools.ant.taskdefs.condition.Os
 
 buildscript {
-    ext.kotlin_version = '1.6.21'
+    ext.kotlin_version = '1.8.10'
     repositories {
         mavenCentral()
         google()
@@ -50,10 +50,10 @@ publishing {
 }
 
 android { // android specific configuration
-    compileSdkVersion 31 // SDK version to compile against
+    compileSdkVersion 33 // SDK version to compile against
     defaultConfig {
-        minSdkVersion 15 // min SDK version supported by this lib
-        targetSdkVersion 31 // max SDK version supported by this lib
+        minSdkVersion 16 // min SDK version supported by this lib
+        targetSdkVersion 33 // max SDK version supported by this lib
         versionCode 2
         versionName getVersion()
         testInstrumentationRunner 'android.support.test.runner.AndroidJUnitRunner' // See notes #1
@@ -166,6 +166,7 @@ kotlin {
                     }
                 }
                 implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2'
+                implementation 'co.touchlab:kermit:2.0.0-RC4'
             }
         }
         commonTest {

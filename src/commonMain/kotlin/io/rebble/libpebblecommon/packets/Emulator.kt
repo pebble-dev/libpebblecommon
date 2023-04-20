@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.packets
 
+import co.touchlab.kermit.Logger
 import io.rebble.libpebblecommon.structmapper.SBytes
 import io.rebble.libpebblecommon.structmapper.SUShort
 import io.rebble.libpebblecommon.structmapper.StructMapper
@@ -50,7 +51,7 @@ open class QemuPacket(protocol: Protocol) {
             return when (protocol.get()) {
                 Protocol.SPP.value -> QemuSPP().also { it.m.fromBytes(buf) }
                 else -> {
-                    println("Warning: QEMU packet left generic")
+                    Logger.w(tag = "Emulator") { "QEMU packet left generic" }
                     QemuPacket(Protocol.Invalid).also { it.m.fromBytes(buf) }
                 }
             }

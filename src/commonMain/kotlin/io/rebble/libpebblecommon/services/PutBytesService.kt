@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.services
 
+import co.touchlab.kermit.Logger
 import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.metadata.WatchType
 import io.rebble.libpebblecommon.metadata.pbw.manifest.PbwBlob
@@ -15,6 +16,8 @@ import kotlinx.coroutines.withTimeout
 class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolService {
     val receivedMessages = Channel<PutBytesResponse>(Channel.BUFFERED)
     val progressUpdates = Channel<PutBytesProgress>(Channel.BUFFERED)
+
+    private val logger = Logger.withTag("PutBytesService")
 
     data class PutBytesProgress(
         val count: Int,
@@ -58,7 +61,7 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
         manifestEntry: PbwBlob,
         type: ObjectType
     ) {
-        println("Send app part $watchType $appId $manifestEntry $type ${type.value}")
+        logger.i { "Send app part $watchType $appId $manifestEntry $type ${type.value}" }
         send(
             PutBytesAppInit(manifestEntry.size.toUInt(), type, appId)
         )
@@ -69,14 +72,14 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
             watchVersion
         )
 
-        println("Sending install")
+        logger.d { "Sending install" }
 
         send(
             PutBytesInstall(cookie)
         )
         awaitAck()
 
-        println("Install complete")
+        logger.i { "Install complete" }
     }
 
     suspend fun awaitCookieAndPutByteArray(
@@ -113,7 +116,6 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
                     PutBytesProgress(totalBytes, totalToPut, cookie)
                 )
             }
-            //println("$totalBytes/${byteArray.size}")
             val calculatedCrc = crcCalculator.finalize()
             if (expectedCrc != null && calculatedCrc != expectedCrc.toUInt()) {
                 throw IllegalStateException(
@@ -121,7 +123,7 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
                 )
             }
 
-            println("Sending commit")
+            logger.d { "Sending commit" }
             send(
                 PutBytesCommit(cookie, calculatedCrc)
             )

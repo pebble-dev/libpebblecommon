@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.protocolhelpers
 
+import co.touchlab.kermit.Logger
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.exceptions.PacketEncodeException
 import io.rebble.libpebblecommon.structmapper.SUShort
@@ -13,9 +14,11 @@ open class PebblePacket{
     val endpoint: ProtocolEndpoint
     val m = StructMapper()
     var type: UByte? = null
+    val importedLength: UShort?
 
     constructor(endpoint: ProtocolEndpoint) { //TODO: Packet-level endianness?
         this.endpoint = endpoint
+        importedLength = null
     }
 
     constructor(packet: UByteArray) {
@@ -26,7 +29,8 @@ open class PebblePacket{
         if (length.get() != (packet.size - (UShort.SIZE_BYTES * 2)).toUShort())
             throw IllegalArgumentException("Length in packet does not match packet actual size, likely malformed")
 
-        println("Importing packet: Len $length | EP $ep")
+        Logger.v { "Importing packet: Len $length | EP $ep" }
+        importedLength = length.get()
 
         this.endpoint =
             ProtocolEndpoint.getByValue(ep.get())
