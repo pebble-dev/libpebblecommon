@@ -82,6 +82,35 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
         logger.i { "Install complete" }
     }
 
+    suspend fun sendFirmwarePart(
+        blob: ByteArray,
+        watchVersion: WatchVersion.WatchVersionResponse,
+        crc: Long,
+        size: UInt,
+        type: ObjectType,
+        fileName: String
+    ) {
+        logger.i { "Send FW part $type ${type.value}" }
+        send(
+            PutBytesInit(size, type, 0u, fileName)
+        )
+
+        val cookie = awaitCookieAndPutByteArray(
+            blob,
+            crc,
+            watchVersion
+        )
+
+        logger.d { "Sending install" }
+
+        send(
+            PutBytesInstall(cookie)
+        )
+        awaitAck()
+
+        logger.i { "Install complete" }
+    }
+
     suspend fun awaitCookieAndPutByteArray(
         byteArray: ByteArray,
         expectedCrc: Long?,

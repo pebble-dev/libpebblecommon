@@ -398,15 +398,26 @@ open class SystemMessage(message: Message) : SystemPacket(endpoint) {
     }
 
     val command = SUByte(m, message.value)
-    val messageType = SUByte(m)
 
     init {
         type = command.get()
-        TODO("Incomplete packet declaration")
     }
 
     companion object {
         val endpoint = ProtocolEndpoint.SYSTEM_MESSAGE
+    }
+
+    class NewFirmwareAvailable: SystemMessage(Message.NewFirmwareAvailable)
+    class FirmwareUpdateStart: SystemMessage(Message.FirmwareUpdateStart)
+    class FirmwareUpdateComplete: SystemMessage(Message.FirmwareUpdateComplete)
+    class FirmwareUpdateFailed: SystemMessage(Message.FirmwareUpdateFailed)
+    class FirmwareUpToDate: SystemMessage(Message.FirmwareUpToDate)
+    class StopReconnecting: SystemMessage(Message.StopReconnecting)
+    class StartReconnecting: SystemMessage(Message.StartReconnecting)
+    class MAPDisabled: SystemMessage(Message.MAPDisabled)
+    class MAPEnabled: SystemMessage(Message.MAPEnabled)
+    class FirmwareUpdateStartResponse: SystemMessage(Message.FirmwareUpdateStartResponse) {
+        val response = SUByte(m)
     }
 }
 
@@ -492,4 +503,9 @@ fun systemPacketsRegister() {
 
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Ping.value) { PingPong.Ping() }
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Pong.value) { PingPong.Pong() }
+
+    PacketRegistry.register(
+        SystemMessage.endpoint,
+        SystemMessage.Message.FirmwareUpdateStartResponse.value
+    ) { SystemMessage.FirmwareUpdateStartResponse() }
 }

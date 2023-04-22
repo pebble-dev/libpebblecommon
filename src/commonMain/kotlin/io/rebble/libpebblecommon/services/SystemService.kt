@@ -2,10 +2,7 @@ package io.rebble.libpebblecommon.services
 
 import io.rebble.libpebblecommon.PacketPriority
 import io.rebble.libpebblecommon.ProtocolHandler
-import io.rebble.libpebblecommon.packets.PhoneAppVersion
-import io.rebble.libpebblecommon.packets.SystemPacket
-import io.rebble.libpebblecommon.packets.WatchFactoryData
-import io.rebble.libpebblecommon.packets.WatchVersion
+import io.rebble.libpebblecommon.packets.*
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.SInt
@@ -23,6 +20,7 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
 
     private var watchVersionCallback: CompletableDeferred<WatchVersion.WatchVersionResponse>? = null
     private var watchModelCallback: CompletableDeferred<UByteArray>? = null
+    private var firmwareUpdateStartResponseCallback: CompletableDeferred<SystemMessage.FirmwareUpdateStartResponse>? = null
 
     init {
         protocolHandler.registerReceiveCallback(ProtocolEndpoint.PHONE_VERSION, this::receive)
@@ -55,6 +53,16 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
         val modelBytes = callback.await()
 
         return SInt(StructMapper()).also { it.fromBytes(DataBuffer(modelBytes)) }.get()
+    }
+
+    suspend fun firmwareUpdateStart(): UByte {
+        val callback = CompletableDeferred<SystemMessage.FirmwareUpdateStartResponse>()
+        firmwareUpdateStartResponseCallback = callback
+        send(SystemMessage.FirmwareUpdateStart())
+
+        val response = callback.await()
+
+        return response.response.get()
     }
 
     suspend fun receive(packet: PebblePacket) {
