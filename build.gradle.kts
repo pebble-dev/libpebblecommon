@@ -60,12 +60,37 @@ kotlin {
 
     jvm()
 
-    val iosTarget: (String, KotlinNativeTarget.() -> Unit) -> KotlinNativeTarget = when {
-        System.getenv("SDK_NAME")?.startsWith("iphoneos") == true -> ::iosArm64
-        System.getenv("NATIVE_ARCH")?.startsWith("arm") == true -> ::iosSimulatorArm64
-        else -> ::iosX64
+    iosX64("iosX64") { // Simulator
+        binaries {
+            framework {
+                baseName = "libpebblecommon"
+            }
+        }
     }
-    iosTarget("ios") {}
+    iosArm64("ios") {
+        binaries {
+            framework {
+                baseName = "libpebblecommon"
+            }
+        }
+    }
+
+    iosArm32("iosArmv7") {
+        binaries {
+            framework {
+                baseName = "libpebblecommon"
+            }
+        }
+    }
+
+    iosSimulatorArm64("iosSimulatorArm64") {
+        binaries {
+            framework {
+                baseName = "libpebblecommon"
+            }
+        }
+    }
+
     version = "1"
 
     val klockVersion = "2.4.13"
@@ -104,6 +129,18 @@ kotlin {
         }
 
         sourceSets["iosMain"].dependencies {
+        }
+
+        val iosX64Main by getting {
+            kotlin.srcDir("src/iosMain/kotlin")
+        }
+
+        val iosArmv7Main by getting {
+            kotlin.srcDir("src/iosMain/kotlin")
+        }
+
+        val iosSimulatorArm64Main by getting {
+            kotlin.srcDir("src/iosMain/kotlin")
         }
 
         sourceSets["jvmMain"].dependencies {
@@ -253,3 +290,5 @@ abstract class PlatformFatFramework: DefaultTask() {
         lipoMergeFrameworkDSYMs()
     }
 }
+
+println(kotlin.targets.asMap.toString())
