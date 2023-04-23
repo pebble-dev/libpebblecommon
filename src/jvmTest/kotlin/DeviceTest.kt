@@ -2,7 +2,6 @@ import io.ktor.client.*
 import io.ktor.client.features.websocket.*
 import io.ktor.http.*
 import io.ktor.http.cio.websocket.*
-import io.ktor.util.KtorExperimentalAPI
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.packets.PingPong
 import io.rebble.libpebblecommon.packets.blobdb.BlobResponse
@@ -35,15 +34,10 @@ class DeviceTests {
     val phoneHost = "change-me"
     val phonePort = 9000
 
-    @KtorExperimentalAPI
     val client = HttpClient {
         install(WebSockets)
     }
 
-    init {
-    }
-
-    @KtorExperimentalAPI
     private suspend fun sendWS(packet: PebblePacket, blockResponse: Boolean): PebblePacket? {
         var ret: PebblePacket? = null
         withTimeout(5_000) {
@@ -73,7 +67,6 @@ class DeviceTests {
         return ret
     }
 
-    @KtorExperimentalAPI
     @Test
     fun sendNotification() = runBlocking {
         val notif = PushNotification(
@@ -95,7 +88,6 @@ class DeviceTests {
         )
     }
 
-    @KtorExperimentalAPI
     @Test
     fun sendPing() = runBlocking {
         val res = sendWS(PingPong.Ping(1337u), true)

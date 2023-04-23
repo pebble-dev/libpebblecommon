@@ -200,11 +200,11 @@ internal class AppMessageTest {
             0u, 0u, 0u, 0u,
             1u,
             6u, 0u,
-            'H'.toInt().toUByte(),
-            'e'.toInt().toUByte(),
-            'l'.toInt().toUByte(),
-            'l'.toInt().toUByte(),
-            'o'.toInt().toUByte(),
+            'H'.code.toUByte(),
+            'e'.code.toUByte(),
+            'l'.code.toUByte(),
+            'l'.code.toUByte(),
+            'o'.code.toUByte(),
             0u
         )
 
