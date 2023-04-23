@@ -106,6 +106,7 @@ kotlin {
                 optIn("kotlin.ExperimentalUnsignedTypes")
                 optIn("kotlin.ExperimentalStdlibApi")
                 optIn("kotlin.RequiresOptIn")
+                optIn("kotlin.ExperimentalSerializationApi")
             }
         }
         sourceSets["commonMain"].dependencies {
@@ -290,5 +291,3 @@ abstract class PlatformFatFramework: DefaultTask() {
         lipoMergeFrameworkDSYMs()
     }
 }
-
-println(kotlin.targets.asMap.toString())
