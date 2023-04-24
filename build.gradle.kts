@@ -56,7 +56,9 @@ android {
 }
 
 kotlin {
-    android()
+    android {
+        publishLibraryVariants("release", "debug")
+    }
 
     jvm()
 
@@ -90,8 +92,6 @@ kotlin {
             }
         }
     }
-
-    version = "1"
 
     val klockVersion = "2.4.13"
     val ktorVersion = "1.6.7"
