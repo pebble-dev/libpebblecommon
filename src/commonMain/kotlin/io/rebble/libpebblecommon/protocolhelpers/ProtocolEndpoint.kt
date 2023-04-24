@@ -3,6 +3,7 @@ package io.rebble.libpebblecommon.protocolhelpers
 import co.touchlab.kermit.Logger
 
 enum class ProtocolEndpoint(val value: UShort) {
+    RECOVERY(0u),
     TIME(11u),
     WATCH_VERSION(16u),
     PHONE_VERSION(17u),

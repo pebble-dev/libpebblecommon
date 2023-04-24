@@ -12,6 +12,7 @@ import io.rebble.libpebblecommon.util.DataBuffer
 import io.rebble.libpebblecommon.util.getPutBytesMaximumDataSize
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.withTimeout
+import kotlin.math.log
 
 class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolService {
     val receivedMessages = Channel<PutBytesResponse>(Channel.BUFFERED)
@@ -22,6 +23,7 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
     data class PutBytesProgress(
         val count: Int,
         val total: Int,
+        val delta: Int,
         val cookie: UInt
     )
 
@@ -87,14 +89,15 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
         watchVersion: WatchVersion.WatchVersionResponse,
         crc: Long,
         size: UInt,
-        type: ObjectType,
-        fileName: String
+        bank: UByte,
+        type: ObjectType
     ) {
         logger.i { "Send FW part $type ${type.value}" }
         send(
-            PutBytesInit(size, type, 0u, fileName)
+            PutBytesInit(size, type, bank, "")
         )
 
+        logger.d { "Putting byte array" }
         val cookie = awaitCookieAndPutByteArray(
             blob,
             crc,
@@ -121,10 +124,10 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
             val cookie = awaitAck().cookie.get()
             lastCookie = cookie
             progressUpdates.trySend(
-                PutBytesProgress(0, totalToPut, cookie)
+                PutBytesProgress(0, totalToPut, 0, cookie)
             )
 
-            val maxDataSize = getPutBytesMaximumDataSize(watchVersion)
+            val maxDataSize =  if (watchVersion.running.isRecovery.get()) 2000 else getPutBytesMaximumDataSize(watchVersion)
             val buffer = DataBuffer(byteArray.asUByteArray())
             val crcCalculator = Crc32Calculator()
 
@@ -142,7 +145,7 @@ class PutBytesService(private val protocolHandler: ProtocolHandler) : ProtocolSe
                 awaitAck()
                 totalBytes += dataToRead
                 progressUpdates.trySend(
-                    PutBytesProgress(totalBytes, totalToPut, cookie)
+                    PutBytesProgress(totalBytes, totalToPut, dataToRead, cookie)
                 )
             }
             val calculatedCrc = crcCalculator.finalize()

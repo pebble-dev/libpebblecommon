@@ -397,10 +397,11 @@ open class SystemMessage(message: Message) : SystemPacket(endpoint) {
         FirmwareUpdateStartResponse(0x0au)
     }
 
-    val command = SUByte(m, message.value)
+    val command = SUByte(m, 0x0u)
+    val messageType = SUByte(m, message.value)
 
     init {
-        type = command.get()
+        type = messageType.get()
     }
 
     companion object {
@@ -408,7 +409,10 @@ open class SystemMessage(message: Message) : SystemPacket(endpoint) {
     }
 
     class NewFirmwareAvailable: SystemMessage(Message.NewFirmwareAvailable)
-    class FirmwareUpdateStart: SystemMessage(Message.FirmwareUpdateStart)
+    class FirmwareUpdateStart(bytesAlreadyTransferred: UInt, bytesToSend: UInt): SystemMessage(Message.FirmwareUpdateStart) {
+        val bytesAlreadyTransferred = SUInt(m, bytesAlreadyTransferred, endianness = '<')
+        val bytesToSend = SUInt(m, bytesToSend, endianness = '<')
+    }
     class FirmwareUpdateComplete: SystemMessage(Message.FirmwareUpdateComplete)
     class FirmwareUpdateFailed: SystemMessage(Message.FirmwareUpdateFailed)
     class FirmwareUpToDate: SystemMessage(Message.FirmwareUpToDate)
@@ -504,6 +508,7 @@ fun systemPacketsRegister() {
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Ping.value) { PingPong.Ping() }
     PacketRegistry.register(PingPong.endpoint, PingPong.Message.Pong.value) { PingPong.Pong() }
 
+    PacketRegistry.registerCustomTypeOffset(SystemMessage.endpoint, 5) // command is always 0, type is next byte
     PacketRegistry.register(
         SystemMessage.endpoint,
         SystemMessage.Message.FirmwareUpdateStartResponse.value

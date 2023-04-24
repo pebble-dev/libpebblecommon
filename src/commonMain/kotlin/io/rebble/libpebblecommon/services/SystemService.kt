@@ -1,5 +1,6 @@
 package io.rebble.libpebblecommon.services
 
+import co.touchlab.kermit.Logger
 import io.rebble.libpebblecommon.PacketPriority
 import io.rebble.libpebblecommon.ProtocolHandler
 import io.rebble.libpebblecommon.packets.*
@@ -26,6 +27,7 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
         protocolHandler.registerReceiveCallback(ProtocolEndpoint.PHONE_VERSION, this::receive)
         protocolHandler.registerReceiveCallback(ProtocolEndpoint.WATCH_VERSION, this::receive)
         protocolHandler.registerReceiveCallback(ProtocolEndpoint.FCT_REG, this::receive)
+        protocolHandler.registerReceiveCallback(ProtocolEndpoint.SYSTEM_MESSAGE, this::receive)
     }
 
     /**
@@ -55,13 +57,11 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
         return SInt(StructMapper()).also { it.fromBytes(DataBuffer(modelBytes)) }.get()
     }
 
-    suspend fun firmwareUpdateStart(): UByte {
+    suspend fun firmwareUpdateStart(bytesAlreadyTransferred: UInt, bytesToSend: UInt): UByte {
         val callback = CompletableDeferred<SystemMessage.FirmwareUpdateStartResponse>()
         firmwareUpdateStartResponseCallback = callback
-        send(SystemMessage.FirmwareUpdateStart())
-
+        send(SystemMessage.FirmwareUpdateStart(bytesAlreadyTransferred, bytesToSend))
         val response = callback.await()
-
         return response.response.get()
     }
 
@@ -88,6 +88,10 @@ class SystemService(private val protocolHandler: ProtocolHandler) : ProtocolServ
                 if (res != null) {
                     send(res) // Cannot be low priority
                 }
+            }
+            is SystemMessage.FirmwareUpdateStartResponse -> {
+                firmwareUpdateStartResponseCallback?.complete(packet)
+                firmwareUpdateStartResponseCallback = null
             }
             else -> receivedMessages.trySend(packet)
         }

@@ -3,10 +3,7 @@ package io.rebble.libpebblecommon.packets
 import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
-import io.rebble.libpebblecommon.structmapper.SBytes
-import io.rebble.libpebblecommon.structmapper.SNullTerminatedString
-import io.rebble.libpebblecommon.structmapper.SUByte
-import io.rebble.libpebblecommon.structmapper.SUInt
+import io.rebble.libpebblecommon.structmapper.*
 
 sealed class PutBytesOutgoingPacket(command: PutBytesCommand) :
     PebblePacket(ProtocolEndpoint.PUT_BYTES) {
@@ -42,7 +39,7 @@ class PutBytesInit(
     val objectSize = SUInt(m, objectSize)
     val objectType = SUByte(m, objectType.value)
     val bank = SUByte(m, bank)
-    val filename = SNullTerminatedString(m, filename)
+    val filename = SOptional(m, SNullTerminatedString(StructMapper(), filename), filename.isNotEmpty())
 }
 
 /**

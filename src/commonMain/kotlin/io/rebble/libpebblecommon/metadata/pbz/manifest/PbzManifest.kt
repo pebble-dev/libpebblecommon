@@ -11,7 +11,7 @@ data class PbzManifest(
     val generatedBy: String,
     val debug: Debug,
     val firmware: PbzFirmware,
-    val resources: SystemResources,
+    val resources: SystemResources?,
     @SerialName("js_tooling")
     val jsTooling: JsTooling,
     val type: String
