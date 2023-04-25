@@ -8,11 +8,11 @@ import kotlinx.serialization.Serializable
 data class PbzManifest(
     val manifestVersion: Int,
     val generatedAt: Long,
-    val generatedBy: String,
-    val debug: Debug,
+    val generatedBy: String? = null,
+    val debug: Debug? = null,
     val firmware: PbzFirmware,
-    val resources: SystemResources?,
+    val resources: SystemResources? = null,
     @SerialName("js_tooling")
-    val jsTooling: JsTooling,
+    val jsTooling: JsTooling? = null,
     val type: String
 )

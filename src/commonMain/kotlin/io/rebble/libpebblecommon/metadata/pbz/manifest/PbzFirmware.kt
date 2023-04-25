@@ -16,5 +16,5 @@ data class PbzFirmware(
     val hwRev: WatchHardwarePlatform,
     val size: Long,
     val crc: Long,
-    val versionTag: String
+    val versionTag: String? = null
 )
