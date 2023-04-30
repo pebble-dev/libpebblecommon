@@ -232,16 +232,22 @@ abstract class PlatformFatFramework: DefaultTask() {
     abstract val platform: Property<String>
 
     @get:InputFiles
-    val inputFrameworks get(): ConfigurableFileCollection = project.objects.fileCollection()
+    val inputFrameworks = project.objects.fileCollection()
 
     @get:InputFiles
-    val inputFrameworkDSYMs get(): ConfigurableFileCollection = project.objects.fileCollection()
+    val inputFrameworkDSYMs = project.objects.fileCollection()
 
     @Internal
     val platformOutputDir: Provider<Directory> = platform.map { project.layout.buildDirectory.dir("platform-fat-framework/${it}").get() }
 
     @get:OutputDirectory
     val outputDir = project.objects.directoryProperty().convention(platformOutputDir)
+
+    @get:OutputDirectories
+    val outputFiles: Provider<Array<File>> = platformOutputDir.map {arrayOf(
+        it.asFile.toPath().resolve(inputFrameworks.files.first().name).toFile(),
+        it.asFile.toPath().resolve(inputFrameworkDSYMs.files.first().name).toFile()
+    )}
 
     private fun copyFramework() {
         val file = inputFrameworks.files.first()
@@ -252,7 +258,7 @@ abstract class PlatformFatFramework: DefaultTask() {
     }
 
     private fun copyFrameworkDSYM() {
-        val file = inputFrameworkDSYMs.files.first()
+        val file = inputFrameworkDSYMs.first()
         project.copy {
             from(file)
             into(outputDir.get().asFile.toPath().resolve(file.name))
@@ -267,7 +273,7 @@ abstract class PlatformFatFramework: DefaultTask() {
         val out = outputDir.get().asFile.toPath()
             .resolve(inputFrameworks.files.first().name+"/libpebblecommon").toString()
         project.exec {
-            commandLine ((arrayOf("lipo", "-create") + inputs) + arrayOf("-output", out))
+            commandLine ("lipo", "-create", *inputs.toTypedArray(), "-output", out)
         }
     }
 
@@ -279,7 +285,7 @@ abstract class PlatformFatFramework: DefaultTask() {
         val out = outputDir.get().asFile.toPath()
             .resolve(inputFrameworkDSYMs.files.first().name+"/Contents/Resources/DWARF/libpebblecommon").toString()
         project.exec {
-            commandLine ((arrayOf("lipo", "-create") + inputs) + arrayOf("-output", out))
+            commandLine ("lipo", "-create", *inputs.toTypedArray(), "-output", out)
         }
     }
 
