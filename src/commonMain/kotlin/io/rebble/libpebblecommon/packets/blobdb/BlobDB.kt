@@ -23,6 +23,12 @@ open class BlobCommand constructor(message: Message, token: UShort, database: Bl
         App(2u),
         Reminder(3u),
         Notification(4u),
+        Weather(5u),
+        CannedResponses(6u),
+        HealthParams(7u),
+        Contacts(8u),
+        AppConfigs(9u),
+        HealthStats(10u),
         AppGlance(11u)
     }
 
