@@ -13,13 +13,13 @@ jobs:
         with:
           java-version: 11
       - name: Cache build deps
-        uses: actions/cache@v2
+        uses: actions/cache@v4
         with:
           path: |
             ~/.gradle/wrapper
             ~/.konan/cache
             ~/.konan/dependencies
-          key: build-deps-${{ hashFiles('~/.gradle/**') }}-${{ hashFiles('~/.konan/**') }}
+          key: build-deps-${{ runner.os }}-${{ hashFiles('~/.gradle') }}-${{ hashFiles('~/.konan') }}
       
       - name: Checkout source
         uses: actions/checkout@v2
