@@ -19,7 +19,7 @@ jobs:
             ~/.gradle/wrapper
             ~/.konan/cache
             ~/.konan/dependencies
-          key: build-deps-${{ runner.os }}-${{ hashFiles('~/.gradle') }}-${{ hashFiles('~/.konan') }}
+          key: build-deps-${{ runner.os }}-${{ hashFiles('gradle/**', 'gradlew*', 'gradle.properties', '*.gradle*') }}
       
       - name: Checkout source
         uses: actions/checkout@v2
