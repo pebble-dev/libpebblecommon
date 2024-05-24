@@ -77,14 +77,6 @@ kotlin {
         }
     }
 
-    iosArm32("iosArmv7") {
-        binaries {
-            framework {
-                baseName = "libpebblecommon"
-            }
-        }
-    }
-
     iosSimulatorArm64("iosSimulatorArm64") {
         binaries {
             framework {
@@ -95,7 +87,7 @@ kotlin {
 
     val klockVersion = "2.4.13"
     val ktorVersion = "1.6.7"
-    val coroutinesVersion = "1.6.4"
+    val coroutinesVersion = "1.7.3"
     val uuidVersion = "0.4.1"
     val kotlinxSerVersion = "1.5.0"
     val kermitVersion = "2.0.0-RC4"
@@ -133,10 +125,6 @@ kotlin {
         }
 
         val iosX64Main by getting {
-            kotlin.srcDir("src/iosMain/kotlin")
-        }
-
-        val iosArmv7Main by getting {
             kotlin.srcDir("src/iosMain/kotlin")
         }
 
