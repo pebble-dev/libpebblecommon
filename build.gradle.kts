@@ -165,13 +165,11 @@ if (Os.isFamily(Os.FAMILY_MAC)) {
             Os.isFamily(Os.FAMILY_MAC)
         }
         val iosTask = (kotlin.targets.getByName("ios") as KotlinNativeTarget).binaries.getFramework("RELEASE")
-        val iosArmv7Task = (kotlin.targets.getByName("iosArmv7") as KotlinNativeTarget).binaries.getFramework("RELEASE")
         dependsOn(iosTask.linkTask)
-        dependsOn(iosArmv7Task.linkTask)
         platform.set("device")
 
-        inputFrameworks.setFrom(project.files(iosTask.outputFile, iosArmv7Task.outputFile))
-        inputFrameworkDSYMs.setFrom(project.files(iosTask.outputFile.path+".dSYM", iosArmv7Task.outputFile.path+".dSYM"))
+        inputFrameworks.setFrom(project.files(iosTask.outputFile))
+        inputFrameworkDSYMs.setFrom(project.files(iosTask.outputFile.path+".dSYM"))
     }
 
     val assembleXCFramework by tasks.registering {
