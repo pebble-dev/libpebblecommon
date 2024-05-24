@@ -2,7 +2,7 @@ package io.rebble.libpebblecommon.util
 
 import kotlinx.cinterop.*
 import platform.Foundation.*
-
+@OptIn(ExperimentalForeignApi::class)
 actual class DataBuffer {
     private val actualBuf: NSMutableData
     private var littleEndian = false
