@@ -6,7 +6,7 @@ import platform.posix.memcpy
 import platform.posix.size_t
 
 actual fun runBlocking(block: suspend () -> Unit) = kotlinx.coroutines.runBlocking{block()}
-
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 internal fun isPlatformBigEndian(): Boolean {
     memScoped {
         val i = alloc<IntVar>()
@@ -22,10 +22,12 @@ internal fun reverseOrd(varr: UInt): UInt = ((reverseOrd((varr and 0xffffu).toUS
 
 internal fun reverseOrd(varr: ULong): ULong = ((reverseOrd((varr and 0xffffffffu).toUInt()).toLong() shl 32) or (reverseOrd((varr shr 32).toUInt()).toLong() and 0xffffffff)).toULong()
 
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 fun ByteArray.toNative(): NSData = memScoped {
     NSData.create(bytes = allocArrayOf(this@toNative), length = castToNativeSize(this@toNative.size))
 }
 
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 fun KUtil.byteArrayFromNative(arr: NSData): ByteArray = ByteArray(arr.length.toInt()).apply {
     if (this.isNotEmpty()) {
         usePinned {
@@ -34,6 +36,7 @@ fun KUtil.byteArrayFromNative(arr: NSData): ByteArray = ByteArray(arr.length.toI
     }
 }
 
+@OptIn(kotlinx.cinterop.ExperimentalForeignApi::class)
 internal fun castToNativeSize(v: Int): size_t {
     @Suppress("CAST_NEVER_SUCCEEDS", "USELESS_CAST") // Depending on the platform different side of if will trigger, lets ignore
     return if (size_t.SIZE_BITS == 32) {
