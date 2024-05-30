@@ -87,7 +87,7 @@ kotlin {
 
     val klockVersion = "2.4.13"
     val ktorVersion = "1.6.7"
-    val coroutinesVersion = "1.7.3"
+    val coroutinesVersion = "1.8.0"
     val uuidVersion = "0.4.1"
     val kotlinxSerVersion = "1.5.0"
     val kermitVersion = "2.0.0-RC4"
@@ -105,11 +105,7 @@ kotlin {
             implementation(kotlin("stdlib-common"))
             implementation("com.benasher44:uuid:$uuidVersion")
             implementation("com.soywiz.korlibs.klock:klock:$klockVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion") {
-                version {
-                    strictly(coroutinesVersion)
-                }
-            }
+            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
             implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerVersion")
             implementation("co.touchlab:kermit:$kermitVersion")
         }
