@@ -7,7 +7,7 @@ import kotlinx.serialization.json.JsonDecoder
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.jsonPrimitive
 
-@Serializable
+@Serializable(StringOrBoolean.Companion::class)
 data class StringOrBoolean(val value: Boolean) {
     @Serializer(forClass = StringOrBoolean::class)
     companion object : KSerializer<StringOrBoolean> {
