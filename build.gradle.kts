@@ -196,7 +196,7 @@ if (Os.isFamily(Os.FAMILY_MAC)) {
     }
 }
 
-project.afterEvaluate {
+/*project.afterEvaluate {
     tasks.withType(PublishToMavenRepository::class.java) {
         onlyIf {
             !publication.name.contains("ios")
@@ -207,7 +207,7 @@ project.afterEvaluate {
             !name.contains("ios")
         }
     }
-}
+}*/
 
 abstract class PlatformFatFramework: DefaultTask() {
     @get:Input
