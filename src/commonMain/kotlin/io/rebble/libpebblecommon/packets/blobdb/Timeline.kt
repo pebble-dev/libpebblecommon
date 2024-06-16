@@ -12,7 +12,7 @@ class TimelineItem(
     itemId: Uuid,
     parentId: Uuid, timestamp: UInt,
     duration: UShort, type: Type,
-    flags: UShort, layout: UByte,
+    flags: UShort, layout: Layout,
     attributes: List<Attribute>,
     actions: List<Action>
 ) : StructMappable() {
@@ -23,8 +23,25 @@ class TimelineItem(
 
         companion object {
             fun fromValue(value: UByte): Type {
-                return values().firstOrNull { it.value == value }
+                return entries.firstOrNull { it.value == value }
                     ?: error("Unknown timeline item type: $value")
+            }
+        }
+    }
+
+    enum class Layout(val value: UByte) {
+        GenericPin(1u),
+        CalendarPin(2u),
+        GenericReminder(3u),
+        GenericNotification(4u),
+        CommNotification(5u),
+        WeatherPin(6u),
+        SportsPin(7u);
+
+        companion object {
+            fun fromValue(value: UByte): Layout {
+                return entries.firstOrNull { it.value == value }
+                    ?: error("Unknown timeline item layout: $value")
             }
         }
     }
@@ -52,7 +69,7 @@ class TimelineItem(
      */
     val flags = SUShort(m, flags, endianness = '<')
 
-    val layout = SUByte(m, layout)
+    val layout = SUByte(m, layout.value)
     val dataLength = SUShort(m, endianness = '<')
     val attrCount = SUByte(m, attributes.size.toUByte())
     val actionCount = SUByte(m, actions.size.toUByte())
