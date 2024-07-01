@@ -77,7 +77,7 @@ open class PushNotification(subject: String, sender: String? = null, message: St
             0u,
             TimelineItem.Type.Notification,
             0u,
-            0x01u,
+            TimelineItem.Layout.GenericPin,
             attributes,
             actions
         )
