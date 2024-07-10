@@ -6,6 +6,7 @@ import com.benasher44.uuid.uuidOf
 import com.soywiz.klock.DateTime
 import io.rebble.libpebblecommon.structmapper.SUInt
 import io.rebble.libpebblecommon.structmapper.StructMapper
+import io.rebble.libpebblecommon.util.TimelineAttributeFactory
 import kotlin.random.Random
 
 private val notifsUUID = uuidFrom("B2CAE818-10F8-46DF-AD2B-98AD2254A3C1")
@@ -24,37 +25,20 @@ enum class NotificationSource(val id: UInt) { //TODO: There's likely more... (pr
 open class PushNotification(subject: String, sender: String? = null, message: String? = null, source: NotificationSource = NotificationSource.Generic, backgroundColor: UByte? = null): BlobCommand.InsertCommand(Random.nextInt(0, UShort.MAX_VALUE.toInt()).toUShort(),
     BlobDatabase.Notification, ubyteArrayOf(), ubyteArrayOf()) {
     init {
-        val iconID = SUInt(StructMapper(), source.id or 0x80000000u).toBytes() //TODO: Work out why GB masks this, and why that makes it work
         val itemID = uuid4()
 
         //TODO: Replies, open on phone, detect dismiss
         val attributes = mutableListOf(
-            TimelineItem.Attribute(
-                TimelineItem.Attribute.Timeline.Sender.id,
-                sender?.encodeToByteArray()?.toUByteArray() ?: ubyteArrayOf()
-            ),
-            TimelineItem.Attribute(
-                TimelineItem.Attribute.Timeline.Icon.id,
-                iconID,
-                contentEndianness = '<'
-            )
+            TimelineAttributeFactory.sender(sender ?: ""),
+            TimelineAttributeFactory.icon(TimelineIcon.fromId(source.id))
         )
-        if (message != null) attributes += TimelineItem.Attribute(
-            TimelineItem.Attribute.Timeline.Message.id,
-            message.encodeToByteArray().toUByteArray()
-        )
-        attributes += TimelineItem.Attribute(
-            TimelineItem.Attribute.Timeline.Subject.id,
-            subject.encodeToByteArray().toUByteArray()
-        )
+        if (message != null) attributes += TimelineAttributeFactory.body(message)
+        attributes += TimelineAttributeFactory.subtitle(subject)
 
         if (backgroundColor != null) {
             // XXX: https://youtrack.jetbrains.com/issue/KT-49366
             val bgColTemp = backgroundColor.toUByte()
-            attributes += TimelineItem.Attribute(
-                TimelineItem.Attribute.Timeline.BackgroundCol.id,
-                ubyteArrayOf(bgColTemp)
-            )
+            attributes += TimelineAttributeFactory.primaryColor(bgColTemp)
         }
 
         val actions = mutableListOf(

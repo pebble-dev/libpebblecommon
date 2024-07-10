@@ -34,15 +34,15 @@ object TimelineAttributeFactory {
         return createAttribute(type.id, content)
     }
 
-    fun title(text: String, ellipsis: Boolean = true): TimelineItem.Attribute {
+    fun title(text: String): TimelineItem.Attribute {
         return createTextAttribute(TimelineAttribute.Title, text)
     }
 
-    fun subtitle(text: String, ellipsis: Boolean = true): TimelineItem.Attribute {
+    fun subtitle(text: String): TimelineItem.Attribute {
         return createTextAttribute(TimelineAttribute.Subtitle, text)
     }
 
-    fun body(text: String, ellipsis: Boolean = true): TimelineItem.Attribute {
+    fun body(text: String): TimelineItem.Attribute {
         return createTextAttribute(TimelineAttribute.Body, text)
     }
 
@@ -150,15 +150,27 @@ object TimelineAttributeFactory {
     }
 
     fun foregroundColor(color: PebbleColor): TimelineItem.Attribute {
-        return createUIntAttribute(TimelineAttribute.ForegroundColor, color.toProtocolNumber())
+        return createUByteAttribute(TimelineAttribute.ForegroundColor, color.toProtocolNumber())
+    }
+
+    fun foregroundColor(rawPebbleColor: UByte): TimelineItem.Attribute {
+        return createUByteAttribute(TimelineAttribute.ForegroundColor, rawPebbleColor)
     }
 
     fun primaryColor(color: PebbleColor): TimelineItem.Attribute {
-        return createUIntAttribute(TimelineAttribute.PrimaryColor, color.toProtocolNumber())
+        return createUByteAttribute(TimelineAttribute.PrimaryColor, color.toProtocolNumber())
+    }
+
+    fun primaryColor(rawPebbleColor: UByte): TimelineItem.Attribute {
+        return createUByteAttribute(TimelineAttribute.PrimaryColor, rawPebbleColor)
     }
 
     fun secondaryColor(color: PebbleColor): TimelineItem.Attribute {
-        return createUIntAttribute(TimelineAttribute.SecondaryColor, color.toProtocolNumber())
+        return createUByteAttribute(TimelineAttribute.SecondaryColor, color.toProtocolNumber())
+    }
+
+    fun secondaryColor(rawPebbleColor: UInt): TimelineItem.Attribute {
+        return createUIntAttribute(TimelineAttribute.SecondaryColor, rawPebbleColor)
     }
 
     fun displayRecurring(recurring: Boolean): TimelineItem.Attribute {
