@@ -122,14 +122,6 @@ class TimelineItem(
     }
 
     class Attribute() : StructMappable() {
-        enum class Timeline(val id: UByte) {
-            Sender(0x01u),
-            Subject(0x02u),
-            Message(0x03u),
-            Icon(0x04u),
-            BackgroundCol(0x1Cu)
-        }
-
         val attributeId = SUByte(m)
         val length = SUShort(m, endianness = '<')
         val content = SBytes(m, 0)
@@ -234,6 +226,43 @@ open class TimelineAction(message: Message) : PebblePacket(endpoint) {
     companion object {
         val endpoint = ProtocolEndpoint.TIMELINE_ACTIONS
     }
+}
+
+enum class TimelineAttribute(val id: UByte, val maxLength: Int = -1) {
+    Title(0x01u, 64),
+    Subtitle(0x02u, 64),
+    Body(0x03u, 512),
+    TinyIcon(0x04u),
+    SmallIcon(0x05u),
+    LargeIcon(0x06u),
+    ANCSAction(0x07u),
+    CannedResponse(0x08u, 512),
+    ShortTitle(0x09u, 64),
+    LocationName(0x0Bu, 64),
+    Sender(0x0Cu, 64),
+    LaunchCode(0x0Du),
+    LastUpdated(0x0Eu),
+    RankAway(0x0Fu),
+    RankHome(0x10u),
+    NameAway(0x11u),
+    NameHome(0x12u),
+    RecordAway(0x13u),
+    RecordHome(0x14u),
+    ScoreAway(0x15u),
+    ScoreHome(0x16u),
+    SportsGameState(0x17u),
+    Broadcaster(0x18u),
+    Headings(0x19u, 128),
+    Paragraphs(0x1Au, 1024),
+    ForegroundColor(0x1Bu),
+    PrimaryColor(0x1Cu),
+    SecondaryColor(0x1Du),
+    DisplayRecurring(0x1Fu),
+    ShortSubtitle(0x24u),
+    Timestamp(0x25u),
+    DisplayTime(0x26u),
+    SubtitleTemplateString(0x2Fu, 150),
+    Icon(0x30u),
 }
 
 fun timelinePacketsRegister() {

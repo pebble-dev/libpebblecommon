@@ -38,7 +38,7 @@ enum class ProtocolEndpoint(val value: UShort) {
     INVALID_ENDPOINT(0xffffu);
 
     companion object {
-        private val values = values()
+        private val values = entries.toTypedArray()
         fun getByValue(value: UShort) = values.firstOrNull { it.value == value }
             ?: INVALID_ENDPOINT.also {
                 Logger.e {
