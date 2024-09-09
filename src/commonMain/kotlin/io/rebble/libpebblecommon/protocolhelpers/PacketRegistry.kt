@@ -29,6 +29,7 @@ object PacketRegistry {
         screenshotPacketsRegister()
         appLogPacketsRegister()
         phoneControlPacketsRegister()
+        logDumpPacketsRegister()
     }
 
     /**
