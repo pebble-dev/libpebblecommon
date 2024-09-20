@@ -6,6 +6,7 @@ import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.SBytes
 import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SUShort
+import io.rebble.libpebblecommon.util.Endian
 
 open class BlobCommand constructor(message: Message, token: UShort, database: BlobDatabase) :
     PebblePacket(
@@ -46,7 +47,7 @@ open class BlobCommand constructor(message: Message, token: UShort, database: Bl
     ) {
         val keySize = SUByte(m, key.size.toUByte())
         val targetKey = SBytes(m, key.size, key)
-        val valSize = SUShort(m, value.size.toUShort(), endianness = '<')
+        val valSize = SUShort(m, value.size.toUShort(), endianness = Endian.Little)
         val targetValue = SBytes(m, value.size, value)
     }
 

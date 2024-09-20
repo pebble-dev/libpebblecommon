@@ -6,28 +6,30 @@ import com.benasher44.uuid.uuidOf
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.exceptions.PacketEncodeException
 import io.rebble.libpebblecommon.util.DataBuffer
+import io.rebble.libpebblecommon.util.Endian
+
 
 /**
  * Represents anything mappable to a struct via a StructMapper
  */
-interface Mappable {
+abstract class Mappable(val endianness: Endian = Endian.Unspecified) {
     /**
      * Serializes/packs the mappable to its raw equivalent
      * @return The serialized mappable
      */
-    fun toBytes(): UByteArray
+    abstract fun toBytes(): UByteArray
 
     /**
      * Deserializes/unpacks raw data into the mappable
      * This will increment the seek position on the DataBuffer
      * @param bytes the data to read, seek position is incremented
      */
-    fun fromBytes(bytes: DataBuffer)
+    abstract fun fromBytes(bytes: DataBuffer)
 
     /**
      * The projected size in bytes of the raw data returned by [toBytes]
      */
-    val size: Int
+    abstract val size: Int
 }
 
 interface NumberStructElement {
@@ -44,8 +46,9 @@ open class StructElement<T>(
     mapper: StructMapper,
     size: Int,
     default: T,
-    endianness: Char = '|'
-) : Mappable { //TODO: Element-level endianness on deserialization
+    endianness: Endian = Endian.Unspecified
+) : Mappable(endianness) {
+
     override var size = size
         get() {
             return linkedSize?.valueNumber?.toInt() ?: field
@@ -59,7 +62,6 @@ open class StructElement<T>(
 
     private val mapIndex = mapper.register(this)
     private var value: T = default
-    var isLittleEndian = endianness == '<'
 
     fun get(): T {
         return value
@@ -74,18 +76,14 @@ open class StructElement<T>(
         if (size < 0) throw PacketDecodeException("Invalid StructElement size: $size")
         else if (size == 0) return ubyteArrayOf()
         val buf = DataBuffer(size)
-        buf.setEndian(if (isLittleEndian) '<' else '>')
+        buf.setEndian(endianness)
         putType(buf, this)
         return buf.array()
     }
 
     override fun fromBytes(bytes: DataBuffer) {
-        bytes.setEndian(if (isLittleEndian) '<' else '>')
+        bytes.setEndian(endianness)
         getType(bytes, this)
-    }
-
-    fun setEndiannes(endianness: Char) {
-        isLittleEndian = endianness == '<'
     }
 
     /**
@@ -98,7 +96,7 @@ open class StructElement<T>(
 
     override fun toString(): String {
         return "StructElement(size=$size, linkedSize=${linkedSize?.valueNumber}, " +
-                "value=$value, isLittleEndian=$isLittleEndian)"
+                "value=$value)"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -141,7 +139,7 @@ class SByte(mapper: StructMapper, default: Byte = 0) :
         get() = get().toLong()
 }
 
-class SUInt(mapper: StructMapper, default: UInt = 0u, endianness: Char = '|') :
+class SUInt(mapper: StructMapper, default: UInt = 0u, endianness: Endian = Endian.Unspecified) :
     StructElement<UInt>(
         { buf, el -> buf.putUInt(el.get()) },
         { buf, el -> el.set(buf.getUInt()) },
@@ -154,7 +152,7 @@ class SUInt(mapper: StructMapper, default: UInt = 0u, endianness: Char = '|') :
         get() = get().toLong()
 }
 
-class SInt(mapper: StructMapper, default: Int = 0, endianness: Char = '|') :
+class SInt(mapper: StructMapper, default: Int = 0, endianness: Endian = Endian.Unspecified) :
     StructElement<Int>(
         { buf, el -> buf.putInt(el.get()) },
         { buf, el -> el.set(buf.getInt()) },
@@ -179,7 +177,7 @@ class SULong(mapper: StructMapper, default: ULong = 0u) :
         get() = get().toLong()
 }
 
-class SUShort(mapper: StructMapper, default: UShort = 0u, endianness: Char = '|') :
+class SUShort(mapper: StructMapper, default: UShort = 0u, endianness: Endian = Endian.Unspecified) :
     StructElement<UShort>(
         { buf, el -> buf.putUShort(el.get()) },
         { buf, el -> el.set(buf.getUShort()) },
@@ -192,7 +190,7 @@ class SUShort(mapper: StructMapper, default: UShort = 0u, endianness: Char = '|'
         get() = get().toLong()
 }
 
-class SShort(mapper: StructMapper, default: Short = 0, endianness: Char = '|') :
+class SShort(mapper: StructMapper, default: Short = 0, endianness: Endian = Endian.Unspecified) :
     StructElement<Short>(
         { buf, el -> buf.putShort(el.get()) },
         { buf, el -> el.set(buf.getShort()) },
@@ -295,7 +293,7 @@ class SBytes(
     mapper: StructMapper,
     length: Int = -1,
     default: UByteArray = ubyteArrayOf(),
-    endianness: Char = '|'
+    endianness: Endian = Endian.Unspecified
 ) :
     StructElement<UByteArray>(
         { buf, el ->
@@ -306,12 +304,12 @@ class SBytes(
                 } else if (el.size != -1 && mValue.size < length) {
                     mValue += UByteArray(length - el.size)// Pad if too short
                 }
-                buf.putBytes(if (el.isLittleEndian) mValue.reversedArray() else mValue)
+                buf.putBytes(if (el.endianness == Endian.Little) mValue.reversedArray() else mValue)
             }
         },
         { buf, el ->
             val value = buf.getBytes(el.size)
-            el.set(if (el.isLittleEndian) value.reversedArray() else value)
+            el.set(if (el.endianness == Endian.Little) value.reversedArray() else value)
         },
         mapper, length, default, endianness
     ) {
@@ -340,7 +338,7 @@ class SBytes(
  */
 class SUnboundBytes(
     mapper: StructMapper,
-    endianness: Char = '|'
+    endianness: Endian = Endian.Unspecified
 ) : StructElement<UByteArray>(
     { buf, el ->
         throw UnsupportedOperationException("SUnboundBytes is read-only")
@@ -348,7 +346,7 @@ class SUnboundBytes(
     { buf, el ->
         val leftBytes = buf.length - buf.readPosition
         val value = buf.getBytes(leftBytes)
-        el.set(if (el.isLittleEndian) value.reversedArray() else value)
+        el.set(if (el.endianness == Endian.Little) value.reversedArray() else value)
     },
     mapper, 0, ubyteArrayOf(), endianness
 ) {
@@ -379,7 +377,7 @@ class SFixedList<T : Mappable>(
     default: List<T> = emptyList(),
     private val itemFactory: () -> T
 ) :
-    Mappable {
+    Mappable(Endian.Unspecified) {
 
     var count = count
         set(value) {
@@ -445,8 +443,9 @@ class SFixedList<T : Mappable>(
 class SOptional<T>(
     mapper: StructMapper,
     val value: StructElement<T>,
-    var present: Boolean
-) : Mappable {
+    var present: Boolean,
+    endianness: Endian = Endian.Unspecified
+) : Mappable(endianness) {
     init {
         mapper.register(this)
     }

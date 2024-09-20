@@ -33,7 +33,7 @@ expect class DataBuffer {
 
     fun array(): UByteArray
 
-    fun setEndian(endian: Char)
+    fun setEndian(endian: Endian)
 
     fun rewind()
 

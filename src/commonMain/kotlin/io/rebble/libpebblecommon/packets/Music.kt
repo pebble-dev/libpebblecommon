@@ -4,6 +4,7 @@ import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
+import io.rebble.libpebblecommon.util.Endian
 
 open class MusicControl(val message: Message) : PebblePacket(ProtocolEndpoint.MUSIC_CONTROL) {
     val command = SUByte(m, message.value)
@@ -43,17 +44,17 @@ open class MusicControl(val message: Message) : PebblePacket(ProtocolEndpoint.MU
         val title = SString(m, title)
         val trackLength = SOptional(
             m,
-            SUInt(StructMapper(), trackLength?.toUInt() ?: 0u, '<'),
+            SUInt(StructMapper(), trackLength?.toUInt() ?: 0u, Endian.Little),
             trackLength != null
         )
         val trackCount = SOptional(
             m,
-            SUInt(StructMapper(), trackCount?.toUInt() ?: 0u, '<'),
+            SUInt(StructMapper(), trackCount?.toUInt() ?: 0u, Endian.Little),
             trackCount != null
         )
         val currentTrack = SOptional(
             m,
-            SUInt(StructMapper(), currentTrack?.toUInt() ?: 0u, '<'),
+            SUInt(StructMapper(), currentTrack?.toUInt() ?: 0u, Endian.Little),
             currentTrack != null
         )
     }
@@ -72,8 +73,8 @@ open class MusicControl(val message: Message) : PebblePacket(ProtocolEndpoint.MU
         repeat: RepeatState = RepeatState.Unknown
     ) : MusicControl(Message.UpdatePlayStateInfo) {
         val state = SUByte(m, playbackState.value)
-        val trackPosition = SUInt(m, trackPosition, '<')
-        val playRate = SUInt(m, playRate, '<')
+        val trackPosition = SUInt(m, trackPosition, Endian.Little)
+        val playRate = SUInt(m, playRate, Endian.Little)
         val shuffle = SUByte(m, shuffle.value)
         val repeat = SUByte(m, repeat.value)
     }

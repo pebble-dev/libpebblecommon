@@ -1,9 +1,10 @@
 package io.rebble.libpebblecommon.structmapper
 
 import io.rebble.libpebblecommon.util.DataBuffer
+import io.rebble.libpebblecommon.util.Endian
 
-abstract class StructMappable : Mappable {
-    val m = StructMapper()
+abstract class StructMappable(endianness: Endian = Endian.Unspecified) : Mappable(endianness) {
+    val m = StructMapper(endianness = endianness)
 
     override fun toBytes(): UByteArray {
         return m.toBytes()

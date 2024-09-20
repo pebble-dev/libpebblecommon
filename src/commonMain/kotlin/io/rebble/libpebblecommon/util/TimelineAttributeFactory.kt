@@ -9,7 +9,7 @@ import io.rebble.libpebblecommon.structmapper.StructMapper
 import kotlin.math.round
 
 object TimelineAttributeFactory {
-    private fun createAttribute(attributeId: UByte, content: UByteArray, contentEndianness: Char = '|'): TimelineItem.Attribute {
+    private fun createAttribute(attributeId: UByte, content: UByteArray, contentEndianness: Endian = Endian.Unspecified): TimelineItem.Attribute {
         return TimelineItem.Attribute(attributeId, content, contentEndianness)
     }
 
@@ -30,7 +30,7 @@ object TimelineAttributeFactory {
     }
 
     private fun createUIntAttribute(type: TimelineAttribute, value: UInt): TimelineItem.Attribute {
-        val content = SUInt(StructMapper(), value, '<').toBytes()
+        val content = SUInt(StructMapper(), value, Endian.Little).toBytes()
         return createAttribute(type.id, content)
     }
 

@@ -16,7 +16,7 @@ class Crc32Calculator {
 
         val mergedArray = leftoverBytes + bytes
         val buffer = DataBuffer(mergedArray)
-        buffer.setEndian('<')
+        buffer.setEndian(Endian.Little)
 
         val finalPosition = mergedArray.size - mergedArray.size % 4
         while (buffer.readPosition < finalPosition) {
@@ -36,7 +36,7 @@ class Crc32Calculator {
 
         if (leftoverBytes.isNotEmpty()) {
             leftoverBytes = leftoverBytes.padZerosLeft(4 - leftoverBytes.size).reversedArray()
-            addInt(DataBuffer(leftoverBytes).apply { setEndian('<') }.getUInt())
+            addInt(DataBuffer(leftoverBytes).apply { setEndian(Endian.Little) }.getUInt())
         }
 
         finalized = true

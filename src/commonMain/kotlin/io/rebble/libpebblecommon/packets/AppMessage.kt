@@ -6,6 +6,7 @@ import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
 import io.rebble.libpebblecommon.util.DataBuffer
+import io.rebble.libpebblecommon.util.Endian
 
 
 class AppMessageTuple() : StructMappable() {
@@ -22,9 +23,9 @@ class AppMessageTuple() : StructMappable() {
         }
     }
 
-    val key = SUInt(m, endianness = '<')
+    val key = SUInt(m, endianness = Endian.Little)
     val type = SUByte(m)
-    val dataLength = SUShort(m, endianness = '<')
+    val dataLength = SUShort(m, endianness = Endian.Little)
     val data = SBytes(m, 0)
 
     init {
@@ -46,8 +47,8 @@ class AppMessageTuple() : StructMappable() {
         get() {
             val obj = when (val size = dataLength.get().toInt()) {
                 1 -> SByte(StructMapper())
-                2 -> SShort(StructMapper(), endianness = '<')
-                4 -> SInt(StructMapper(), endianness = '<')
+                2 -> SShort(StructMapper(), endianness = Endian.Little)
+                4 -> SInt(StructMapper(), endianness = Endian.Little)
                 else -> error("Size not supported: $size")
             }
             return obj.apply {
@@ -59,8 +60,8 @@ class AppMessageTuple() : StructMappable() {
         get() {
             val obj = when (val size = dataLength.get().toInt()) {
                 1 -> SUByte(StructMapper())
-                2 -> SUShort(StructMapper(), endianness = '<')
-                4 -> SUInt(StructMapper(), endianness = '<')
+                2 -> SUShort(StructMapper(), endianness = Endian.Little)
+                4 -> SUInt(StructMapper(), endianness = Endian.Little)
                 else -> error("Size not supported: $size")
             }
             return obj.apply {
@@ -146,7 +147,7 @@ class AppMessageTuple() : StructMappable() {
             this.key.set(key)
             this.type.set(Type.Int.value)
 
-            val bytes = SShort(StructMapper(), data, endianness = '<').toBytes()
+            val bytes = SShort(StructMapper(), data, endianness = Endian.Little).toBytes()
             this.dataLength.set(bytes.size.toUShort())
             this.data.set(bytes)
         }
@@ -158,7 +159,7 @@ class AppMessageTuple() : StructMappable() {
             this.key.set(key)
             this.type.set(Type.UInt.value)
 
-            val bytes = SUShort(StructMapper(), data, endianness = '<').toBytes()
+            val bytes = SUShort(StructMapper(), data, endianness = Endian.Little).toBytes()
             this.dataLength.set(bytes.size.toUShort())
             this.data.set(bytes)
         }
@@ -170,7 +171,7 @@ class AppMessageTuple() : StructMappable() {
             this.key.set(key)
             this.type.set(Type.Int.value)
 
-            val bytes = SInt(StructMapper(), data, endianness = '<').toBytes()
+            val bytes = SInt(StructMapper(), data, endianness = Endian.Little).toBytes()
             this.dataLength.set(bytes.size.toUShort())
             this.data.set(bytes)
         }
@@ -182,7 +183,7 @@ class AppMessageTuple() : StructMappable() {
             this.key.set(key)
             this.type.set(Type.UInt.value)
 
-            val bytes = SUInt(StructMapper(), data, endianness = '<').toBytes()
+            val bytes = SUInt(StructMapper(), data, endianness = Endian.Little).toBytes()
             this.dataLength.set(bytes.size.toUShort())
             this.data.set(bytes)
         }

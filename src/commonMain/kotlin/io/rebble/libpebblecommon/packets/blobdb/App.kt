@@ -1,6 +1,7 @@
 package io.rebble.libpebblecommon.packets.blobdb
 
 import io.rebble.libpebblecommon.structmapper.*
+import io.rebble.libpebblecommon.util.Endian
 
 /**
  * Data of the APP BlobDB Entry
@@ -14,12 +15,12 @@ class AppMetadata() : StructMappable() {
     /**
      * App install flags.
      */
-    val flags: SUInt = SUInt(m)
+    val flags: SUInt = SUInt(m, endianness = Endian.Little)
 
     /**
      * Resource ID of the primary icon.
      */
-    val icon: SUInt = SUInt(m)
+    val icon: SUInt = SUInt(m, endianness = Endian.Little)
 
     /**
      * Major app version.

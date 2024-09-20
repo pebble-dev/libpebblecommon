@@ -8,6 +8,7 @@ import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SUShort
 import io.rebble.libpebblecommon.util.Bitmap
 import io.rebble.libpebblecommon.util.DataBuffer
+import io.rebble.libpebblecommon.util.Endian
 
 class AppCustomizationSetStockAppTitleMessage(
     appType: AppType,
@@ -23,21 +24,21 @@ class AppCustomizationSetStockAppIconMessage(
 ) : PebblePacket(ProtocolEndpoint.APP_CUSTOMIZE) {
     // First bit being set signifies that this is icon packet instead of name packet
     val appType = SUByte(m, appType.value or 0b10000000u)
-    val bytesPerLine = SUShort(m, endianness = '<')
+    val bytesPerLine = SUShort(m, endianness = Endian.Little)
 
     /**
      * No idea what flags are possible. Stock app always sends 4096 here.
      */
-    val flags = SUShort(m, 4096u, endianness = '<')
+    val flags = SUShort(m, 4096u, endianness = Endian.Little)
 
     /**
      * Offset is not supported by app. Always 0.
      */
-    val originY = SUShort(m, 0u, endianness = '<')
-    val originX = SUShort(m, 0u, endianness = '<')
+    val originY = SUShort(m, 0u, endianness = Endian.Little)
+    val originX = SUShort(m, 0u, endianness = Endian.Little)
 
-    val width = SUShort(m, endianness = '<')
-    val height = SUShort(m, endianness = '<')
+    val width = SUShort(m, endianness = Endian.Little)
+    val height = SUShort(m, endianness = Endian.Little)
 
     val imageData = SBytes(m)
 

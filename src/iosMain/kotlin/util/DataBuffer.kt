@@ -126,8 +126,8 @@ actual class DataBuffer {
 
     actual fun array(): UByteArray = getBytes(actualBuf.length.toInt())
 
-    actual fun setEndian(endian: Char) {
-        littleEndian = endian == '<'
+    actual fun setEndian(endian: Endian) {
+        littleEndian = endian == Endian.Little
     }
 
     actual fun putUInt(uint: UInt) {

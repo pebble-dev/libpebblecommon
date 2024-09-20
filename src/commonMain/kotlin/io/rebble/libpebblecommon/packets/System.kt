@@ -9,6 +9,7 @@ import io.rebble.libpebblecommon.protocolhelpers.PacketRegistry
 import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
+import io.rebble.libpebblecommon.util.Endian
 
 sealed class SystemPacket(endpoint: ProtocolEndpoint) : PebblePacket(endpoint)
 
@@ -410,8 +411,8 @@ open class SystemMessage(message: Message) : SystemPacket(endpoint) {
 
     class NewFirmwareAvailable: SystemMessage(Message.NewFirmwareAvailable)
     class FirmwareUpdateStart(bytesAlreadyTransferred: UInt, bytesToSend: UInt): SystemMessage(Message.FirmwareUpdateStart) {
-        val bytesAlreadyTransferred = SUInt(m, bytesAlreadyTransferred, endianness = '<')
-        val bytesToSend = SUInt(m, bytesToSend, endianness = '<')
+        val bytesAlreadyTransferred = SUInt(m, bytesAlreadyTransferred, endianness = Endian.Little)
+        val bytesToSend = SUInt(m, bytesToSend, endianness = Endian.Little)
     }
     class FirmwareUpdateComplete: SystemMessage(Message.FirmwareUpdateComplete)
     class FirmwareUpdateFailed: SystemMessage(Message.FirmwareUpdateFailed)

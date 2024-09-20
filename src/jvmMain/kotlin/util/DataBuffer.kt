@@ -63,10 +63,11 @@ actual class DataBuffer {
 
     actual fun array(): UByteArray = actualBuf.array().toUByteArray()
 
-    actual fun setEndian(endian: Char) {
+    actual fun setEndian(endian: Endian) {
         when (endian) {
-            '>' -> actualBuf.order(ByteOrder.BIG_ENDIAN)
-            '<' -> actualBuf.order(ByteOrder.LITTLE_ENDIAN)
+            Endian.Big -> actualBuf.order(ByteOrder.BIG_ENDIAN)
+            Endian.Little -> actualBuf.order(ByteOrder.LITTLE_ENDIAN)
+            Endian.Unspecified -> {actualBuf.order(ByteOrder.BIG_ENDIAN)}
         }
     }
 

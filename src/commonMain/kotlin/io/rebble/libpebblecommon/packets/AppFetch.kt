@@ -6,6 +6,7 @@ import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.SUByte
 import io.rebble.libpebblecommon.structmapper.SUInt
 import io.rebble.libpebblecommon.structmapper.SUUID
+import io.rebble.libpebblecommon.util.Endian
 
 sealed class AppFetchIncomingPacket() : PebblePacket(ProtocolEndpoint.APP_FETCH) {
     /**
@@ -38,7 +39,7 @@ class AppFetchRequest : AppFetchIncomingPacket() {
     /**
      * ID of the app bank. Use in the [PutBytesAppInit] packet to identify this app install.
      */
-    val appId = SUInt(m, endianness = '<')
+    val appId = SUInt(m, endianness = Endian.Little)
 }
 
 /**

@@ -7,6 +7,7 @@ import io.rebble.libpebblecommon.protocolhelpers.PebblePacket
 import io.rebble.libpebblecommon.protocolhelpers.ProtocolEndpoint
 import io.rebble.libpebblecommon.structmapper.*
 import io.rebble.libpebblecommon.util.DataBuffer
+import io.rebble.libpebblecommon.util.Endian
 
 class TimelineItem(
     itemId: Uuid,
@@ -52,12 +53,12 @@ class TimelineItem(
     /**
      * Timeline pin timestamp in unix time
      */
-    val timestamp = SUInt(m, timestamp, endianness = '<')
+    val timestamp = SUInt(m, timestamp, endianness = Endian.Little)
 
     /**
      * Duration of the pin in minutes
      */
-    val duration = SUShort(m, duration, endianness = '<')
+    val duration = SUShort(m, duration, endianness = Endian.Little)
 
     /**
      * Serialization of [Type]. Use [Type.value].
@@ -67,10 +68,10 @@ class TimelineItem(
     /**
      * Serialization of [Flag] entries. Use [Flag.makeFlags].
      */
-    val flags = SUShort(m, flags, endianness = '<')
+    val flags = SUShort(m, flags, endianness = Endian.Little)
 
     val layout = SUByte(m, layout.value)
-    val dataLength = SUShort(m, endianness = '<')
+    val dataLength = SUShort(m, endianness = Endian.Little)
     val attrCount = SUByte(m, attributes.size.toUByte())
     val actionCount = SUByte(m, actions.size.toUByte())
     val attributes =
@@ -87,7 +88,7 @@ class TimelineItem(
         dataLength.set((this.attributes.toBytes().size + this.actions.toBytes().size).toUShort())
     }
 
-    class Action(actionID: UByte, type: Type, attributes: List<Attribute>) : Mappable {
+    class Action(actionID: UByte, type: Type, attributes: List<Attribute>) : Mappable() {
         val m = StructMapper()
 
         enum class Type(val value: UByte) {
@@ -121,22 +122,21 @@ class TimelineItem(
             get() = m.size
     }
 
-    class Attribute() : StructMappable() {
+    class Attribute(contentEndianness: Endian = Endian.Unspecified) : StructMappable() {
         val attributeId = SUByte(m)
-        val length = SUShort(m, endianness = '<')
-        val content = SBytes(m, 0)
+        val length = SUShort(m, endianness = Endian.Little)
+        val content = SBytes(m, 0, endianness = contentEndianness)
 
         constructor(
             attributeId: UByte,
             content: UByteArray,
-            contentEndianness: Char = '|'
-        ) : this() {
+            contentEndianness: Endian = Endian.Unspecified
+        ) : this(contentEndianness) {
             this.attributeId.set(attributeId)
 
             this.length.set(content.size.toUShort())
 
             this.content.set(content)
-            this.content.setEndiannes(contentEndianness)
         }
 
         init {

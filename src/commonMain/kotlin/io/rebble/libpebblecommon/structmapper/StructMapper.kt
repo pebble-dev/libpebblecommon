@@ -2,11 +2,12 @@ package io.rebble.libpebblecommon.structmapper
 
 import io.rebble.libpebblecommon.exceptions.PacketDecodeException
 import io.rebble.libpebblecommon.util.DataBuffer
+import io.rebble.libpebblecommon.util.Endian
 
 /**
  * Maps class properties to a struct equivalent
  */
-class StructMapper: Mappable {
+class StructMapper(endianness: Endian = Endian.Unspecified): Mappable(endianness) {
     private var struct: MutableList<Mappable> = mutableListOf()
 
     /**
