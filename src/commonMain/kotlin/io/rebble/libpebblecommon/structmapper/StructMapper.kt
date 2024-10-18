@@ -7,7 +7,7 @@ import io.rebble.libpebblecommon.util.Endian
 /**
  * Maps class properties to a struct equivalent
  */
-class StructMapper(endianness: Endian = Endian.Unspecified): Mappable(endianness) {
+class StructMapper(endianness: Endian = Endian.Unspecified, private val debugTag: String? = null): Mappable(endianness) {
     private var struct: MutableList<Mappable> = mutableListOf()
 
     /**
@@ -40,7 +40,7 @@ class StructMapper(endianness: Endian = Endian.Unspecified): Mappable(endianness
             try {
                 mappable.fromBytes(bytes)
             }catch (e: Exception) {
-                throw PacketDecodeException("Unable to deserialize mappable ${mappable::class.simpleName} at index $i (${mappable})", e)
+                throw PacketDecodeException("Unable to deserialize mappable ${mappable::class.simpleName} at index $i (${mappable}) ($debugTag)\n${bytes.array().toHexString()}", e)
             }
 
         }

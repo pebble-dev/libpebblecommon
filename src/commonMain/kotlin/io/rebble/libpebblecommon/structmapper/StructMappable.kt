@@ -4,7 +4,7 @@ import io.rebble.libpebblecommon.util.DataBuffer
 import io.rebble.libpebblecommon.util.Endian
 
 abstract class StructMappable(endianness: Endian = Endian.Unspecified) : Mappable(endianness) {
-    val m = StructMapper(endianness = endianness)
+    val m = StructMapper(endianness = endianness, debugTag = this::class.simpleName)
 
     override fun toBytes(): UByteArray {
         return m.toBytes()

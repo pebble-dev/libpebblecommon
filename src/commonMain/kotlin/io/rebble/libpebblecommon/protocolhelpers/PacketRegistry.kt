@@ -30,6 +30,8 @@ object PacketRegistry {
         appLogPacketsRegister()
         phoneControlPacketsRegister()
         logDumpPacketsRegister()
+        voicePacketsRegister()
+        audioStreamPacketsRegister()
     }
 
     /**
