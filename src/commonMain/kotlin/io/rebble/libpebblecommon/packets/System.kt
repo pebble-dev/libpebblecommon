@@ -337,6 +337,7 @@ enum class ProtocolCapsFlag(val value: Int) {
     SupportsLocalization(4),
     Supports8kAppMessage(5),
     SupportsHealthInsights(6),
+    SupportsAppDictation(7),
     SupportsSendTextApp(8),
     SupportsUnreadCoreDump(10),
     SupportsWeatherApp(11),
