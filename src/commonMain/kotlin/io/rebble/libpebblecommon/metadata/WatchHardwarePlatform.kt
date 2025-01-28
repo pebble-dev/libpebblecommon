@@ -15,7 +15,7 @@ enum class WatchHardwarePlatform(val protocolNumber: UByte, val watchType: Watch
     PEBBLE_ONE_EV_2_3(3u, WatchType.APLITE, "ev2_3"),
     PEBBLE_ONE_EV_2_4(4u, WatchType.APLITE, "ev2_4"),
     PEBBLE_ONE_POINT_FIVE(5u, WatchType.APLITE, "v1_5"),
-    PEBBLE_ONE_POINT_ZERO(6u, WatchType.APLITE, "v2_0"),
+    PEBBLE_TWO_POINT_ZERO(6u, WatchType.APLITE, "v2_0"),
     PEBBLE_SNOWY_EVT_2(7u, WatchType.BASALT, "snowy_evt2"),
     PEBBLE_SNOWY_DVT(8u, WatchType.BASALT, "snowy_dvt"),
     PEBBLE_BOBBY_SMILES(10u, WatchType.BASALT, "snowy_s3"),
