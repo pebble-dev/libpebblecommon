@@ -34,6 +34,10 @@ object TimelineAttributeFactory {
         return createAttribute(type.id, content)
     }
 
+    fun bannerTitle(text: String): TimelineItem.Attribute {
+        return createTextAttribute(TimelineAttribute.BannerTitle, text);
+    }
+
     fun title(text: String): TimelineItem.Attribute {
         return createTextAttribute(TimelineAttribute.Title, text)
     }

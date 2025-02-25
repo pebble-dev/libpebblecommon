@@ -263,6 +263,7 @@ enum class TimelineAttribute(val id: UByte, val maxLength: Int = -1) {
     DisplayTime(0x26u),
     SubtitleTemplateString(0x2Fu, 150),
     Icon(0x30u),
+    BannerTitle(0x31u, 64),
 }
 
 fun timelinePacketsRegister() {
