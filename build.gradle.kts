@@ -39,7 +39,7 @@ publishing {
 android {
     namespace = project.group.toString()
     compileSdk = 33
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    namespace = "io.rebble.libpebblecommon"
     defaultConfig {
         minSdk = 21
         targetSdk = compileSdk
