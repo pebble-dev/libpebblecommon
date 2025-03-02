@@ -7,11 +7,13 @@ coroutine = "1.8.0"
 uuid = "0.4.1"
 serialization = "1.5.0"
 kermit = "2.0.0-RC4"
+publish = "0.30.0"
 
 [plugins]
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
+publish = { id = "com.vanniktech.maven.publish", version.ref = "publish"}
 
 [libraries]
 uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
