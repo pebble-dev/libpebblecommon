@@ -1,4 +1,3 @@
-import com.android.build.gradle.internal.cxx.configure.gradleLocalProperties
 import org.apache.tools.ant.taskdefs.condition.Os
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 
@@ -10,17 +9,12 @@ allprojects {
     }
 }
 
-buildscript {
-    dependencies {
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.10")
-    }
-}
 
 plugins {
-    id("org.jetbrains.kotlin.multiplatform")
+    alias(libs.plugins.kotlin.multiplatform)
     `maven-publish`
-    id("org.jetbrains.kotlin.plugin.serialization")
-    id("com.android.library")
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.android.library)
 }
 
 publishing {
@@ -84,14 +78,7 @@ kotlin {
             }
         }
     }
-
-    val klockVersion = "2.4.13"
-    val ktorVersion = "1.6.7"
-    val coroutinesVersion = "1.8.0"
-    val uuidVersion = "0.4.1"
-    val kotlinxSerVersion = "1.5.0"
-    val kermitVersion = "2.0.0-RC4"
-
+    
     sourceSets {
         all {
             languageSettings {
@@ -102,16 +89,15 @@ kotlin {
             }
         }
         sourceSets["commonMain"].dependencies {
-            implementation(kotlin("stdlib-common"))
-            implementation("com.benasher44:uuid:$uuidVersion")
-            implementation("com.soywiz.korlibs.klock:klock:$klockVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutinesVersion")
-            implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerVersion")
-            implementation("co.touchlab:kermit:$kermitVersion")
+            implementation(libs.uuid)
+            implementation(libs.klock)
+            implementation(libs.coroutines)
+            implementation(libs.serialization)
+            implementation(libs.kermit)
         }
 
         sourceSets["commonTest"].dependencies {
-            implementation(kotlin("test"))
+            implementation(libs.kotlin.test)
         }
 
         sourceSets["androidMain"].dependencies {
@@ -132,11 +118,11 @@ kotlin {
         }
 
         sourceSets["jvmTest"].dependencies {
-            implementation(kotlin("test"))
-            implementation(kotlin("test-junit"))
-            implementation("io.ktor:ktor-client-websockets:$ktorVersion")
-            implementation("io.ktor:ktor-client-cio:$ktorVersion")
-            implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+            implementation(libs.kotlin.test)
+            implementation(libs.kotlin.test.junit)
+            implementation(libs.ktor.websockets)
+            implementation(libs.ktor.cio)
+            implementation(libs.ktor.okhttp)
         }
     }
 }

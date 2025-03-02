@@ -1,0 +1,27 @@
+[versions]
+agp = "8.1.4"
+kotlin = "2.0.0"
+klock = "2.4.13"
+ktor = "1.6.7"
+coroutine = "1.8.0"
+uuid = "0.4.1"
+serialization = "1.5.0"
+kermit = "2.0.0-RC4"
+
+[plugins]
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+android-library = { id = "com.android.library", version.ref = "agp" }
+
+[libraries]
+uuid = { module = "com.benasher44:uuid", version.ref = "uuid" }
+klock = { module = "com.soywiz.korlibs.klock:klock", version.ref = "klock" }
+coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutine" }
+serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
+kermit = { module = "co.touchlab:kermit", version.ref = "kermit" }
+ktor-websockets = { module = "io.ktor:ktor-client-websockets", version.ref = "ktor" }
+ktor-cio = { module = "io.ktor:ktor-client-cio", version.ref = "ktor" }
+ktor-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
+
