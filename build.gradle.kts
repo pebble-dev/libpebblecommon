@@ -1,5 +1,7 @@
 import org.apache.tools.ant.taskdefs.condition.Os
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 allprojects {
     repositories {
@@ -12,22 +14,9 @@ allprojects {
 
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
-    `maven-publish`
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.android.library)
-}
-
-publishing {
-    repositories {
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/pebble-dev/libpebblecommon")
-            credentials {
-                username = System.getenv("GITHUB_ACTOR")
-                password = System.getenv("GITHUB_TOKEN")
-            }
-        }
-    }
+    alias(libs.plugins.publish)
 }
 
 android {
@@ -43,13 +32,11 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
-
-    kotlin {
-        jvmToolchain(11)
-    }
 }
 
 kotlin {
+    jvmToolchain(17)
+    
     android {
         publishLibraryVariants("release", "debug")
     }
@@ -127,6 +114,13 @@ kotlin {
     }
 }
 
+tasks.withType<KotlinCompile>().configureEach {
+    compilerOptions {
+        jvmTarget = JvmTarget.JVM_11
+    }
+}
+
+
 if (Os.isFamily(Os.FAMILY_MAC)) {
     val iosSimulatorFatFramework by tasks.registering(PlatformFatFramework::class) {
         onlyIf {
@@ -153,47 +147,8 @@ if (Os.isFamily(Os.FAMILY_MAC)) {
         inputFrameworks.setFrom(project.files(iosTask.outputFile))
         inputFrameworkDSYMs.setFrom(project.files(iosTask.outputFile.path+".dSYM"))
     }
-
-    val assembleXCFramework by tasks.registering {
-        onlyIf {
-            org.apache.tools.ant.taskdefs.condition.Os.isFamily(org.apache.tools.ant.taskdefs.condition.Os.FAMILY_MAC)
-        }
-        val deviceTask = tasks.getByName("iosDeviceFatFramework")
-        val simulatorTask = tasks.getByName("iosSimulatorFatFramework")
-        dependsOn(deviceTask)
-        dependsOn(simulatorTask)
-        outputs.dir(layout.buildDirectory.dir("xcframework")).withPropertyName("outputDir")
-
-        val outputPath = layout.buildDirectory.dir("xcframework").get().asFile.path + "/libpebblecommon.xcframework"
-
-        doLast {
-            delete(outputPath)
-            exec {
-                commandLine (
-                    "xcodebuild", "-create-xcframework",
-                    "-framework", deviceTask.outputs.files.first { it.name == "libpebblecommon.framework" }.path,
-                    "-debug-symbols", deviceTask.outputs.files.first { it.name == "libpebblecommon.framework.dSYM" }.path,
-                    "-framework", simulatorTask.outputs.files.first { it.name == "libpebblecommon.framework" }.path,
-                    "-debug-symbols", simulatorTask.outputs.files.first { it.name == "libpebblecommon.framework.dSYM" }.path,
-                    "-output", outputPath
-                )
-            }
-        }
-    }
 }
 
-/*project.afterEvaluate {
-    tasks.withType(PublishToMavenRepository::class.java) {
-        onlyIf {
-            !publication.name.contains("ios")
-        }
-    }
-    tasks.withType(Jar::class.java) {
-        onlyIf {
-            !name.contains("ios")
-        }
-    }
-}*/
 
 abstract class PlatformFatFramework: DefaultTask() {
     @get:Input

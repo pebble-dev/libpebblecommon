@@ -5,65 +5,6 @@ on:
     types: [published]
 
 jobs:
-  publish-swift:
-    runs-on: macos-latest
-    steps:
-      - name: Setup JDK
-        uses: actions/setup-java@v1.4.4
-        with:
-          java-version: 17
-      - name: Checkout source
-        uses: actions/checkout@v4
-      - name: Cache build deps
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/wrapper
-            ~/.konan/cache
-            ~/.konan/dependencies
-          key: build-deps-${{ runner.os }}-${{ hashFiles('gradle/**', 'gradlew*', 'gradle.properties', '*.gradle*') }}
-      
-      - name: Build XCFrameworks
-        run: ./gradlew assembleXCFramework
-
-      - name: Zip XCFramework
-        uses: vimtor/action-zip@v1
-        with:
-          files: build/xcframework/
-          dest: build/xcframework.zip
-
-      - name: Add release artifacts
-        id: release_artifacts
-        uses: softprops/action-gh-release@15d2aaca23625e5b2744248f7b68fc1e6bbff48e
-        with:
-          tag_name: ${{ github.event.release.tag_name }}
-          files: |
-            build/xcframework.zip
-
-      - name: Calculate checksums for XCFrameworks
-        run: |
-          cp Package.swift.template Package.swift
-          echo RELEASE_CHECKSUM=$(swift package compute-checksum build/xcframework.zip) >> $GITHUB_ENV
-        
-      - name: Checkout master
-        uses: actions/checkout@v2
-        with:
-          ref: 'master'
-
-      - name: Update swift package
-        run: |
-          sed -e 's|RELEASE-URL|${{ github.server_url }}/${{ github.repository }}/releases/download/${{ github.event.release.tag_name }}/xcframework.zip|;w Package.swift.tmp' Package.swift.template
-          sed -e 's/RELEASE-CHECKSUM/${{ env.RELEASE_CHECKSUM }}/;w Package.swift' Package.swift.tmp
-
-      - name: Commit swift package
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add Package.swift
-          git commit -m "[CI] Update swift package"
-          git tag swiftpm-${{ github.event.release.tag_name }}
-          git push origin swiftpm-${{ github.event.release.tag_name }}
-
   publish-maven:
     runs-on: macos-latest
 
